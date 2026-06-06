@@ -40,7 +40,7 @@ def build_context_packet(
             "name": provider.name,
             "mode": provider.mode.value,
             "uses_cloud": provider.uses_cloud,
-            "data_type": "synthetic",
+            "data_type": getattr(provider, "data_type", "synthetic"),
         },
         active_scenario=concept.concept_id,
         prohibited_assumptions=PROHIBITED_ASSUMPTIONS,

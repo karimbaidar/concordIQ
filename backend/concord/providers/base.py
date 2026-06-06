@@ -1,13 +1,10 @@
 """Typed contracts shared by every semantic grounding provider."""
 
-from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
 from typing import Any, Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
-from concord.config import Settings
 
 
 class ProviderMode(StrEnum):
@@ -162,20 +159,3 @@ class GroundingProvider(Protocol):
 
     def get_authority_rules(self, concept_id: str) -> list[AuthorityRule]:
         """Return configured authority rules without inferring missing ownership."""
-
-
-@dataclass(slots=True)
-class CloudProviderScaffold:
-    """Fail-closed base for cloud adapters implemented in Phase P5."""
-
-    settings: Settings = field(default_factory=Settings)
-    name: str = "CloudProvider"
-    mode: ProviderMode = ProviderMode.LOCAL
-    uses_cloud: bool = True
-
-    def require_ready(self) -> None:
-        """Verify cloud opt-in, then report that the adapter is not configured."""
-        self.settings.require_cloud_access(self.name)
-        raise ProviderNotConfigured(
-            f"{self.name} is an architecture scaffold; no endpoint is configured."
-        )

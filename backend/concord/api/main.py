@@ -9,7 +9,7 @@ from sqlalchemy import Engine
 from concord.api.routes import router
 from concord.config import Settings
 from concord.orchestration.runner import ReconciliationRunner
-from concord.providers import GroundingProvider, LocalProvider
+from concord.providers import GroundingProvider, create_provider
 from concord.storage.db import create_database_engine
 from concord.storage.repositories import ReconciliationRepository
 
@@ -22,7 +22,7 @@ def create_app(
 ) -> FastAPI:
     """Create an app using local, cloud-disabled defaults unless injected."""
     active_settings = settings or Settings()
-    active_provider = provider or LocalProvider(duckdb_path=active_settings.duckdb_path)
+    active_provider = provider or create_provider(active_settings)
     active_engine = engine or create_database_engine(active_settings)
     repository = ReconciliationRepository(active_engine)
     runner = ReconciliationRunner(

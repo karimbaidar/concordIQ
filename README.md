@@ -6,7 +6,7 @@
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Phase_P4-demo_ready-brightgreen)](#implementation-status)
+[![Status](https://img.shields.io/badge/Status-P5_capture_blocked-orange)](#implementation-status)
 [![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
@@ -21,13 +21,14 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-This repository is being built in tested phases. **Phase P4 is the current public
-state:** all three synthetic scenarios run end to end through the typed state
-machine, deterministic agents, skeptical verifier, PostgreSQL evidence store,
-API, headless demo, and reviewer-facing React workbench.
+The deterministic product runs all three synthetic scenarios end to end through
+the typed state machine, specialist agents, skeptical verifier, PostgreSQL
+evidence store, API, headless demo, and React reviewer workbench.
 
-Working Microsoft IQ adapters and sanitized IQ capture remain incomplete. Their
-package boundaries and roadmap stay visible without overstating what works.
+Phase P5 adds guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, a
+provider status endpoint, and product documentation. This workspace had no
+configured Microsoft tenant, so the required real IQ smoke capture remains
+blocked. No sanitized artifact or successful Microsoft IQ call is claimed.
 
 ## Why it matters
 
@@ -94,9 +95,9 @@ make lint
 make test
 ```
 
-The suite covers seed determinism, provider contracts, conflict and equivalence
-verdicts, authority-driven refusal, evidence persistence, cloud guards, context
-scope, the demo, and the API.
+The suite covers seed determinism, provider and replay contracts, conflict and
+equivalence verdicts, authority-driven refusal, evidence persistence, cloud
+budgets, capture sanitization, context scope, the demo, and the API.
 
 ### Run all three scenarios headlessly
 
@@ -198,16 +199,18 @@ The grounding layer keeps four modes explicit:
 | Provider | Role | Current status |
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
-| `ReplayProvider` | Replays sanitized responses captured from a real Microsoft IQ smoke test | Identity and committed artifact path present; loading starts in P5 |
-| `FoundryIQProvider` | Microsoft IQ fallback adapter | Fail-closed scaffold only |
-| `FabricIQProvider` | Target ontology and grounding adapter | Fail-closed scaffold only |
+| `ReplayProvider` | Replays a reviewed real-IQ capture through the same typed contract | Implemented; refuses missing or unverified artifacts |
+| `FoundryIQProvider` | Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
+| `FabricIQProvider` | Fabric IQ ontology MCP | Guarded MCP adapter and injected-transport tests complete; tenant smoke test pending |
 
 `LocalProvider` is the reproducibility scaffold. It is not presented as Microsoft
-IQ and does not satisfy the final IQ-integration goal by itself. Later work must
-verify current APIs and tenant access, perform a tiny manually enabled smoke test,
-sanitize the response, and commit only the synthetic replay artifact.
+IQ and does not satisfy the final IQ-integration goal by itself. The cloud adapters
+never fall back to it silently.
 
-No successful Microsoft IQ call or sanitized capture is claimed in P1.
+The real-integration gate requires a tiny manually enabled smoke test, ignored raw
+response, reviewed sanitized copy, and successful `ReplayProvider` run. See
+[IQ integration](docs/iq-integration.md) and
+[replay artifact policy](artifacts/replay/README.md).
 
 ## Cloud and cost safety
 
@@ -220,9 +223,9 @@ MAX_CLOUD_CALLS=0
 LLM_PROVIDER=disabled
 ```
 
-`FabricIQProvider` and `FoundryIQProvider` fail closed unless both explicit cloud
-permission and a positive call budget are configured. Automated tests must not call
-Microsoft services.
+`FabricIQProvider` and `FoundryIQProvider` fail closed unless explicit cloud
+permission, a positive call budget, endpoint, and authentication are configured.
+Automated tests use injected transports and never call Microsoft services.
 
 **Do not assume Foundry, Fabric, or IQ usage is free or unlimited. Verify current
 Microsoft pricing, trial limits, tenant settings, and permissions before enabling
@@ -233,6 +236,10 @@ for demo rehearsal.**
 Raw provider responses belong in `artifacts/replay/raw/` and are ignored. Only a
 reviewed, synthetic-only, secret-free response may be placed in
 `artifacts/replay/sanitized/`.
+
+Manual capture is available through `make capture`; configuration and review steps
+are documented in [cost controls](docs/cost-controls.md). No verified capture is
+currently committed.
 
 ## Reliability principles
 
@@ -249,16 +256,8 @@ reviewed, synthetic-only, secret-free response may be placed in
 
 ## Optional local LLM
 
-Concord IQ will run its core reconciliation without any LLM. A later optional mode
-can use Ollama for narrative generation:
-
-```bash
-ollama pull qwen3:8b
-LLM_PROVIDER=ollama OLLAMA_MODEL=qwen3:8b make dev
-```
-
-The LLM never replaces evidence, SQL execution, or authority rules. It only turns
-verified findings into clearer explanations.
+The core runs with `LLM_PROVIDER=disabled`. A future optional Ollama mode may
+narrate verified findings, but it cannot replace evidence, SQL, or authority rules.
 
 ## Synthetic data contract
 
@@ -284,6 +283,7 @@ frontend/           React/Vite reviewer workbench
 data/synthetic/    committed synthetic CSV fixtures
 tests/             deterministic acceptance tests
 docs/assets/       honest graphic placeholders
+docs/*.md           architecture, integration, demo, safety, submission
 artifacts/replay/
   raw/             ignored captures
   sanitized/       committed reviewed replays
@@ -295,7 +295,7 @@ files.
 
 ## Evaluation
 
-P4 preserves the deterministic credibility core and adds the reviewer interface:
+Current acceptance status:
 
 | Phase | Acceptance focus |
 | --- | --- |
@@ -304,7 +304,7 @@ P4 preserves the deterministic credibility core and adds the reviewer interface:
 | P2 | Active Customer conflict, impact rank, evidence, cloud guard |
 | P3 | Net Revenue decoy, Churned Customer refusal, headless demo — complete |
 | P4 | Reviewer-facing demo interface and reasoning timeline — complete |
-| P5 | Verified IQ adapters, sanitized replay, provider contract |
+| P5 | Adapters, guards, replay contract, capture command, docs — real capture blocked |
 
 ## Hackathon alignment
 
@@ -312,10 +312,9 @@ P4 preserves the deterministic credibility core and adds the reviewer interface:
 binding inspection, data execution, impact ranking, authority resolution, proposal
 or refusal, verification, and audit.
 
-**Best Use of IQ Tools:** Fabric IQ is intended as the target semantic source of
-truth, with Foundry IQ as the fallback. The ontology is meant to be load-bearing,
-not a decorative data source. That claim becomes valid only after a real adapter
-smoke test and sanitized replay exist.
+**Best Use of IQ Tools:** Fabric IQ is the target ontology surface, with an Azure
+AI Search knowledge base as the Foundry path. The integration claim becomes
+complete only after a real adapter smoke test and sanitized replay exist.
 
 **Reliability and safety:** The system is designed to reject false conflicts, refuse
 unsupported governance choices, preserve evidence, and keep cloud access opt-in.
@@ -327,7 +326,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P2: Active Customer reasoning engine and persisted evidence
 - [x] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [x] P4: demo-first React interface
-- [ ] P5: verified Foundry IQ and Fabric IQ adapters, capture, replay, docs
+- [ ] P5: adapters, capture/replay, docs; real IQ capture still required
 - [ ] P6: optional Ollama narration
 
 ## Limitations
@@ -337,6 +336,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - The data is synthetic and intentionally engineered for known evaluation cases.
 - Behavioral equivalence is proven only over the bound data and period being tested.
 - Microsoft IQ preview surfaces, pricing, permissions, and availability can change.
+- The guarded adapters are not tenant-verified in this workspace.
 - No production-readiness claim is made.
 
 ## AI-assisted development

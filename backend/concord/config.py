@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,17 @@ class Settings(BaseSettings):
     ollama_model: str = "qwen3:8b"
     database_url: str = "postgresql+psycopg://concord:concord-local-only@localhost:5432/concord_iq"
     duckdb_path: Path = Path("data/concord_iq.duckdb")
+    replay_artifact_path: Path = Path("artifacts/replay/sanitized/latest.json")
+    replay_require_verified_capture: bool = True
+    capture_raw_dir: Path = Path("artifacts/replay/raw")
+    capture_sanitized_path: Path = Path("artifacts/replay/sanitized/latest.json")
+    foundry_iq_endpoint: str | None = None
+    foundry_iq_knowledge_base: str | None = None
+    foundry_iq_api_version: str = "2026-04-01"
+    foundry_iq_access_token: SecretStr | None = None
+    foundry_iq_api_key: SecretStr | None = None
+    fabric_iq_mcp_endpoint: str | None = None
+    fabric_iq_access_token: SecretStr | None = None
 
     def require_cloud_access(self, provider_name: str) -> None:
         """Fail closed unless cloud access and a positive call budget are explicit."""

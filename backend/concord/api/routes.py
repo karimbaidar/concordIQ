@@ -6,6 +6,7 @@ from concord.agents.coordinator import UnsupportedScenario
 from concord.demo import DEMO_SCENARIOS, get_demo_scenario
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
+from concord.providers import provider_statuses
 
 router = APIRouter()
 
@@ -21,8 +22,14 @@ def health(request: Request) -> dict[str, object]:
         "status": "ok",
         "provider": runner.provider.name,
         "cloud_enabled": runner.settings.allow_cloud,
-        "data_type": "synthetic",
+        "data_type": getattr(runner.provider, "data_type", "synthetic"),
     }
+
+
+@router.get("/providers")
+def providers(request: Request) -> list[dict[str, object]]:
+    """Expose readiness without probing any cloud endpoint."""
+    return provider_statuses(_runner(request).settings)
 
 
 @router.post("/reconcile", response_model=ReconciliationCase)

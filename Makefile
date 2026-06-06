@@ -40,8 +40,7 @@ demo: postgres seed
 	$(PYTHON) -m concord.demo
 
 capture:
-	@echo "Cloud capture remains disabled and requires explicit ALLOW_CLOUD=true in Phase P5."
-	@exit 1
+	$(PYTHON) -m concord.capture
 
 clean:
 	rm -f data/concord_iq.duckdb
