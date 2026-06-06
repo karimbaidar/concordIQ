@@ -7,7 +7,7 @@ from concord.config import Settings
 from concord.llm import create_llm_provider
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
-from concord.providers import LocalProvider
+from concord.providers import create_provider
 from concord.storage.db import create_database_engine
 from concord.storage.repositories import ReconciliationRepository
 
@@ -91,7 +91,7 @@ def main() -> None:
     repository = ReconciliationRepository(engine)
     repository.initialize()
     runner = ReconciliationRunner(
-        provider=LocalProvider(duckdb_path=settings.duckdb_path),
+        provider=create_provider(settings),
         repository=repository,
         settings=settings,
         llm_provider=create_llm_provider(settings),

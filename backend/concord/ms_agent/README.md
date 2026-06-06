@@ -35,6 +35,28 @@ or a JSON object:
 
 No cloud provider silently falls back to local data.
 
+## Fabric grounding workflow
+
+Prepare and inspect the deterministic seed package without cloud access:
+
+```bash
+make fabric-bootstrap-dry-run
+```
+
+After current pricing, tenant permissions, and preview API availability are
+verified, bootstrap the tiny Fabric resources and capture the three scenarios:
+
+```bash
+ALLOW_CLOUD=true make fabric-bootstrap
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
+make replay-check
+```
+
+The bootstrap never writes `.env` or prints access tokens. Fabric capture needs
+six requests because MCP initialization and tool discovery precede the three
+scenario calls. A sanitized artifact is not considered verified until
+`make replay-check` passes and runs the cloud-free replay demo.
+
 ## Foundry Agent Service scaffold
 
 Install the optional preview hosting packages:

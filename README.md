@@ -27,12 +27,11 @@ tools. The workflow can be deployed through Foundry Agent Service. Fabric IQ is
 the primary semantic grounding provider, with Foundry IQ as fallback and
 LocalProvider for reproducible public review.
 
-Phase P5 adds guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, a
-provider status endpoint, and product documentation. This workspace had no
-configured Microsoft tenant, so the required real IQ smoke capture remains
-blocked. No sanitized artifact or successful Microsoft IQ call is claimed.
-P6 optional local narration and the Agent Framework integration are implemented
-without weakening that limitation.
+Guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, Fabric bootstrap
+helpers, optional local narration, and the Agent Framework integration are
+implemented. This workspace had no configured Microsoft tenant, so the required
+real IQ smoke capture remains open. No sanitized artifact or successful Microsoft
+IQ call is claimed.
 
 ## Why it matters
 
@@ -126,6 +125,41 @@ make dev
 Open `http://127.0.0.1:5173` for the UI or `http://127.0.0.1:8000/docs` for
 the API. The workbench exposes provider safety, definitions, impact, the full
 reasoning timeline, verifier status, governed outcome, and exact SQL evidence.
+
+### Bootstrap Fabric and prove replay
+
+Start with a cloud-free plan and regenerate the committed synthetic seed package:
+
+```bash
+make fabric-bootstrap-dry-run
+```
+
+After verifying current pricing, capacity, tenant permissions, and preview API
+availability, copy `.env.example` to a local `.env`, authenticate with a
+short-lived `FABRIC_IQ_ACCESS_TOKEN` or `az login`, and opt in:
+
+```bash
+ALLOW_CLOUD=true make fabric-bootstrap
+```
+
+The bootstrap creates or reuses the named workspace, lakehouse, and ontology
+where supported, attempts the preview ontology definition import, and prints IDs
+plus the ontology MCP endpoint for manual `.env` entry. It never writes `.env` or
+prints the token. If preview import fails, the created resources are preserved and
+the command prints a Fabric UI fallback using `fabric_seed/`.
+
+Once the ontology is published and the MCP endpoint and fresh token are configured:
+
+```bash
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
+make replay-check
+```
+
+Fabric capture uses three MCP setup calls and one semantic request for each of the
+three scenarios. `make replay-check` rejects shallow connectivity captures,
+unverified provenance, missing semantic evidence, missing scenarios, and obvious
+secrets before running the full demo through `ReplayProvider` with cloud disabled.
+A passing replay check is the gate for claiming verified Microsoft IQ retrieval.
 
 ## Architecture
 
@@ -272,9 +306,9 @@ Raw provider responses belong in `artifacts/replay/raw/` and are ignored. Only a
 reviewed, synthetic-only, secret-free response may be placed in
 `artifacts/replay/sanitized/`.
 
-Manual capture is available through `make capture`; configuration and review steps
-are documented in [cost controls](docs/cost-controls.md). No verified capture is
-currently committed.
+The complete bootstrap, capture, and replay workflow is documented in
+[IQ integration](docs/iq-integration.md) and
+[cost controls](docs/cost-controls.md). No verified capture is currently committed.
 
 ## Reliability principles
 
@@ -325,6 +359,7 @@ backend/concord/
   storage/         SQLAlchemy registry models
 frontend/           React/Vite reviewer workbench
 data/synthetic/    committed synthetic CSV fixtures
+fabric_seed/       LocalProvider exports for tiny manual Fabric setup
 tests/             deterministic acceptance tests
 docs/assets/       honest graphic placeholders
 docs/*.md           architecture, integration, demo, safety, submission
@@ -359,9 +394,11 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P2: Active Customer reasoning engine and persisted evidence
 - [x] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [x] P4: demo-first React interface
-- [ ] P5: adapters, capture/replay, docs; real IQ capture still required
+- [x] P5: guarded adapters, capture/replay, and integration docs
 - [x] P6: optional Ollama narration, advisory verifier critique, audit explanation
 - [x] Microsoft Agent Framework orchestration and Foundry Agent Service scaffold
+- [x] Fabric bootstrap dry run, synthetic seed package, and strict replay check
+- [ ] Real tenant capture and reviewed sanitized replay
 
 ## Limitations
 

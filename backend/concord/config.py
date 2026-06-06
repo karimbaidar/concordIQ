@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     foundry_iq_api_key: SecretStr | None = None
     fabric_iq_mcp_endpoint: str | None = None
     fabric_iq_access_token: SecretStr | None = None
+    fabric_workspace_name: str = "ConcordIQHackathon"
+    fabric_lakehouse_name: str = "ConcordIQLakehouse"
+    fabric_ontology_name: str = "ConcordIQOntology"
+    fabric_capacity_id: str | None = None
+    fabric_workspace_id: str | None = None
+    fabric_lakehouse_id: str | None = None
+    fabric_ontology_id: str | None = None
 
     def require_cloud_access(self, provider_name: str) -> None:
         """Fail closed unless cloud access and a positive call budget are explicit."""

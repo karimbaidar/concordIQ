@@ -14,6 +14,7 @@ _planning/
 # Environment and Python
 .env
 .env.*
+!.env.example
 .venv/
 __pycache__/
 *.pyc
@@ -25,6 +26,7 @@ dist/
 
 # JavaScript
 node_modules/
+.DS_Store
 
 # Local databases and services
 .duckdb

@@ -14,6 +14,15 @@ Open `http://127.0.0.1:5173`. Confirm the provider badge says
 Run `make agent-smoke` once to show the same deterministic case through Microsoft
 Agent Framework.
 
+For a verified IQ demo, also run:
+
+```bash
+make replay-check
+```
+
+This must pass against `artifacts/replay/sanitized/latest.json`. If it does not,
+use the local demo and state that the tenant capture gate remains open.
+
 ## 0:00–0:35 — The problem
 
 Say: “Enterprises created a single source of truth for data, but not for
@@ -63,7 +72,7 @@ Open `GET /providers` in the API docs. Explain:
 - Fabric IQ is the primary semantic grounding provider.
 - Foundry IQ is the fallback knowledge provider.
 - Local is reproducibility mode.
-- Replay is for a sanitized real-IQ capture.
+- Replay is for a sanitized real-IQ capture that passes `make replay-check`.
 - Cloud remains off until an operator explicitly enables a budget.
 
 Do not claim a real IQ smoke test until the sanitized artifact is present.

@@ -2,7 +2,8 @@ UV ?= uv
 PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
-.PHONY: setup postgres seed test lint dev frontend demo agent-smoke capture clean
+.PHONY: setup postgres seed test lint dev frontend demo agent-smoke capture \
+	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
 
 setup:
 	$(UV) sync --extra dev
@@ -48,6 +49,16 @@ agent-smoke: postgres seed
 
 capture:
 	$(PYTHON) -m concord.capture
+
+fabric-bootstrap-dry-run:
+	$(PYTHON) -m concord.fabric_bootstrap --dry-run
+
+fabric-bootstrap:
+	$(PYTHON) -m concord.fabric_bootstrap
+
+replay-check:
+	$(PYTHON) -m concord.replay_check
+	PROVIDER=replay ALLOW_CLOUD=false MAX_CLOUD_CALLS=0 $(MAKE) demo
 
 clean:
 	rm -f data/concord_iq.duckdb

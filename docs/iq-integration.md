@@ -61,6 +61,43 @@ FABRIC_IQ_ACCESS_TOKEN=<short-lived-token>
 Secrets are represented as Pydantic secret values and are never included in
 provider status output, replay metadata, or logs.
 
+## Fabric bootstrap
+
+Concord IQ has one guarded workflow from deterministic local data to a verified
+cloud replay:
+
+```bash
+make fabric-bootstrap-dry-run
+ALLOW_CLOUD=true make fabric-bootstrap
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
+make replay-check
+```
+
+`make fabric-bootstrap-dry-run` makes no Microsoft call. It regenerates
+`fabric_seed/` from `LocalProvider`, the fixed synthetic DuckDB seed, and the
+typed replay schema. The package contains all three scenario snapshots, a
+human-readable ontology seed, metric definitions, authority rules, and a
+non-secret bootstrap report.
+
+`make fabric-bootstrap` refuses unless `ALLOW_CLOUD=true`. It reads `.env`, uses
+`FABRIC_IQ_ACCESS_TOKEN` or the current Azure CLI login, and creates or reuses the
+configured Fabric workspace, lakehouse, and ontology through public APIs where
+available. The command never writes `.env` and never prints the token. It prints
+resource IDs and the ontology MCP endpoint for the operator to paste into `.env`.
+
+Ontology definition import is a preview surface. If the import fails, Concord IQ
+preserves the created resources, records the failure in
+`fabric_seed/bootstrap-report.md`, and prints the manual Fabric UI steps. Upload
+or paste the generated seed artifacts into the tiny lakehouse/ontology setup,
+publish the ontology, and then run capture.
+
+Fabric capture requires six budgeted MCP requests: initialize, initialized
+notification, tool discovery, and one scenario request for Active Customer, Net
+Revenue, and Churned Customer. `make replay-check` validates real-IQ provenance,
+scenario completeness, ontology and definition evidence, executed evaluations,
+authority rules, and secret hygiene. It then runs the demo with
+`PROVIDER=replay`, `ALLOW_CLOUD=false`, and `MAX_CLOUD_CALLS=0`.
+
 ## Foundry Agent Service
 
 `concord.ms_agent.foundry_hosted_entrypoint` wraps the typed Microsoft Agent

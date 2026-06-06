@@ -15,23 +15,37 @@ cloud endpoints from health checks, provider status, tests, or page load.
 
 > Do not assume Foundry, Fabric, or IQ usage is free or unlimited. Verify current Microsoft pricing, trial limits, tenant settings, and permissions before enabling cloud mode. Keep datasets tiny, use cloud only for smoke tests, pause or delete idle resources, and replay sanitized captured responses through ReplayProvider for demo rehearsal.
 
-## Manual capture
+## Fabric bootstrap, capture, and replay
 
-Use a dedicated synthetic-only resource. Configure exactly one cloud provider,
-set a budget, then run:
+Use a dedicated synthetic-only resource. First inspect the plan without network
+access:
+
+```bash
+make fabric-bootstrap-dry-run
+```
+
+After verifying capacity, permissions, pricing, and preview API availability,
+authenticate with a short-lived token or Azure CLI and opt in:
+
+```bash
+ALLOW_CLOUD=true make fabric-bootstrap
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
+make replay-check
+```
+
+Fabric capture uses initialization, initialized notification, and tool discovery
+before the three scenario calls. The six-request budget is intentionally small.
+Foundry IQ remains the fallback and uses one retrieve request per scenario:
 
 ```bash
 PROVIDER=foundry_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=3 make capture
+make replay-check
 ```
-
-Foundry capture uses one retrieve request per scenario. Fabric MCP capture needs
-initialization, the initialized notification, and tool discovery before scenario
-calls, so budget for at least six requests and confirm the actual behavior in the
-target tenant.
 
 The command writes exact responses to `artifacts/replay/raw/`, which is ignored.
 It then validates typed synthetic snapshots and writes a sanitized candidate to
 `artifacts/replay/sanitized/latest.json`. Review that file before staging it.
+`make replay-check` must pass before the artifact is presented as verified.
 
 ## Operational hygiene
 

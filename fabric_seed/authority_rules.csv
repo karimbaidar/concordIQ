@@ -1,0 +1,8 @@
+scenario_id,term,concept_id,semantic_dimension,status,owner,rationale
+active-customer,Active Customer,active_customer,revenue-recognition,clear,Finance,Finance governs recognized revenue policy.
+active-customer,Active Customer,active_customer,pipeline-status,clear,Sales,Sales governs opportunity stage semantics.
+active-customer,Active Customer,active_customer,qualifying-usage,clear,Customer Success,Customer Success governs qualifying adoption signals.
+active-customer,Active Customer,active_customer,canonical-active-customer,clear,Data Governance Council,The council owns the cross-domain board metric and can approve a canonical composition.
+net-revenue,Net Revenue,net_revenue,revenue-recognition,clear,Finance,Finance governs recognized revenue.
+churned-customer,Churned Customer,churned_customer,churn-effective-date,shared,,Finance and Customer Success use the date for different governed processes.
+churned-customer,Churned Customer,churned_customer,grace-period,ambiguous,,No approved enterprise owner or precedence rule exists.
