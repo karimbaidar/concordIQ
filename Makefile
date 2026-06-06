@@ -25,9 +25,8 @@ lint:
 dev:
 	$(PYTHON) -m uvicorn concord.api.main:app --reload
 
-demo:
-	@echo "The headless reconciliation demo is scheduled for Phase P3."
-	@exit 1
+demo: postgres seed
+	$(PYTHON) -m concord.demo
 
 capture:
 	@echo "Cloud capture is disabled in P0 and will require explicit ALLOW_CLOUD=true in Phase P5."

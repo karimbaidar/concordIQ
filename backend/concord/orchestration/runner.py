@@ -1,4 +1,4 @@
-"""Coordinator for the P2 Active Customer reconciliation slice."""
+"""Coordinator for deterministic semantic reconciliation scenarios."""
 
 from dataclasses import dataclass, field
 
@@ -113,17 +113,26 @@ class ReconciliationRunner:
             summary=f"Authority is {authority.status}: {authority.owner or 'no owner'}.",
         )
 
-        proposal = ReconciliationAgent().run(
+        decision = ReconciliationAgent().run(
+            concept.concept_id,
+            execution.verdict,
             bindings,
             impact,
             authority,
             execution.evidence,
         )
-        case.reconciliation_proposal = proposal
+        case.reconciliation_proposal = decision.proposal
+        case.refusal_reason = decision.refusal_reason
+        case.requires_human_approval = decision.requires_human_approval
+        decision_summaries = {
+            "propose": "Created a draft canonical definition with human approval required.",
+            "refuse": "Refused automatic reconciliation and routed it to human approval.",
+            "no_action": "Ruled out the decoy by result-set equality; no reconciliation needed.",
+        }
         case.transition(
             ReconciliationState.PROPOSE_OR_REFUSE,
             agent="ReconciliationAgent",
-            summary="Created a draft canonical definition with human approval required.",
+            summary=decision_summaries[decision.action],
         )
 
         verifier = SkepticalVerifierAgent().run(case)
@@ -144,12 +153,12 @@ class ReconciliationRunner:
         case.transition(
             ReconciliationState.AUDIT,
             agent="AuditAgent",
-            summary="Prepared run, finding, evidence, proposal, and timeline for persistence.",
+            summary="Prepared run, finding, evidence, decision, and timeline for persistence.",
         )
         case.transition(
             ReconciliationState.COMPLETE,
             agent="CoordinatorAgent",
-            summary="Completed the verified Active Customer reconciliation.",
+            summary=f"Completed the verified {concept.canonical_name} reconciliation.",
         )
         AuditAgent(self.repository).run(case)
         return case

@@ -6,7 +6,7 @@
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Phase_P0-foundation-orange)](#implementation-status)
+[![Status](https://img.shields.io/badge/Status-Phase_P3-core_complete-brightgreen)](#implementation-status)
 [![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
@@ -21,13 +21,14 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-This repository is being built in tested phases. **Phase P2 is the current public
-state:** Active Customer runs end to end through the typed state machine, deterministic
-agents, skeptical verifier, PostgreSQL evidence store, and `POST /reconcile`.
+This repository is being built in tested phases. **Phase P3 is the current public
+state:** all three synthetic scenarios run end to end through the typed state
+machine, deterministic agents, skeptical verifier, PostgreSQL evidence store,
+API, and headless demo.
 
-Net Revenue verdicting, Churn refusal, the UI, Microsoft IQ adapters, and sanitized
-IQ capture are not represented as complete. Their package boundaries and roadmap
-remain visible without overstating what works.
+The UI, working Microsoft IQ adapters, and sanitized IQ capture are not represented
+as complete. Their package boundaries and roadmap remain visible without
+overstating what works.
 
 ## Why it matters
 
@@ -61,7 +62,7 @@ When complete, Concord IQ will:
 The deterministic generator creates the synthetic analytical tables and cohorts.
 No real customer or tenant data is used.
 
-## Quick start: Phase P2
+## Demo in five minutes
 
 ### Prerequisites
 
@@ -87,15 +88,30 @@ make seed
 The command writes deterministic CSV fixtures to `data/synthetic/` and loads the
 same rows into the ignored local database `data/concord_iq.duckdb`.
 
-### Verify the reasoning slice
+### Verify the reasoning core
 
 ```bash
 make lint
 make test
 ```
 
-The suite covers seed determinism, provider contracts, Active Customer conflict,
-impact ranking, evidence persistence, cloud guards, context scope, and the API.
+The suite covers seed determinism, provider contracts, conflict and equivalence
+verdicts, authority-driven refusal, evidence persistence, cloud guards, context
+scope, the demo, and the API.
+
+### Run all three scenarios headlessly
+
+```bash
+make demo
+```
+
+Expected verdicts:
+
+```text
+Active Customer: CONFLICT | counts=96/90/80 | proposal drafted; human approval required
+Net Revenue: CONSISTENT | counts=96/96 | decoy ruled out; no reconciliation needed
+Churned Customer: CONFLICT | counts=20/40 | automatic reconciliation refused; human approval required
+```
 
 ### Run the API
 
@@ -103,8 +119,8 @@ impact ranking, evidence persistence, cloud guards, context scope, and the API.
 make dev
 ```
 
-Open `http://localhost:8000/docs` and call `POST /reconcile`. The headless
-three-scenario `make demo` target belongs to P3.
+Open `http://localhost:8000/docs` and call `POST /reconcile`, inspect
+`GET /demo/scenarios`, or run one case through `POST /demo/run/{scenario_id}`.
 
 ## Architecture
 
@@ -153,7 +169,7 @@ flowchart TD
 
 ## How it reasons
 
-The planned orchestration is a blackboard casefile driven by a typed DAG:
+The orchestration is a blackboard casefile driven by a typed DAG:
 
 ```text
 START
@@ -179,7 +195,7 @@ critique can never pass unsupported evidence or overrule a refusal.
 
 The grounding layer keeps four modes explicit:
 
-| Provider | Role | P1 status |
+| Provider | Role | Current status |
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
 | `ReplayProvider` | Replays sanitized responses captured from a real Microsoft IQ smoke test | Identity and committed artifact path present; loading starts in P5 |
@@ -224,7 +240,7 @@ reviewed, synthetic-only, secret-free response may be placed in
 - Synthetic data only
 - Typed PostgreSQL model and provider boundaries
 - Deterministic SQL as the source of truth
-- Exact SQL retained as evidence in later phases
+- Exact SQL retained as evidence
 - Result-set equality for decoy rejection
 - Configuration lookup for authority and refusal
 - Cloud off by default
@@ -255,9 +271,9 @@ file remains local-only.
 
 ```text
 backend/concord/
-  agents/          specialist agents (later phases)
+  agents/          deterministic specialist agents
   analytics/       DuckDB execution utilities
-  api/             FastAPI surface (later phases)
+  api/             FastAPI reconciliation and demo routes
   evals/           scenario evaluation
   llm/             disabled/local/cloud narration providers
   orchestration/   casefile and typed state machine
@@ -278,14 +294,14 @@ files.
 
 ## Evaluation
 
-P2 proves the Active Customer conflict and evidence-backed proposal. Later gates add:
+P3 proves the complete deterministic credibility core:
 
 | Phase | Acceptance focus |
 | --- | --- |
 | P0 | Repeatable synthetic seed |
 | P1 | Ontology resolution, bindings, and LocalProvider execution |
 | P2 | Active Customer conflict, impact rank, evidence, cloud guard |
-| P3 | Net Revenue decoy, Churned Customer refusal, headless demo |
+| P3 | Net Revenue decoy, Churned Customer refusal, headless demo — complete |
 | P4 | Reviewer-facing demo interface and reasoning timeline |
 | P5 | Verified IQ adapters, sanitized replay, provider contract |
 
@@ -303,26 +319,20 @@ smoke test and sanitized replay exist.
 **Reliability and safety:** The system is designed to reject false conflicts, refuse
 unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 
-## Graphic placeholders
-
-The deliberate wireframe placeholders are `hero-placeholder.svg`,
-`architecture-placeholder.svg`, `demo-placeholder.svg`, `reasoning-placeholder.svg`,
-and `semantic-pr-placeholder.svg` in `docs/assets/`. They will be replaced with
-real product visuals after the relevant UI exists.
-
 ## Roadmap
 
 - [x] P0: repository, storage models, deterministic seed, test, README
 - [x] P1: ontology, authority rules, metric definitions, `LocalProvider`
 - [x] P2: Active Customer reasoning engine and persisted evidence
-- [ ] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
+- [x] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [ ] P4: demo-first React interface
 - [ ] P5: verified Foundry IQ and Fabric IQ adapters, capture, replay, docs
 - [ ] P6: optional Ollama narration
 
 ## Limitations
 
-- P2 produces a verdict only for Active Customer; other scenarios return HTTP 422.
+- The three implemented verdicts cover fixed, reviewed synthetic scenarios rather
+  than arbitrary business concepts.
 - The data is synthetic and intentionally engineered for known evaluation cases.
 - Behavioral equivalence is proven only over the bound data and period being tested.
 - Microsoft IQ preview surfaces, pricing, permissions, and availability can change.
@@ -330,9 +340,8 @@ real product visuals after the relevant UI exists.
 
 ## AI-assisted development
 
-Concord IQ is an AI agent project built with AI-assisted engineering tools. The
-repository uses tests, deterministic data, reviewable code, and explicit status
-labels rather than implying unaided authorship or completed integrations.
+Concord IQ uses AI-assisted engineering with tests, deterministic data, reviewable
+code, and explicit status labels.
 
 ## License
 

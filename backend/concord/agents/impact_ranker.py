@@ -17,6 +17,16 @@ class ImpactRankerAgent:
         customer_delta = max(counts) - min(counts)
         arr_delta = round(max(totals) - min(totals), 2)
         units = tuple(dict.fromkeys(binding.owner for binding in bindings))
+        if customer_delta == 0 and arr_delta == 0:
+            return ImpactAssessment(
+                rank=0,
+                severity="low",
+                customer_count_delta=0,
+                arr_delta=0.0,
+                reports_affected=len(units),
+                business_units_affected=units,
+                decision_criticality="low",
+            )
         high_impact = customer_delta >= 10 or arr_delta >= 1_000_000
         return ImpactAssessment(
             rank=1,

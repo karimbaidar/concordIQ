@@ -34,7 +34,7 @@ class DataExecutionAgent:
         evaluations = tuple(
             self.provider.evaluate_definition(binding.binding_id, period) for binding in bindings
         )
-        entity_sets = {evaluation.entity_ids for evaluation in evaluations}
+        entity_sets = {frozenset(evaluation.entity_ids) for evaluation in evaluations}
         verdict = "conflict" if len(entity_sets) > 1 else "consistent"
         evidence = tuple(
             EvidenceRecord(

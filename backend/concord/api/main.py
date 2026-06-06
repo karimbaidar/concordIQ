@@ -1,4 +1,4 @@
-"""FastAPI application factory with injectable P2 dependencies."""
+"""FastAPI application factory with injectable deterministic dependencies."""
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager

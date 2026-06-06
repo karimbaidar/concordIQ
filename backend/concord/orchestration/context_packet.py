@@ -25,7 +25,7 @@ def build_context_packet(
     subgraph: OntologySubgraph,
     authority_rules: list[AuthorityRule],
 ) -> ContextPacket:
-    """Include only the context required for the resolved Active Customer case."""
+    """Include only the context required for the resolved scenario."""
     return ContextPacket(
         user_question=question,
         resolved_term=concept.canonical_name,

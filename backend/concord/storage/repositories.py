@@ -37,8 +37,8 @@ class ReconciliationRepository:
             raise ValueError("Only verifier-approved cases may be persisted as complete.")
         if not case.context_packet or not case.resolved_concept:
             raise ValueError("Resolved concept and context packet are required.")
-        if not case.impact_assessment or not case.reconciliation_proposal:
-            raise ValueError("Impact and proposal are required for the P2 case.")
+        if not case.impact_assessment or not case.authority_assessment:
+            raise ValueError("Impact and authority assessments are required.")
 
         with self._sessions.begin() as session:
             term = self._get_or_create_term(session, case)
@@ -54,7 +54,7 @@ class ReconciliationRepository:
             session.flush()
             finding_id = uuid5(
                 NAMESPACE_URL,
-                f"concord-iq:{case.run_id}:active-customer-finding",
+                f"concord-iq:{case.run_id}:{case.resolved_concept.concept_id}-finding",
             )
             finding = ConflictFinding(
                 id=finding_id,
@@ -73,6 +73,8 @@ class ReconciliationRepository:
                     },
                     "impact": case.impact_assessment.model_dump(mode="json"),
                     "authority": case.authority_assessment.model_dump(mode="json"),
+                    "refusal_reason": case.refusal_reason,
+                    "requires_human_approval": case.requires_human_approval,
                     "verifier": case.verifier_report.model_dump(mode="json"),
                 },
             )
@@ -96,20 +98,23 @@ class ReconciliationRepository:
                 )
                 for item in case.evidence
             )
-            session.add(
-                SemanticProposal(
-                    id=uuid5(
-                        NAMESPACE_URL,
-                        f"concord-iq:{case.run_id}:active-customer-proposal",
-                    ),
-                    run_id=case.run_id,
-                    finding_id=finding_id,
-                    canonical_definition_id=None,
-                    status="draft",
-                    proposal_text=case.reconciliation_proposal.model_dump_json(),
-                    requires_human_approval=(case.reconciliation_proposal.requires_human_approval),
+            if case.reconciliation_proposal:
+                session.add(
+                    SemanticProposal(
+                        id=uuid5(
+                            NAMESPACE_URL,
+                            f"concord-iq:{case.run_id}:{case.resolved_concept.concept_id}-proposal",
+                        ),
+                        run_id=case.run_id,
+                        finding_id=finding_id,
+                        canonical_definition_id=None,
+                        status="draft",
+                        proposal_text=case.reconciliation_proposal.model_dump_json(),
+                        requires_human_approval=(
+                            case.reconciliation_proposal.requires_human_approval
+                        ),
+                    )
                 )
-            )
             session.add_all(
                 AuditEvent(
                     run_id=case.run_id,

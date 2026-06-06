@@ -198,7 +198,7 @@ def test_api_post_reconcile(
     assert payload["verifier_report"]["passed"] is True
 
 
-def test_api_defers_non_active_scenarios_to_p3(
+def test_api_post_reconcile_supports_net_revenue(
     postgres_engine: Engine,
     p2_local_provider: LocalProvider,
 ) -> None:
@@ -216,5 +216,8 @@ def test_api_defers_non_active_scenarios_to_p3(
             },
         )
 
-    assert response.status_code == 422
-    assert "Phase P2 supports Active Customer only" in response.json()["detail"]
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["verdict"] == "consistent"
+    assert payload["reconciliation_proposal"] is None
+    assert payload["refusal_reason"] is None

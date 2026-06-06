@@ -1,17 +1,19 @@
-"""Deterministic scenario selection for the current phase."""
+"""Deterministic scenario selection for implemented reconciliation cases."""
 
 from concord.providers import ConceptResolution
 
 
 class UnsupportedScenario(ValueError):
-    """Raised when a scenario belongs to a later implementation phase."""
+    """Raised when a scenario has no implemented deterministic decision path."""
 
 
 class CoordinatorAgent:
-    """Keep the P2 execution plan scoped to Active Customer."""
+    """Limit execution to the three reviewed synthetic scenarios."""
+
+    supported_concepts = frozenset({"active_customer", "net_revenue", "churned_customer"})
 
     def require_supported(self, concept: ConceptResolution) -> None:
-        if concept.concept_id != "active_customer":
+        if concept.concept_id not in self.supported_concepts:
             raise UnsupportedScenario(
-                "Phase P2 supports Active Customer only; other verdicts arrive in P3."
+                f"No deterministic reconciliation path is implemented for {concept.canonical_name}."
             )

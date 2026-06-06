@@ -119,6 +119,15 @@ class ReconciliationProposal(CaseModel):
     evidence_refs: tuple[UUID, ...]
 
 
+class ReconciliationDecision(CaseModel):
+    """Typed proposal, refusal, or no-action decision."""
+
+    action: Literal["propose", "refuse", "no_action"]
+    proposal: ReconciliationProposal | None = None
+    refusal_reason: str | None = None
+    requires_human_approval: bool = False
+
+
 class VerifierReport(CaseModel):
     """Blocking deterministic checks over the completed casefile."""
 
@@ -145,6 +154,7 @@ class ReconciliationCase(CaseModel):
     authority_assessment: AuthorityAssessment | None = None
     reconciliation_proposal: ReconciliationProposal | None = None
     refusal_reason: str | None = None
+    requires_human_approval: bool = False
     verifier_report: VerifierReport | None = None
     evidence: tuple[EvidenceRecord, ...] = ()
     audit_log: tuple[TimelineEntry, ...] = ()

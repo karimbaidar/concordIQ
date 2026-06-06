@@ -25,6 +25,15 @@ class AuthorityResolverAgent:
                 rules=rules,
                 rationale=canonical_rule.rationale,
             )
+        clear_owners = {rule.owner for rule in rules if rule.status == "clear" and rule.owner}
+        if rules and all(rule.status == "clear" for rule in rules) and len(clear_owners) == 1:
+            owner = clear_owners.pop()
+            return AuthorityAssessment(
+                status="clear",
+                owner=owner,
+                rules=rules,
+                rationale=f"{owner} is the configured authority for this concept.",
+            )
         statuses = {rule.status for rule in rules}
         status = (
             "ambiguous"
