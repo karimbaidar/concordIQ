@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "concept_id": "active_customer",
+      "semantic_dimension": "revenue-recognition",
+      "status": "clear",
+      "owner": "Finance",
+      "rationale": "Finance governs recognized revenue policy."
+    },
+    {
+      "concept_id": "active_customer",
+      "semantic_dimension": "pipeline-status",
+      "status": "clear",
+      "owner": "Sales",
+      "rationale": "Sales governs opportunity stage semantics."
+    },
+    {
+      "concept_id": "active_customer",
+      "semantic_dimension": "qualifying-usage",
+      "status": "clear",
+      "owner": "Customer Success",
+      "rationale": "Customer Success governs qualifying adoption signals."
+    },
+    {
+      "concept_id": "active_customer",
+      "semantic_dimension": "canonical-active-customer",
+      "status": "clear",
+      "owner": "Data Governance Council",
+      "rationale": "The council owns the cross-domain board metric and can approve a canonical composition."
+    },
+    {
+      "concept_id": "net_revenue",
+      "semantic_dimension": "revenue-recognition",
+      "status": "clear",
+      "owner": "Finance",
+      "rationale": "Finance governs recognized revenue."
+    },
+    {
+      "concept_id": "churned_customer",
+      "semantic_dimension": "churn-effective-date",
+      "status": "shared",
+      "owner": null,
+      "rationale": "Finance and Customer Success use the date for different governed processes."
+    },
+    {
+      "concept_id": "churned_customer",
+      "semantic_dimension": "grace-period",
+      "status": "ambiguous",
+      "owner": null,
+      "rationale": "No approved enterprise owner or precedence rule exists."
+    }
+  ]
+}

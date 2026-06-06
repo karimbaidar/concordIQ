@@ -21,13 +21,13 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-This repository is being built in tested phases. **Phase P0 is the current public
-state:** the storage model, provider boundaries, deterministic synthetic data seed,
-Docker Compose foundation, and seed reproducibility test are implemented.
+This repository is being built in tested phases. **Phase P1 is the current public
+state:** the typed grounding contract, ontology, authority rules, three scenario
+registries, deterministic DuckDB execution, and provider contract tests work.
 
-The reconciliation engine, ontology, UI, Microsoft IQ adapters, and sanitized IQ
-capture are not represented as complete. Their package boundaries and roadmap are
-visible so progress can be evaluated without overstating what works.
+The reconciliation engine, persistence workflow, API, UI, Microsoft IQ adapters,
+and sanitized IQ capture are not represented as complete. Their package boundaries
+and roadmap remain visible without overstating what works.
 
 ## Why it matters
 
@@ -189,9 +189,9 @@ critique can never pass unsupported evidence or overrule a refusal.
 
 The grounding layer keeps four modes explicit:
 
-| Provider | Role | P0 status |
+| Provider | Role | P1 status |
 | --- | --- | --- |
-| `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Identity and package boundary present; behavior starts in P1 |
+| `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
 | `ReplayProvider` | Replays sanitized responses captured from a real Microsoft IQ smoke test | Identity and committed artifact path present; loading starts in P5 |
 | `FoundryIQProvider` | Microsoft IQ fallback adapter | Fail-closed scaffold only |
 | `FabricIQProvider` | Target ontology and grounding adapter | Fail-closed scaffold only |
@@ -201,7 +201,7 @@ IQ and does not satisfy the final IQ-integration goal by itself. Later work must
 verify current APIs and tenant access, perform a tiny manually enabled smoke test,
 sanitize the response, and commit only the synthetic replay artifact.
 
-No successful Microsoft IQ call or sanitized capture is claimed in P0.
+No successful Microsoft IQ call or sanitized capture is claimed in P1.
 
 ## Cloud and cost safety
 
@@ -288,7 +288,7 @@ files.
 
 ## Evaluation
 
-P0 currently proves seed determinism. Later phase gates add these behavioral checks:
+P1 proves seed determinism and the local grounding contract. Later phase gates add:
 
 | Phase | Acceptance focus |
 | --- | --- |
@@ -323,7 +323,7 @@ real product visuals after the relevant UI exists.
 ## Roadmap
 
 - [x] P0: repository, storage models, deterministic seed, test, README
-- [ ] P1: ontology, authority rules, metric definitions, `LocalProvider`
+- [x] P1: ontology, authority rules, metric definitions, `LocalProvider`
 - [ ] P2: Active Customer reasoning engine and persisted evidence
 - [ ] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [ ] P4: demo-first React interface
@@ -332,7 +332,7 @@ real product visuals after the relevant UI exists.
 
 ## Limitations
 
-- P0 does not reconcile terms yet.
+- P1 evaluates definitions but does not produce reconciliation verdicts yet.
 - The data is synthetic and intentionally engineered for known evaluation cases.
 - Behavioral equivalence is proven only over the bound data and period being tested.
 - Microsoft IQ preview surfaces, pricing, permissions, and availability can change.

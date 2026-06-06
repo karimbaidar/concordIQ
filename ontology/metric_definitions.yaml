@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "definitions": [
+    {
+      "definition_id": "active_customer_finance",
+      "concept_id": "active_customer",
+      "name": "Finance Active Customer",
+      "owner": "Finance",
+      "rule_text": "Customer with recognized revenue during the trailing 90-day reporting window.",
+      "semantic_dimensions": ["revenue-recognition", "activity-window", "customer-population"],
+      "binding": {
+        "binding_id": "active_customer_finance_v1",
+        "source_tables": ["customers", "revenue_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with a recognized revenue event in the trailing 90 days.",
+        "time_window_days": 90,
+        "filters": ["event_type = recognized_revenue", "event_date in trailing 90 days"],
+        "exclusions": [],
+        "sql_template": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN revenue_events r ON r.customer_id = c.customer_id WHERE r.event_type = 'recognized_revenue' AND CAST(r.event_date AS DATE) BETWEEN DATE '{period_end}' - INTERVAL 89 DAY AND DATE '{period_end}' ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "active_customer_sales",
+      "concept_id": "active_customer",
+      "name": "Sales Active Customer",
+      "owner": "Sales",
+      "rule_text": "Customer with an open or won opportunity updated during the trailing 180 days.",
+      "semantic_dimensions": ["pipeline-status", "activity-window", "customer-population"],
+      "binding": {
+        "binding_id": "active_customer_sales_v1",
+        "source_tables": ["customers", "opportunities"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers represented by current pipeline activity.",
+        "time_window_days": 180,
+        "filters": ["stage in open, won", "updated_at in trailing 180 days"],
+        "exclusions": ["closed_lost opportunities"],
+        "sql_template": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN opportunities o ON o.customer_id = c.customer_id WHERE o.stage IN ('open', 'won') AND CAST(o.updated_at AS DATE) BETWEEN DATE '{period_end}' - INTERVAL 179 DAY AND DATE '{period_end}' ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "active_customer_customer_success",
+      "concept_id": "active_customer",
+      "name": "Customer Success Active Customer",
+      "owner": "Customer Success",
+      "rule_text": "Customer with an active contract and qualifying product usage in the trailing 30 days.",
+      "semantic_dimensions": ["contract-status", "qualifying-usage", "activity-window"],
+      "binding": {
+        "binding_id": "active_customer_customer_success_v1",
+        "source_tables": ["customers", "contracts", "usage_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Contracted customers demonstrating recent qualifying usage.",
+        "time_window_days": 30,
+        "filters": ["contract status = active", "qualifying = 1", "usage in trailing 30 days"],
+        "exclusions": ["expired contracts", "non-qualifying usage"],
+        "sql_template": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN contracts ct ON ct.customer_id = c.customer_id JOIN usage_events u ON u.customer_id = c.customer_id WHERE ct.status = 'active' AND CAST(ct.start_date AS DATE) <= DATE '{as_of_date}' AND CAST(ct.end_date AS DATE) >= DATE '{as_of_date}' AND u.qualifying = 1 AND CAST(u.event_date AS DATE) BETWEEN DATE '{period_end}' - INTERVAL 29 DAY AND DATE '{period_end}' ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "net_revenue_finance",
+      "concept_id": "net_revenue",
+      "name": "Finance Net Revenue",
+      "owner": "Finance",
+      "rule_text": "Sum recognized recurring revenue events during the selected period.",
+      "semantic_dimensions": ["revenue-recognition", "reporting-period"],
+      "binding": {
+        "binding_id": "net_revenue_finance_v1",
+        "source_tables": ["revenue_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with recognized recurring revenue in the period.",
+        "filters": ["event_type = recognized_revenue", "event_date in selected period"],
+        "exclusions": [],
+        "sql_template": "SELECT r.customer_id AS entity_id, SUM(r.amount) AS metric_value FROM revenue_events r WHERE r.event_type = 'recognized_revenue' AND CAST(r.event_date AS DATE) BETWEEN DATE '{period_start}' AND DATE '{period_end}' GROUP BY r.customer_id ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "net_revenue_sales",
+      "concept_id": "net_revenue",
+      "name": "Sales Booked Revenue",
+      "owner": "Sales",
+      "rule_text": "Customer recurring revenue joined to the customer book for the selected period.",
+      "semantic_dimensions": ["booked-revenue", "reporting-period"],
+      "binding": {
+        "binding_id": "net_revenue_sales_v1",
+        "source_tables": ["customers", "revenue_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customer book entries with recognized recurring revenue in the period.",
+        "filters": ["recognized revenue event in selected period"],
+        "exclusions": [],
+        "sql_template": "SELECT c.customer_id AS entity_id, SUM(r.amount) AS metric_value FROM customers c INNER JOIN revenue_events r ON c.customer_id = r.customer_id AND r.event_type = 'recognized_revenue' WHERE CAST(r.event_date AS DATE) >= DATE '{period_start}' AND CAST(r.event_date AS DATE) <= DATE '{period_end}' GROUP BY c.customer_id ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "churned_customer_finance",
+      "concept_id": "churned_customer",
+      "name": "Finance Churned Customer",
+      "owner": "Finance",
+      "rule_text": "Customer whose contract term ended without renewal by the reporting date.",
+      "semantic_dimensions": ["churn-effective-date", "contract-renewal"],
+      "binding": {
+        "binding_id": "churned_customer_finance_v1",
+        "source_tables": ["customers", "churn_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with a recorded Finance churn date on or before period end.",
+        "filters": ["finance_churn_date is populated", "finance_churn_date <= period end"],
+        "exclusions": [],
+        "sql_template": "SELECT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN churn_events ce ON ce.customer_id = c.customer_id WHERE TRY_CAST(ce.finance_churn_date AS DATE) IS NOT NULL AND TRY_CAST(ce.finance_churn_date AS DATE) <= DATE '{period_end}' ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "churned_customer_customer_success",
+      "concept_id": "churned_customer",
+      "name": "Customer Success Churned Customer",
+      "owner": "Customer Success",
+      "rule_text": "Customer whose inactivity threshold and operational grace period elapsed by the reporting date.",
+      "semantic_dimensions": ["churn-effective-date", "inactivity-threshold", "grace-period"],
+      "binding": {
+        "binding_id": "churned_customer_customer_success_v1",
+        "source_tables": ["customers", "churn_events"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with a recorded Customer Success churn date on or before period end.",
+        "filters": ["cs_churn_date is populated", "cs_churn_date <= period end"],
+        "exclusions": [],
+        "sql_template": "SELECT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN churn_events ce ON ce.customer_id = c.customer_id WHERE TRY_CAST(ce.cs_churn_date AS DATE) IS NOT NULL AND TRY_CAST(ce.cs_churn_date AS DATE) <= DATE '{period_end}' ORDER BY entity_id"
+      }
+    }
+  ]
+}

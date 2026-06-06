@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "concepts": [
+    {
+      "concept_id": "active_customer",
+      "canonical_name": "Active Customer",
+      "description": "A customer included in current operating and board-level activity reporting.",
+      "aliases": ["active customers", "active enterprise customer", "active enterprise customers"]
+    },
+    {
+      "concept_id": "net_revenue",
+      "canonical_name": "Net Revenue",
+      "description": "Recognized recurring revenue in the selected analytical period.",
+      "aliases": ["revenue", "booked revenue"]
+    },
+    {
+      "concept_id": "churned_customer",
+      "canonical_name": "Churned Customer",
+      "description": "A customer treated as lost for retention and financial reporting.",
+      "aliases": ["churn", "churned customers", "lost customer"]
+    }
+  ],
+  "nodes": [
+    {"node_id": "active_customer", "node_type": "business_concept", "label": "Active Customer"},
+    {"node_id": "net_revenue", "node_type": "business_concept", "label": "Net Revenue"},
+    {"node_id": "churned_customer", "node_type": "business_concept", "label": "Churned Customer"},
+    {"node_id": "customer", "node_type": "entity_type", "label": "Customer"},
+    {"node_id": "contract", "node_type": "entity_type", "label": "Contract"},
+    {"node_id": "opportunity", "node_type": "entity_type", "label": "Opportunity"},
+    {"node_id": "usage_event", "node_type": "entity_type", "label": "Usage Event"},
+    {"node_id": "revenue_event", "node_type": "entity_type", "label": "Revenue Event"},
+    {"node_id": "churn_event", "node_type": "entity_type", "label": "Churn Event"}
+  ],
+  "relationships": [
+    {"source": "active_customer", "target": "customer", "relationship_type": "selects"},
+    {"source": "active_customer", "target": "contract", "relationship_type": "derived_from"},
+    {"source": "active_customer", "target": "opportunity", "relationship_type": "derived_from"},
+    {"source": "active_customer", "target": "usage_event", "relationship_type": "derived_from"},
+    {"source": "active_customer", "target": "revenue_event", "relationship_type": "derived_from"},
+    {"source": "net_revenue", "target": "revenue_event", "relationship_type": "aggregates"},
+    {"source": "churned_customer", "target": "contract", "relationship_type": "derived_from"},
+    {"source": "churned_customer", "target": "usage_event", "relationship_type": "derived_from"},
+    {"source": "churned_customer", "target": "churn_event", "relationship_type": "materialized_as"}
+  ]
+}
