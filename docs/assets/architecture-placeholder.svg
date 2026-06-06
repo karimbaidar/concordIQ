@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title">
+  <title id="title">Concord IQ architecture placeholder</title>
+  <rect width="1200" height="520" rx="24" fill="#f5f8fc"/>
+  <text x="600" y="55" text-anchor="middle" fill="#15243a" font-family="Arial" font-size="28" font-weight="bold">Architecture placeholder</text>
+  <g font-family="Arial" font-size="18" text-anchor="middle">
+    <rect x="70" y="115" width="210" height="80" rx="14" fill="#dcecff" stroke="#2375c9" stroke-width="2"/>
+    <text x="175" y="162" fill="#17355f">Interface</text>
+    <rect x="350" y="115" width="240" height="80" rx="14" fill="#eee9ff" stroke="#7357ce" stroke-width="2"/>
+    <text x="470" y="162" fill="#332760">Reasoning DAG</text>
+    <rect x="660" y="115" width="250" height="80" rx="14" fill="#fff1cf" stroke="#c88c12" stroke-width="2"/>
+    <text x="785" y="162" fill="#604612">GroundingProvider</text>
+    <rect x="970" y="115" width="170" height="80" rx="14" fill="#dff6ee" stroke="#19856a" stroke-width="2"/>
+    <text x="1055" y="162" fill="#164d42">Evidence</text>
+    <path d="M280 155 H350 M590 155 H660 M910 155 H970" stroke="#52657b" stroke-width="4"/>
+    <rect x="70" y="290" width="220" height="75" rx="12" fill="#fff" stroke="#2375c9" stroke-width="2"/>
+    <text x="180" y="335" fill="#17355f">LocalProvider</text>
+    <rect x="330" y="290" width="220" height="75" rx="12" fill="#fff" stroke="#2375c9" stroke-width="2"/>
+    <text x="440" y="335" fill="#17355f">ReplayProvider</text>
+    <rect x="590" y="290" width="230" height="75" rx="12" fill="#fff" stroke="#7357ce" stroke-width="2"/>
+    <text x="705" y="335" fill="#332760">FoundryIQProvider</text>
+    <rect x="860" y="290" width="230" height="75" rx="12" fill="#fff" stroke="#7357ce" stroke-width="2"/>
+    <text x="975" y="335" fill="#332760">FabricIQProvider</text>
+  </g>
+  <text x="600" y="455" text-anchor="middle" fill="#6b7787" font-family="Arial" font-size="20">Replace with a verified product diagram after the provider contracts are implemented.</text>
+</svg>

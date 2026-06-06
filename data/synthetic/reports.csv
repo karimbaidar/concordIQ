@@ -1,0 +1,7 @@
+report_id,business_unit,report_name,business_term,decision_criticality
+RPT001,Finance,Quarterly Board Metrics,Active Customer,high
+RPT002,Sales,Enterprise Pipeline,Active Customer,high
+RPT003,Customer Success,Adoption Health,Active Customer,high
+RPT004,Finance,Net Revenue,Net Revenue,high
+RPT005,Sales,Booked Revenue,Net Revenue,medium
+RPT006,Customer Success,Retention Review,Churned Customer,high

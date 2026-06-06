@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title">
+  <title id="title">Concord IQ reasoning timeline placeholder</title>
+  <rect width="1200" height="360" rx="24" fill="#f7f4ff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#2e2453" font-family="Arial" font-size="28" font-weight="bold">Evidence-backed reasoning timeline</text>
+  <path d="M110 190 H1090" stroke="#baaee0" stroke-width="8"/>
+  <g font-family="Arial" text-anchor="middle">
+    <circle cx="130" cy="190" r="30" fill="#5b43ad"/>
+    <circle cx="365" cy="190" r="30" fill="#5b43ad"/>
+    <circle cx="600" cy="190" r="30" fill="#5b43ad"/>
+    <circle cx="835" cy="190" r="30" fill="#5b43ad"/>
+    <circle cx="1070" cy="190" r="30" fill="#1b8c70"/>
+    <text x="130" y="255" fill="#332760" font-size="17">Resolve</text>
+    <text x="365" y="255" fill="#332760" font-size="17">Inspect</text>
+    <text x="600" y="255" fill="#332760" font-size="17">Execute</text>
+    <text x="835" y="255" fill="#332760" font-size="17">Govern</text>
+    <text x="1070" y="255" fill="#22574c" font-size="17">Verify</text>
+  </g>
+  <text x="600" y="315" text-anchor="middle" fill="#756a96" font-family="Arial" font-size="18">Placeholder until real state transitions are available in Phase P2.</text>
+</svg>

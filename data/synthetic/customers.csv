@@ -1,0 +1,121 @@
+customer_id,customer_name,region,segment,annual_recurring_revenue,created_at
+C0001,Northstar Synthetic 001,North America,Enterprise,183000,2023-09-11
+C0002,Northstar Synthetic 002,Europe,Mid-Market,56000,2025-01-18
+C0003,Northstar Synthetic 003,Asia Pacific,Growth,86000,2022-12-18
+C0004,Northstar Synthetic 004,North America,Enterprise,219000,2024-04-02
+C0005,Northstar Synthetic 005,Europe,Mid-Market,102000,2023-06-18
+C0006,Northstar Synthetic 006,Asia Pacific,Growth,167000,2024-05-13
+C0007,Northstar Synthetic 007,North America,Enterprise,119000,2023-11-30
+C0008,Northstar Synthetic 008,Europe,Mid-Market,135000,2022-12-06
+C0009,Northstar Synthetic 009,Asia Pacific,Growth,240000,2024-04-09
+C0010,Northstar Synthetic 010,North America,Enterprise,180000,2023-11-17
+C0011,Northstar Synthetic 011,Europe,Mid-Market,193000,2024-04-24
+C0012,Northstar Synthetic 012,Asia Pacific,Growth,226000,2024-10-29
+C0013,Northstar Synthetic 013,North America,Enterprise,67000,2023-09-01
+C0014,Northstar Synthetic 014,Europe,Mid-Market,60000,2024-03-17
+C0015,Northstar Synthetic 015,Asia Pacific,Growth,81000,2024-09-14
+C0016,Northstar Synthetic 016,North America,Enterprise,193000,2024-03-18
+C0017,Northstar Synthetic 017,Europe,Mid-Market,138000,2023-02-12
+C0018,Northstar Synthetic 018,Asia Pacific,Growth,60000,2023-08-31
+C0019,Northstar Synthetic 019,North America,Enterprise,182000,2023-01-30
+C0020,Northstar Synthetic 020,Europe,Mid-Market,173000,2025-02-10
+C0021,Northstar Synthetic 021,Asia Pacific,Growth,217000,2024-08-27
+C0022,Northstar Synthetic 022,North America,Enterprise,197000,2025-02-10
+C0023,Northstar Synthetic 023,Europe,Mid-Market,170000,2024-08-27
+C0024,Northstar Synthetic 024,Asia Pacific,Growth,176000,2025-03-09
+C0025,Northstar Synthetic 025,North America,Enterprise,83000,2025-01-17
+C0026,Northstar Synthetic 026,Europe,Mid-Market,124000,2023-12-07
+C0027,Northstar Synthetic 027,Asia Pacific,Growth,29000,2024-05-24
+C0028,Northstar Synthetic 028,North America,Enterprise,223000,2023-07-28
+C0029,Northstar Synthetic 029,Europe,Mid-Market,233000,2023-02-15
+C0030,Northstar Synthetic 030,Asia Pacific,Growth,151000,2024-02-24
+C0031,Northstar Synthetic 031,North America,Enterprise,203000,2024-11-03
+C0032,Northstar Synthetic 032,Europe,Mid-Market,143000,2024-05-05
+C0033,Northstar Synthetic 033,Asia Pacific,Growth,119000,2023-09-24
+C0034,Northstar Synthetic 034,North America,Enterprise,166000,2024-07-22
+C0035,Northstar Synthetic 035,Europe,Mid-Market,160000,2025-01-27
+C0036,Northstar Synthetic 036,Asia Pacific,Growth,92000,2024-11-14
+C0037,Northstar Synthetic 037,North America,Enterprise,167000,2025-03-05
+C0038,Northstar Synthetic 038,Europe,Mid-Market,227000,2023-12-30
+C0039,Northstar Synthetic 039,Asia Pacific,Growth,183000,2025-04-13
+C0040,Northstar Synthetic 040,North America,Enterprise,211000,2023-10-08
+C0041,Northstar Synthetic 041,Europe,Mid-Market,167000,2024-02-12
+C0042,Northstar Synthetic 042,Asia Pacific,Growth,61000,2023-05-07
+C0043,Northstar Synthetic 043,North America,Enterprise,113000,2024-07-27
+C0044,Northstar Synthetic 044,Europe,Mid-Market,120000,2025-02-04
+C0045,Northstar Synthetic 045,Asia Pacific,Growth,140000,2023-09-04
+C0046,Northstar Synthetic 046,North America,Enterprise,141000,2024-10-17
+C0047,Northstar Synthetic 047,Europe,Mid-Market,31000,2024-04-27
+C0048,Northstar Synthetic 048,Asia Pacific,Growth,109000,2024-01-10
+C0049,Northstar Synthetic 049,North America,Enterprise,212000,2023-05-15
+C0050,Northstar Synthetic 050,Europe,Mid-Market,218000,2023-08-11
+C0051,Northstar Synthetic 051,Asia Pacific,Growth,216000,2025-01-04
+C0052,Northstar Synthetic 052,North America,Enterprise,158000,2024-05-14
+C0053,Northstar Synthetic 053,Europe,Mid-Market,227000,2024-05-26
+C0054,Northstar Synthetic 054,Asia Pacific,Growth,140000,2023-06-25
+C0055,Northstar Synthetic 055,North America,Enterprise,184000,2025-04-25
+C0056,Northstar Synthetic 056,Europe,Mid-Market,138000,2024-05-28
+C0057,Northstar Synthetic 057,Asia Pacific,Growth,53000,2024-02-23
+C0058,Northstar Synthetic 058,North America,Enterprise,137000,2023-04-08
+C0059,Northstar Synthetic 059,Europe,Mid-Market,40000,2024-11-02
+C0060,Northstar Synthetic 060,Asia Pacific,Growth,206000,2023-11-19
+C0061,Northstar Synthetic 061,North America,Enterprise,57000,2024-05-23
+C0062,Northstar Synthetic 062,Europe,Mid-Market,219000,2023-11-04
+C0063,Northstar Synthetic 063,Asia Pacific,Growth,235000,2024-12-16
+C0064,Northstar Synthetic 064,North America,Enterprise,103000,2023-11-27
+C0065,Northstar Synthetic 065,Europe,Mid-Market,200000,2023-02-28
+C0066,Northstar Synthetic 066,Asia Pacific,Growth,163000,2023-12-21
+C0067,Northstar Synthetic 067,North America,Enterprise,194000,2023-05-12
+C0068,Northstar Synthetic 068,Europe,Mid-Market,209000,2024-03-07
+C0069,Northstar Synthetic 069,Asia Pacific,Growth,200000,2024-09-26
+C0070,Northstar Synthetic 070,North America,Enterprise,48000,2023-08-28
+C0071,Northstar Synthetic 071,Europe,Mid-Market,125000,2024-02-03
+C0072,Northstar Synthetic 072,Asia Pacific,Growth,123000,2023-11-02
+C0073,Northstar Synthetic 073,North America,Enterprise,66000,2023-07-30
+C0074,Northstar Synthetic 074,Europe,Mid-Market,226000,2025-01-22
+C0075,Northstar Synthetic 075,Asia Pacific,Growth,55000,2023-04-24
+C0076,Northstar Synthetic 076,North America,Enterprise,26000,2024-08-04
+C0077,Northstar Synthetic 077,Europe,Mid-Market,64000,2024-03-11
+C0078,Northstar Synthetic 078,Asia Pacific,Growth,41000,2023-05-24
+C0079,Northstar Synthetic 079,North America,Enterprise,116000,2023-09-29
+C0080,Northstar Synthetic 080,Europe,Mid-Market,153000,2024-04-21
+C0081,Northstar Synthetic 081,Asia Pacific,Growth,224000,2024-07-19
+C0082,Northstar Synthetic 082,North America,Enterprise,47000,2023-10-21
+C0083,Northstar Synthetic 083,Europe,Mid-Market,45000,2025-02-03
+C0084,Northstar Synthetic 084,Asia Pacific,Growth,128000,2024-06-30
+C0085,Northstar Synthetic 085,North America,Enterprise,230000,2024-03-20
+C0086,Northstar Synthetic 086,Europe,Mid-Market,126000,2024-04-28
+C0087,Northstar Synthetic 087,Asia Pacific,Growth,100000,2024-06-05
+C0088,Northstar Synthetic 088,North America,Enterprise,183000,2023-06-30
+C0089,Northstar Synthetic 089,Europe,Mid-Market,173000,2024-11-02
+C0090,Northstar Synthetic 090,Asia Pacific,Growth,60000,2025-03-30
+C0091,Northstar Synthetic 091,North America,Enterprise,122000,2023-06-24
+C0092,Northstar Synthetic 092,Europe,Mid-Market,42000,2023-02-09
+C0093,Northstar Synthetic 093,Asia Pacific,Growth,52000,2023-10-17
+C0094,Northstar Synthetic 094,North America,Enterprise,128000,2024-08-28
+C0095,Northstar Synthetic 095,Europe,Mid-Market,43000,2023-12-14
+C0096,Northstar Synthetic 096,Asia Pacific,Growth,157000,2022-12-10
+C0097,Northstar Synthetic 097,North America,Enterprise,61000,2024-11-02
+C0098,Northstar Synthetic 098,Europe,Mid-Market,202000,2023-08-12
+C0099,Northstar Synthetic 099,Asia Pacific,Growth,205000,2025-03-26
+C0100,Northstar Synthetic 100,North America,Enterprise,157000,2023-02-17
+C0101,Northstar Synthetic 101,Europe,Mid-Market,121000,2024-02-02
+C0102,Northstar Synthetic 102,Asia Pacific,Growth,135000,2024-08-09
+C0103,Northstar Synthetic 103,North America,Enterprise,127000,2024-03-03
+C0104,Northstar Synthetic 104,Europe,Mid-Market,70000,2023-01-15
+C0105,Northstar Synthetic 105,Asia Pacific,Growth,127000,2024-05-28
+C0106,Northstar Synthetic 106,North America,Enterprise,111000,2024-02-26
+C0107,Northstar Synthetic 107,Europe,Mid-Market,211000,2024-04-09
+C0108,Northstar Synthetic 108,Asia Pacific,Growth,168000,2024-01-24
+C0109,Northstar Synthetic 109,North America,Enterprise,193000,2024-09-20
+C0110,Northstar Synthetic 110,Europe,Mid-Market,46000,2023-12-31
+C0111,Northstar Synthetic 111,Asia Pacific,Growth,185000,2024-09-19
+C0112,Northstar Synthetic 112,North America,Enterprise,155000,2024-09-04
+C0113,Northstar Synthetic 113,Europe,Mid-Market,65000,2022-11-30
+C0114,Northstar Synthetic 114,Asia Pacific,Growth,25000,2023-12-03
+C0115,Northstar Synthetic 115,North America,Enterprise,139000,2023-04-12
+C0116,Northstar Synthetic 116,Europe,Mid-Market,47000,2024-02-03
+C0117,Northstar Synthetic 117,Asia Pacific,Growth,185000,2024-05-30
+C0118,Northstar Synthetic 118,North America,Enterprise,112000,2025-03-17
+C0119,Northstar Synthetic 119,Europe,Mid-Market,198000,2024-11-22
+C0120,Northstar Synthetic 120,Asia Pacific,Growth,171000,2024-09-19

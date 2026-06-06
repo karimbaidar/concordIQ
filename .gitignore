@@ -1,0 +1,38 @@
+# Private planning and local agent memory
+build-prompt.md
+execution-playbook.md
+concord-iq-architecture.md
+concord-iq-build-prompt.md
+concord-iq-execution-playbook.md
+concord-iq-kickoff-prompt.md
+CLAUDE.md
+AGENTS.md
+SKILLS.md
+docs/wiki/
+_planning/
+
+# Environment and Python
+.env
+.env.*
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# JavaScript
+node_modules/
+
+# Local databases and services
+.duckdb
+*.duckdb
+postgres-data/
+
+# Replay captures
+artifacts/replay/raw/*
+!artifacts/replay/raw/.gitkeep
+!artifacts/replay/sanitized/
+!artifacts/replay/sanitized/**
