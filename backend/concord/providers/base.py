@@ -171,6 +171,7 @@ class CloudProviderScaffold:
     settings: Settings = field(default_factory=Settings)
     name: str = "CloudProvider"
     mode: ProviderMode = ProviderMode.LOCAL
+    uses_cloud: bool = True
 
     def require_ready(self) -> None:
         """Verify cloud opt-in, then report that the adapter is not configured."""

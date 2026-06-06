@@ -15,6 +15,7 @@ seed:
 	$(PYTHON) -m concord.seed.seed_duckdb
 
 test:
+	docker compose up -d --wait postgres
 	$(PYTHON) -m pytest
 
 lint:
@@ -22,7 +23,7 @@ lint:
 	$(PYTHON) -m ruff format --check backend tests
 
 dev:
-	@echo "The API and frontend are scheduled for later phases; P0 provides data and storage foundations."
+	$(PYTHON) -m uvicorn concord.api.main:app --reload
 
 demo:
 	@echo "The headless reconciliation demo is scheduled for Phase P3."

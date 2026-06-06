@@ -1,1 +1,5 @@
-"""FastAPI surface implemented after the P0 data foundation."""
+"""FastAPI surface for Concord IQ."""
+
+from concord.api.main import create_app
+
+__all__ = ["create_app"]

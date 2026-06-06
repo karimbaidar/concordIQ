@@ -21,13 +21,13 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-This repository is being built in tested phases. **Phase P1 is the current public
-state:** the typed grounding contract, ontology, authority rules, three scenario
-registries, deterministic DuckDB execution, and provider contract tests work.
+This repository is being built in tested phases. **Phase P2 is the current public
+state:** Active Customer runs end to end through the typed state machine, deterministic
+agents, skeptical verifier, PostgreSQL evidence store, and `POST /reconcile`.
 
-The reconciliation engine, persistence workflow, API, UI, Microsoft IQ adapters,
-and sanitized IQ capture are not represented as complete. Their package boundaries
-and roadmap remain visible without overstating what works.
+Net Revenue verdicting, Churn refusal, the UI, Microsoft IQ adapters, and sanitized
+IQ capture are not represented as complete. Their package boundaries and roadmap
+remain visible without overstating what works.
 
 ## Why it matters
 
@@ -58,10 +58,10 @@ When complete, Concord IQ will:
 | Net Revenue | Finance and Sales wording differs while both bindings select the same seeded result | Rule it consistent by result-set equality |
 | Churned Customer | Finance uses contract end; Customer Success uses prolonged inactivity and grace | Detect divergence, then refuse because authority is shared |
 
-The P0 generator already creates the synthetic analytical tables and cohorts that
-later phases will bind to these definitions. No real customer or tenant data is used.
+The deterministic generator creates the synthetic analytical tables and cohorts.
+No real customer or tenant data is used.
 
-## Quick start: Phase P0
+## Quick start: Phase P2
 
 ### Prerequisites
 
@@ -87,34 +87,24 @@ make seed
 The command writes deterministic CSV fixtures to `data/synthetic/` and loads the
 same rows into the ignored local database `data/concord_iq.duckdb`.
 
-### Verify P0
+### Verify the reasoning slice
 
 ```bash
 make lint
 make test
 ```
 
-The key acceptance test is:
+The suite covers seed determinism, provider contracts, Active Customer conflict,
+impact ranking, evidence persistence, cloud guards, context scope, and the API.
 
-```text
-test_synthetic_seed_is_deterministic
-```
-
-It seeds two independent DuckDB databases and compares the canonical digest, table
-counts, and every ordered row.
-
-## Target demo workflow
+### Run the API
 
 ```bash
-make setup
-make seed
-make test
-make demo
 make dev
 ```
 
-This is the final intended local workflow. `make demo` and the web application are
-intentionally not implemented in P0; the roadmap states which phase owns them.
+Open `http://localhost:8000/docs` and call `POST /reconcile`. The headless
+three-scenario `make demo` target belongs to P3.
 
 ## Architecture
 
@@ -288,7 +278,7 @@ files.
 
 ## Evaluation
 
-P1 proves seed determinism and the local grounding contract. Later phase gates add:
+P2 proves the Active Customer conflict and evidence-backed proposal. Later gates add:
 
 | Phase | Acceptance focus |
 | --- | --- |
@@ -324,7 +314,7 @@ real product visuals after the relevant UI exists.
 
 - [x] P0: repository, storage models, deterministic seed, test, README
 - [x] P1: ontology, authority rules, metric definitions, `LocalProvider`
-- [ ] P2: Active Customer reasoning engine and persisted evidence
+- [x] P2: Active Customer reasoning engine and persisted evidence
 - [ ] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [ ] P4: demo-first React interface
 - [ ] P5: verified Foundry IQ and Fabric IQ adapters, capture, replay, docs
@@ -332,7 +322,7 @@ real product visuals after the relevant UI exists.
 
 ## Limitations
 
-- P1 evaluates definitions but does not produce reconciliation verdicts yet.
+- P2 produces a verdict only for Active Customer; other scenarios return HTTP 422.
 - The data is synthetic and intentionally engineered for known evaluation cases.
 - Behavioral equivalence is proven only over the bound data and period being tested.
 - Microsoft IQ preview surfaces, pricing, permissions, and availability can change.
