@@ -6,7 +6,7 @@
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-P5_capture_blocked-orange)](#implementation-status)
+[![Status](https://img.shields.io/badge/Status-P6_local_ready-orange)](#implementation-status)
 [![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
@@ -29,6 +29,7 @@ Phase P5 adds guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, a
 provider status endpoint, and product documentation. This workspace had no
 configured Microsoft tenant, so the required real IQ smoke capture remains
 blocked. No sanitized artifact or successful Microsoft IQ call is claimed.
+P6 optional local narration is implemented without weakening that limitation.
 
 ## Why it matters
 
@@ -127,8 +128,8 @@ reasoning timeline, verifier status, governed outcome, and exact SQL evidence.
 
 Concord IQ separates semantic grounding from optional language generation. The
 deterministic truth path is SQL result-set comparison plus authority-rule lookup.
-An LLM may eventually narrate already verified evidence, but it cannot alter a
-conflict verdict, authority decision, or stored result.
+An optional local LLM can narrate verified evidence, but its text-only contract
+cannot alter a conflict verdict, authority decision, or stored result.
 
 ```mermaid
 flowchart TD
@@ -143,6 +144,8 @@ flowchart TD
     ENGINE --> POSTGRES[("PostgreSQL registry and evidence")]
     ENGINE --> VERIFY["Deterministic verifier"]
     VERIFY --> AUDIT["Evidence and audit trail"]
+    ENGINE -. "verified facts only" .-> LLM["Disabled or Ollama narrator"]
+    LLM -. "text only" .-> UI
 ```
 
 ![Architecture graphic placeholder](docs/assets/architecture-placeholder.svg)
@@ -256,8 +259,16 @@ currently committed.
 
 ## Optional local LLM
 
-The core runs with `LLM_PROVIDER=disabled`. A future optional Ollama mode may
-narrate verified findings, but it cannot replace evidence, SQL, or authority rules.
+The core runs with `LLM_PROVIDER=disabled`. To add local proposal, verifier, and
+audit explanations:
+
+```bash
+ollama pull qwen3:8b
+LLM_PROVIDER=ollama OLLAMA_MODEL=qwen3:8b make dev
+```
+
+If Ollama is unavailable, Concord IQ uses reviewed deterministic fallback text.
+Narration never replaces evidence, SQL execution, verdicts, or authority rules.
 
 ## Synthetic data contract
 
@@ -293,19 +304,6 @@ Private prompts, planning files, agent instructions, and local checkpoint memory
 are excluded from version control. A clean public clone depends only on product
 files.
 
-## Evaluation
-
-Current acceptance status:
-
-| Phase | Acceptance focus |
-| --- | --- |
-| P0 | Repeatable synthetic seed |
-| P1 | Ontology resolution, bindings, and LocalProvider execution |
-| P2 | Active Customer conflict, impact rank, evidence, cloud guard |
-| P3 | Net Revenue decoy, Churned Customer refusal, headless demo — complete |
-| P4 | Reviewer-facing demo interface and reasoning timeline — complete |
-| P5 | Adapters, guards, replay contract, capture command, docs — real capture blocked |
-
 ## Hackathon alignment
 
 **Reasoning Agents:** Concord IQ decomposes reconciliation into concept resolution,
@@ -327,7 +325,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
 - [x] P4: demo-first React interface
 - [ ] P5: adapters, capture/replay, docs; real IQ capture still required
-- [ ] P6: optional Ollama narration
+- [x] P6: optional Ollama narration, advisory verifier critique, audit explanation
 
 ## Limitations
 

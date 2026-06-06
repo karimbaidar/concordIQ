@@ -21,6 +21,10 @@ flowchart LR
     REPLAY --> ARTIFACT[("Sanitized replay JSON")]
     FOUNDRY --> SEARCH["Azure AI Search knowledge base"]
     FABRIC --> ONTOLOGY["Fabric ontology MCP"]
+    RUNNER -. "verified facts only" .-> LLM["LLMProvider"]
+    LLM --> DISABLED["DisabledLLMProvider"]
+    LLM --> OLLAMA["OllamaLLMProvider"]
+    LLM -. "narration records only" .-> UI
     RUNNER --> POSTGRES[("PostgreSQL evidence and audit")]
 ```
 
@@ -59,6 +63,17 @@ reviewed, synthetic-only capture. The Foundry and Fabric adapters retrieve the
 same typed snapshot from Microsoft IQ surfaces and cache it for the remainder of
 the case. They never fall back to local data silently.
 
+`LLMProvider` is a separate axis. Disabled mode returns reviewed deterministic
+text. Ollama posts schema-constrained requests to the local `/api/chat` endpoint.
+Its result type contains text and provenance only, so it cannot return a verdict,
+authority choice, evidence set, impact value, or approval decision. Connection or
+validation failures fall back without interrupting reconciliation.
+
+The adapter follows Ollama's official
+[chat API](https://docs.ollama.com/api/chat) and
+[structured output](https://docs.ollama.com/capabilities/structured-outputs)
+contracts with streaming disabled and temperature zero.
+
 ## Data flow and trust
 
 1. The user selects one of three synthetic scenarios.
@@ -66,7 +81,8 @@ the case. They never fall back to local data silently.
 3. Trusted definition bindings produce entity sets and metric totals.
 4. Agents compare behavior, rank impact, and consult authority rules.
 5. The verifier checks evidence completeness and decision constraints.
-6. PostgreSQL stores the auditable case.
+6. Optional narration receives a compact copy of those verified facts.
+7. PostgreSQL stores the auditable case, including narration provenance.
 
 The context packet excludes execution results and decisions until those stages
 have run. This keeps each specialist scoped to the information it needs.

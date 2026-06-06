@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from concord.llm import NarrationResult
 from concord.orchestration.state_machine import (
     ReconciliationState,
     require_transition,
@@ -126,6 +127,7 @@ class ReconciliationDecision(CaseModel):
     proposal: ReconciliationProposal | None = None
     refusal_reason: str | None = None
     requires_human_approval: bool = False
+    narration: NarrationResult | None = None
 
 
 class VerifierReport(CaseModel):
@@ -135,6 +137,7 @@ class VerifierReport(CaseModel):
     checks: dict[str, bool]
     failures: tuple[str, ...] = ()
     advisory_notes: tuple[str, ...] = ()
+    narration: NarrationResult | None = None
 
 
 class ReconciliationCase(CaseModel):
@@ -156,6 +159,7 @@ class ReconciliationCase(CaseModel):
     refusal_reason: str | None = None
     requires_human_approval: bool = False
     verifier_report: VerifierReport | None = None
+    narrations: tuple[NarrationResult, ...] = ()
     evidence: tuple[EvidenceRecord, ...] = ()
     audit_log: tuple[TimelineEntry, ...] = ()
 

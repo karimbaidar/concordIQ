@@ -1,10 +1,21 @@
 """Deterministic blocking checks over verified evidence."""
 
+from dataclasses import dataclass, field
+
+from concord.llm import (
+    DisabledLLMProvider,
+    LLMProvider,
+    NarrationRequest,
+    NarrationTask,
+)
 from concord.orchestration.casefile import ReconciliationCase, VerifierReport
 
 
+@dataclass(slots=True)
 class SkepticalVerifierAgent:
     """Block unsupported conflicts and proposals without consulting an LLM."""
+
+    llm_provider: LLMProvider = field(default_factory=DisabledLLMProvider)
 
     def run(self, case: ReconciliationCase) -> VerifierReport:
         concept_id = case.resolved_concept.concept_id if case.resolved_concept else ""
@@ -95,11 +106,30 @@ class SkepticalVerifierAgent:
         else:
             checks["scenario_is_supported"] = False
         failures = tuple(name for name, passed in checks.items() if not passed)
+        passed = not failures
+        narration = self.llm_provider.narrate(
+            NarrationRequest(
+                task=NarrationTask.VERIFIER,
+                facts={
+                    "concept_id": concept_id,
+                    "verdict": case.verdict,
+                    "passed": passed,
+                    "checks": checks,
+                    "failure_names": failures,
+                    "evidence_count": len(case.evidence),
+                },
+                fallback_text=(
+                    "All deterministic blocking checks passed over the stored SQL "
+                    "evidence and configured authority."
+                    if passed
+                    else f"Deterministic blocking checks failed: {', '.join(failures)}."
+                ),
+            )
+        )
         return VerifierReport(
-            passed=not failures,
+            passed=passed,
             checks=checks,
             failures=failures,
-            advisory_notes=(
-                "LLM critique is disabled; blocking checks use structured evidence only.",
-            ),
+            advisory_notes=(narration.text,),
+            narration=narration,
         )

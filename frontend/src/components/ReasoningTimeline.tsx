@@ -66,6 +66,9 @@ export function ReasoningTimeline({ result }: ReasoningTimelineProps) {
               </li>
             ))}
           </ul>
+          <p className="verifier-advisory">
+            {result.verifier_report.advisory_notes[0]}
+          </p>
         </div>
       )}
     </section>

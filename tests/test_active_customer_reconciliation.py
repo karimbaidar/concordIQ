@@ -169,6 +169,9 @@ def test_api_health(
         "provider": "LocalProvider",
         "cloud_enabled": False,
         "data_type": "synthetic",
+        "llm_provider": "DisabledLLMProvider",
+        "llm_enabled": False,
+        "llm_model": None,
     }
 
 

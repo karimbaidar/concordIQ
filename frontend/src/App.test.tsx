@@ -154,8 +154,35 @@ function makeCase(
         scenario_outcome_is_supported: true,
       },
       failures: [],
-      advisory_notes: [],
+      advisory_notes: ["All deterministic blocking checks passed."],
+      narration: null,
     },
+    narrations: [
+      {
+        task: "decision",
+        text: "The executed definitions materially diverge.",
+        provider_name: "DisabledLLMProvider",
+        model: null,
+        generated: false,
+        fallback_reason: "LLM narration is disabled.",
+      },
+      {
+        task: "verifier",
+        text: "All deterministic blocking checks passed.",
+        provider_name: "DisabledLLMProvider",
+        model: null,
+        generated: false,
+        fallback_reason: "LLM narration is disabled.",
+      },
+      {
+        task: "audit",
+        text: "Concord IQ completed the verified case.",
+        provider_name: "DisabledLLMProvider",
+        model: null,
+        generated: false,
+        fallback_reason: "LLM narration is disabled.",
+      },
+    ],
     evidence,
     audit_log: [
       {
@@ -196,6 +223,9 @@ describe("Concord IQ demo", () => {
             provider: "LocalProvider",
             cloud_enabled: false,
             data_type: "synthetic",
+            llm_provider: "DisabledLLMProvider",
+            llm_enabled: false,
+            llm_model: null,
           });
         }
         if (url.endsWith("/demo/scenarios")) {
@@ -235,6 +265,8 @@ describe("Concord IQ demo", () => {
     expect(screen.getByText("Proposed canonical definition")).toBeInTheDocument();
     expect(screen.getByText("Skeptical verifier passed")).toBeInTheDocument();
     expect(screen.getByLabelText("3 evidence records")).toBeInTheDocument();
+    expect(screen.getByText("Evidence narration")).toBeInTheDocument();
+    expect(screen.getAllByText("deterministic fallback")).toHaveLength(3);
   });
 
   it("surfaces both the decoy and governed-refusal outcomes", async () => {

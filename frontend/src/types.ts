@@ -6,6 +6,9 @@ export interface HealthStatus {
   provider: string;
   cloud_enabled: boolean;
   data_type: string;
+  llm_provider: string;
+  llm_enabled: boolean;
+  llm_model: string | null;
 }
 
 export interface DemoScenario {
@@ -108,6 +111,16 @@ export interface VerifierReport {
   checks: Record<string, boolean>;
   failures: string[];
   advisory_notes: string[];
+  narration: NarrationResult | null;
+}
+
+export interface NarrationResult {
+  task: "decision" | "verifier" | "audit";
+  text: string;
+  provider_name: string;
+  model: string | null;
+  generated: boolean;
+  fallback_reason: string | null;
 }
 
 export interface ReconciliationCase {
@@ -143,6 +156,7 @@ export interface ReconciliationCase {
   refusal_reason: string | null;
   requires_human_approval: boolean;
   verifier_report: VerifierReport | null;
+  narrations: NarrationResult[];
   evidence: EvidenceRecord[];
   audit_log: TimelineEntry[];
 }

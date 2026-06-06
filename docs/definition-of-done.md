@@ -32,6 +32,14 @@
 - [x] Architecture documentation includes Mermaid diagrams.
 - [ ] A public license is selected.
 
+## Optional narration
+
+- [x] `DisabledLLMProvider` is the default and makes no network request.
+- [x] `OllamaLLMProvider` uses the local structured chat API.
+- [x] Decision, verifier, and audit narration carries explicit provenance.
+- [x] Ollama failure falls back without breaking reconciliation.
+- [x] Tests prove generated text cannot override evidence or deterministic decisions.
+
 ## Release gate
 
 P5 is not fully complete until the two unchecked real-capture items are satisfied.

@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from concord.config import Settings
+from concord.llm import create_llm_provider
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import LocalProvider
@@ -93,6 +94,7 @@ def main() -> None:
         provider=LocalProvider(duckdb_path=settings.duckdb_path),
         repository=repository,
         settings=settings,
+        llm_provider=create_llm_provider(settings),
     )
     try:
         run_demo(runner)

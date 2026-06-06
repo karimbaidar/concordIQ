@@ -11,6 +11,9 @@ export function ProviderBadge({ health, result }: ProviderBadgeProps) {
   const mode = metadata?.mode ?? "local";
   const cloudEnabled = metadata?.uses_cloud ?? health?.cloud_enabled ?? false;
   const dataType = metadata?.data_type ?? health?.data_type ?? "synthetic";
+  const llmLabel = health?.llm_enabled
+    ? health.llm_model ?? health.llm_provider
+    : "narration off";
 
   return (
     <div className="provider-badge" aria-label="Runtime status">
@@ -19,7 +22,7 @@ export function ProviderBadge({ health, result }: ProviderBadgeProps) {
         <strong>{provider}</strong>
         <small className="provider-mode">{mode} mode</small>
         <small className="runtime-summary">
-          {mode} · {cloudEnabled ? "cloud on" : "cloud off"} · {dataType}
+          {mode} · {cloudEnabled ? "cloud on" : "cloud off"} · {llmLabel}
         </small>
       </span>
       <span className="badge-divider" />

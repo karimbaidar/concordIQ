@@ -19,6 +19,8 @@ meaning. Concord IQ finds when teams share a term but not an operational
 definition.”
 
 Point to the three terms in the scenario selector.
+If Ollama is enabled, point out its model name in the runtime badge. Otherwise,
+explain that deterministic narration fallback is active.
 
 ## 0:35–2:10 — Active Customer
 
@@ -29,6 +31,7 @@ Point to the three terms in the scenario selector.
 5. Walk through the ten-state reasoning timeline and verifier pass.
 6. Open the draft semantic pull request and emphasize human approval.
 7. Expand one evidence item to show exact SQL.
+8. Show the evidence narration panel and its provenance label.
 
 Judge takeaway: the conflict is proven by data, not guessed from wording.
 

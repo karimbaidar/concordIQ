@@ -76,6 +76,9 @@ class ReconciliationRepository:
                     "refusal_reason": case.refusal_reason,
                     "requires_human_approval": case.requires_human_approval,
                     "verifier": case.verifier_report.model_dump(mode="json"),
+                    "narrations": [
+                        narration.model_dump(mode="json") for narration in case.narrations
+                    ],
                 },
             )
             session.add(finding)

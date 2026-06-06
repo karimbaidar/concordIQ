@@ -23,6 +23,9 @@ def health(request: Request) -> dict[str, object]:
         "provider": runner.provider.name,
         "cloud_enabled": runner.settings.allow_cloud,
         "data_type": getattr(runner.provider, "data_type", "synthetic"),
+        "llm_provider": runner.llm_provider.name,
+        "llm_enabled": runner.llm_provider.enabled,
+        "llm_model": runner.llm_provider.model,
     }
 
 

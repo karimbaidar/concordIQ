@@ -15,6 +15,7 @@ from concord.agents import (
     SkepticalVerifierAgent,
 )
 from concord.config import Settings
+from concord.llm import DisabledLLMProvider, LLMProvider
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.context_packet import build_context_packet
 from concord.orchestration.state_machine import ReconciliationState
@@ -33,6 +34,7 @@ class ReconciliationRunner:
     provider: GroundingProvider
     repository: ReconciliationRepository
     settings: Settings = field(default_factory=Settings)
+    llm_provider: LLMProvider = field(default_factory=DisabledLLMProvider)
 
     def __post_init__(self) -> None:
         if self.provider.uses_cloud:
@@ -113,7 +115,7 @@ class ReconciliationRunner:
             summary=f"Authority is {authority.status}: {authority.owner or 'no owner'}.",
         )
 
-        decision = ReconciliationAgent().run(
+        decision = ReconciliationAgent(self.llm_provider).run(
             concept.concept_id,
             execution.verdict,
             bindings,
@@ -124,6 +126,8 @@ class ReconciliationRunner:
         case.reconciliation_proposal = decision.proposal
         case.refusal_reason = decision.refusal_reason
         case.requires_human_approval = decision.requires_human_approval
+        if decision.narration:
+            case.narrations = (*case.narrations, decision.narration)
         decision_summaries = {
             "propose": "Created a draft canonical definition with human approval required.",
             "refuse": "Refused automatic reconciliation and routed it to human approval.",
@@ -135,8 +139,10 @@ class ReconciliationRunner:
             summary=decision_summaries[decision.action],
         )
 
-        verifier = SkepticalVerifierAgent().run(case)
+        verifier = SkepticalVerifierAgent(self.llm_provider).run(case)
         case.verifier_report = verifier
+        if verifier.narration:
+            case.narrations = (*case.narrations, verifier.narration)
         case.transition(
             ReconciliationState.VERIFY,
             agent="SkepticalVerifierAgent",
@@ -160,5 +166,5 @@ class ReconciliationRunner:
             agent="CoordinatorAgent",
             summary=f"Completed the verified {concept.canonical_name} reconciliation.",
         )
-        AuditAgent(self.repository).run(case)
+        AuditAgent(self.repository, self.llm_provider).run(case)
         return case

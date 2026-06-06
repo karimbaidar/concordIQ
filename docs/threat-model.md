@@ -14,6 +14,7 @@
 flowchart LR
     USER["Reviewer"] --> APP["Local app"]
     APP --> DB[("PostgreSQL / DuckDB")]
+    APP -. "verified facts only" .-> OLLAMA["Local Ollama"]
     APP -. "explicit opt-in only" .-> IQ["Microsoft IQ endpoint"]
     IQ --> RAW["Ignored raw capture"]
     RAW --> REVIEW["Typed validation + human review"]
@@ -30,7 +31,9 @@ flowchart LR
 | Confidential business data | synthetic datasets and scenarios only |
 | Fabric/Foundry response drift | strict typed snapshot validation and fail-closed parsing |
 | Prompt or tool injection | adapters request registered snapshots; deterministic verifier owns decisions |
-| Generated narrative changes truth | core decisions use SQL, rules, and typed agents without an LLM |
+| Generated narrative changes truth | text-only result type; typed decisions are finalized separately |
+| Prompt injection through fact values | facts are JSON data; system prompt forbids instruction following |
+| Ollama unavailable or malformed | deterministic fallback; reconciliation continues |
 | Silent provider fallback | provider factory raises instead of substituting LocalProvider |
 | Replay provenance confusion | verified capture flag required by default |
 | Unsupported governance choice | reconciliation refuses when authority is missing or ambiguous |

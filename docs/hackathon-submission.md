@@ -46,6 +46,8 @@ mode and is not represented as Microsoft IQ.
 - no LLM required for core behavior
 - hard cloud request budget
 - raw capture isolation and sanitized replay validation
+- optional local Ollama narration with a text-only output contract
+- deterministic fallback when Ollama is unavailable or returns invalid output
 
 ## Current limitation
 

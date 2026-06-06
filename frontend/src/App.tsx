@@ -6,6 +6,7 @@ import { DecoyRuledOut } from "./components/DecoyRuledOut";
 import { DefinitionDiff } from "./components/DefinitionDiff";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ImpactPanel } from "./components/ImpactPanel";
+import { NarrationPanel } from "./components/NarrationPanel";
 import { ProviderBadge } from "./components/ProviderBadge";
 import { ReasoningTimeline } from "./components/ReasoningTimeline";
 import { RefusalCard } from "./components/RefusalCard";
@@ -235,6 +236,8 @@ export default function App() {
               />
             )}
             {result.verdict === "consistent" && <DecoyRuledOut result={result} />}
+
+            <NarrationPanel narrations={result.narrations} />
 
             <div id="evidence">
               <EvidencePanel result={result} />
