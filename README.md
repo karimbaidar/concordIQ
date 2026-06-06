@@ -6,7 +6,7 @@
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Phase_P3-core_complete-brightgreen)](#implementation-status)
+[![Status](https://img.shields.io/badge/Status-Phase_P4-demo_ready-brightgreen)](#implementation-status)
 [![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
@@ -21,14 +21,13 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-This repository is being built in tested phases. **Phase P3 is the current public
+This repository is being built in tested phases. **Phase P4 is the current public
 state:** all three synthetic scenarios run end to end through the typed state
 machine, deterministic agents, skeptical verifier, PostgreSQL evidence store,
-API, and headless demo.
+API, headless demo, and reviewer-facing React workbench.
 
-The UI, working Microsoft IQ adapters, and sanitized IQ capture are not represented
-as complete. Their package boundaries and roadmap remain visible without
-overstating what works.
+Working Microsoft IQ adapters and sanitized IQ capture remain incomplete. Their
+package boundaries and roadmap stay visible without overstating what works.
 
 ## Why it matters
 
@@ -68,7 +67,7 @@ No real customer or tenant data is used.
 
 - Docker Desktop with Docker Compose v2
 - [`uv`](https://docs.astral.sh/uv/) for Python 3.12 environment management
-- GNU Make
+- Node.js, pnpm, and GNU Make
 
 ### Build the local foundation
 
@@ -113,14 +112,15 @@ Net Revenue: CONSISTENT | counts=96/96 | decoy ruled out; no reconciliation need
 Churned Customer: CONFLICT | counts=20/40 | automatic reconciliation refused; human approval required
 ```
 
-### Run the API
+### Run the reviewer workbench
 
 ```bash
 make dev
 ```
 
-Open `http://localhost:8000/docs` and call `POST /reconcile`, inspect
-`GET /demo/scenarios`, or run one case through `POST /demo/run/{scenario_id}`.
+Open `http://127.0.0.1:5173` for the UI or `http://127.0.0.1:8000/docs` for
+the API. The workbench exposes provider safety, definitions, impact, the full
+reasoning timeline, verifier status, governed outcome, and exact SQL evidence.
 
 ## Architecture
 
@@ -280,6 +280,7 @@ backend/concord/
   providers/       Local, Replay, Foundry IQ, Fabric IQ
   seed/            fixed-seed synthetic generator
   storage/         SQLAlchemy registry models
+frontend/           React/Vite reviewer workbench
 data/synthetic/    committed synthetic CSV fixtures
 tests/             deterministic acceptance tests
 docs/assets/       honest graphic placeholders
@@ -294,7 +295,7 @@ files.
 
 ## Evaluation
 
-P3 proves the complete deterministic credibility core:
+P4 preserves the deterministic credibility core and adds the reviewer interface:
 
 | Phase | Acceptance focus |
 | --- | --- |
@@ -302,7 +303,7 @@ P3 proves the complete deterministic credibility core:
 | P1 | Ontology resolution, bindings, and LocalProvider execution |
 | P2 | Active Customer conflict, impact rank, evidence, cloud guard |
 | P3 | Net Revenue decoy, Churned Customer refusal, headless demo — complete |
-| P4 | Reviewer-facing demo interface and reasoning timeline |
+| P4 | Reviewer-facing demo interface and reasoning timeline — complete |
 | P5 | Verified IQ adapters, sanitized replay, provider contract |
 
 ## Hackathon alignment
@@ -325,7 +326,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P1: ontology, authority rules, metric definitions, `LocalProvider`
 - [x] P2: Active Customer reasoning engine and persisted evidence
 - [x] P3: Net Revenue decoy, Churned Customer refusal, `make demo`
-- [ ] P4: demo-first React interface
+- [x] P4: demo-first React interface
 - [ ] P5: verified Foundry IQ and Fabric IQ adapters, capture, replay, docs
 - [ ] P6: optional Ollama narration
 
