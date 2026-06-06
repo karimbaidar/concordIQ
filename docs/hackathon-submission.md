@@ -13,16 +13,18 @@ refuses a governed semantic reconciliation.
 
 ### Reasoning Agents
 
-The agent uses a typed state machine and specialist roles for concept resolution,
-binding inspection, conflict hypothesis, data execution, impact ranking,
-authority resolution, reconciliation, skeptical verification, and audit.
+Microsoft Agent Framework coordinates ten typed specialist workflow nodes for
+concept resolution, binding inspection, conflict hypothesis, data execution,
+impact ranking, authority resolution, reconciliation, skeptical verification,
+and audit. The existing deterministic runner is exposed as their domain tool.
 
 ### Best Use of IQ Tools
 
-The architecture includes guarded adapters for:
+The architecture uses:
 
-- Azure AI Search knowledge bases used by Foundry IQ
-- Fabric IQ ontology MCP
+- Fabric IQ ontology MCP as the primary semantic grounding provider
+- Foundry IQ knowledge-base retrieval as the fallback IQ provider
+- Foundry Agent Service as the deployment path
 
 `ReplayProvider` is designed to preserve a reviewed real-IQ response for
 zero-spend rehearsal. `LocalProvider` is clearly labeled deterministic reviewer
@@ -36,6 +38,7 @@ mode and is not represented as Microsoft IQ.
   shared or ambiguous.
 - Every completed case retains executed SQL, evidence, verifier checks, and audit.
 - Cloud calls are impossible under default configuration.
+- The HTTP API executes through the Microsoft Agent Framework workflow.
 
 ## Reliability
 
@@ -54,7 +57,8 @@ mode and is not represented as Microsoft IQ.
 The adapter code and contract tests are complete, but the development workspace
 did not have a Microsoft tenant or IQ resource available for the required real
 smoke capture. No real-integration claim should be made until a sanitized capture
-is committed and demonstrated through `ReplayProvider`.
+is committed and demonstrated through `ReplayProvider`. The Foundry Agent Service
+entrypoint is scaffolding and has not been tenant-deployed.
 
 ## Future work
 

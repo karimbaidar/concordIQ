@@ -10,6 +10,32 @@ from concord.providers.local import LocalProvider
 from concord.providers.replay import ReplayProvider
 
 
+def fabric_iq_is_configured(settings: Settings) -> bool:
+    """Return Fabric IQ readiness without making a network request."""
+    return bool(settings.fabric_iq_mcp_endpoint and settings.fabric_iq_access_token)
+
+
+def foundry_iq_is_configured(settings: Settings) -> bool:
+    """Return Foundry IQ readiness without making a network request."""
+    return bool(
+        settings.foundry_iq_endpoint
+        and settings.foundry_iq_knowledge_base
+        and (settings.foundry_iq_access_token or settings.foundry_iq_api_key)
+    )
+
+
+def create_preferred_cloud_provider(settings: Settings) -> GroundingProvider:
+    """Prefer Fabric IQ, using Foundry IQ only when Fabric is not configured."""
+    if fabric_iq_is_configured(settings):
+        return FabricIQProvider(settings)
+    if foundry_iq_is_configured(settings):
+        return FoundryIQProvider(settings)
+    raise ProviderNotConfigured(
+        "No cloud IQ provider is configured. Configure Fabric IQ first or Foundry IQ "
+        "as the fallback."
+    )
+
+
 def create_provider(settings: Settings) -> GroundingProvider:
     """Create exactly the configured provider without falling back silently."""
     try:
@@ -62,21 +88,17 @@ def provider_statuses(settings: Settings) -> list[dict[str, Any]]:
             ),
         },
         {
-            "mode": ProviderMode.FOUNDRY_IQ,
-            "name": "FoundryIQProvider",
-            "configured": bool(
-                settings.foundry_iq_endpoint
-                and settings.foundry_iq_knowledge_base
-                and (settings.foundry_iq_access_token or settings.foundry_iq_api_key)
-            ),
-            "cloud": True,
-            "detail": "Azure AI Search knowledge-base retrieve adapter.",
-        },
-        {
             "mode": ProviderMode.FABRIC_IQ,
             "name": "FabricIQProvider",
-            "configured": bool(settings.fabric_iq_mcp_endpoint and settings.fabric_iq_access_token),
+            "configured": fabric_iq_is_configured(settings),
             "cloud": True,
-            "detail": "Fabric IQ ontology MCP adapter.",
+            "detail": "Primary cloud grounding: Fabric IQ ontology MCP adapter.",
+        },
+        {
+            "mode": ProviderMode.FOUNDRY_IQ,
+            "name": "FoundryIQProvider",
+            "configured": foundry_iq_is_configured(settings),
+            "cloud": True,
+            "detail": "Fallback cloud grounding: Azure AI Search knowledge-base adapter.",
         },
     ]

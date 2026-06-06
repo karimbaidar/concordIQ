@@ -11,6 +11,8 @@ make dev
 
 Open `http://127.0.0.1:5173`. Confirm the provider badge says
 `LocalProvider`, cloud is disabled, and data is synthetic.
+Run `make agent-smoke` once to show the same deterministic case through Microsoft
+Agent Framework.
 
 ## 0:00–0:35 — The problem
 
@@ -56,10 +58,12 @@ Judge takeaway: the agent does not invent governance authority.
 
 Open `GET /providers` in the API docs. Explain:
 
+- Microsoft Agent Framework orchestrates the specialist workflow.
+- Foundry Agent Service is the deployment path.
+- Fabric IQ is the primary semantic grounding provider.
+- Foundry IQ is the fallback knowledge provider.
 - Local is reproducibility mode.
 - Replay is for a sanitized real-IQ capture.
-- Foundry uses Azure AI Search knowledge-base retrieval.
-- Fabric uses the ontology MCP endpoint.
 - Cloud remains off until an operator explicitly enables a budget.
 
 Do not claim a real IQ smoke test until the sanitized artifact is present.

@@ -2,7 +2,7 @@ UV ?= uv
 PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
-.PHONY: setup postgres seed test lint dev frontend demo capture clean
+.PHONY: setup postgres seed test lint dev frontend demo agent-smoke capture clean
 
 setup:
 	$(UV) sync --extra dev
@@ -38,6 +38,13 @@ dev: postgres seed
 
 demo: postgres seed
 	$(PYTHON) -m concord.demo
+
+agent-smoke: postgres seed
+	PYTHONWARNINGS="ignore::FutureWarning" \
+	$(PYTHON) -c "from concord.ms_agent.workflow import main; main()" \
+		--term "Active Customer" \
+		--period "2026-03-04/2026-06-01" \
+		--provider local
 
 capture:
 	$(PYTHON) -m concord.capture

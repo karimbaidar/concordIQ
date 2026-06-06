@@ -1,22 +1,24 @@
 # Concord IQ architecture
 
-Concord IQ is a semantic reconciliation agent with a deterministic truth path.
-It separates semantic grounding, analytical execution, governance, and optional
-language generation so a fluent explanation cannot change an evidence-backed
-verdict.
+Concord IQ uses Microsoft Agent Framework as its orchestration layer and the
+existing deterministic reconciliation engine as its domain tool layer. Semantic
+grounding, analytical execution, governance, and optional language generation
+remain separated so fluent explanation cannot change an evidence-backed verdict.
 
 ## System view
 
 ```mermaid
 flowchart LR
     UI["React reviewer workbench"] --> API["FastAPI"]
-    API --> RUNNER["Typed reconciliation runner"]
-    RUNNER --> AGENTS["Specialist agents"]
-    AGENTS --> PROVIDER["GroundingProvider contract"]
+    API --> MAF["Microsoft Agent Framework"]
+    MAF --> NODES["Ten specialist workflow nodes"]
+    NODES --> TOOL["reconcile_business_term"]
+    TOOL --> RUNNER["Deterministic ReconciliationRunner"]
+    RUNNER --> PROVIDER["GroundingProvider contract"]
     PROVIDER --> LOCAL["LocalProvider"]
     PROVIDER --> REPLAY["ReplayProvider"]
-    PROVIDER --> FOUNDRY["FoundryIQProvider"]
-    PROVIDER --> FABRIC["FabricIQProvider"]
+    PROVIDER --> FABRIC["FabricIQProvider primary"]
+    PROVIDER --> FOUNDRY["FoundryIQProvider fallback"]
     LOCAL --> DUCKDB[("DuckDB synthetic analytics")]
     REPLAY --> ARTIFACT[("Sanitized replay JSON")]
     FOUNDRY --> SEARCH["Azure AI Search knowledge base"]
@@ -26,9 +28,23 @@ flowchart LR
     LLM --> OLLAMA["OllamaLLMProvider"]
     LLM -. "narration records only" .-> UI
     RUNNER --> POSTGRES[("PostgreSQL evidence and audit")]
+    MAF -. "optional deployment" .-> HOST["Foundry Agent Service"]
 ```
 
 ## Reconciliation flow
+
+The Agent Framework graph is:
+
+```text
+CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
+-> ConflictHypothesisAgent -> DataExecutionAgent -> ImpactRankerAgent
+-> AuthorityResolverAgent -> ReconciliationAgent
+-> SkepticalVerifierAgent -> AuditAgent
+```
+
+The coordinator calls the deterministic domain tool once. Each later workflow
+node validates its corresponding typed output before forwarding the casefile.
+The domain tool retains the tested state machine:
 
 ```mermaid
 stateDiagram-v2
@@ -44,9 +60,8 @@ stateDiagram-v2
     AUDIT --> COMPLETE
 ```
 
-Each specialist writes typed output to a casefile. The skeptical verifier blocks
-unsupported proposals. The audit agent persists the result, evidence references,
-exact SQL, decision, and complete state timeline.
+The skeptical verifier blocks unsupported proposals. The audit agent persists the
+result, evidence references, exact SQL, decision, and complete state timeline.
 
 ## Provider model
 
@@ -58,10 +73,11 @@ All grounding modes implement the same contract:
 - return the relevant ontology subgraph
 - return configured authority rules
 
-`LocalProvider` is deterministic reviewer mode. `ReplayProvider` consumes a
-reviewed, synthetic-only capture. The Foundry and Fabric adapters retrieve the
-same typed snapshot from Microsoft IQ surfaces and cache it for the remainder of
-the case. They never fall back to local data silently.
+`LocalProvider` is deterministic reviewer mode, not fake Microsoft IQ.
+`ReplayProvider` consumes a reviewed, synthetic-only capture. For automatic cloud
+selection, Fabric IQ is preferred because ontology and governed business
+vocabulary are central to Concord IQ. Foundry IQ is the fallback knowledge
+provider. Neither cloud path falls back to local data silently.
 
 `LLMProvider` is a separate axis. Disabled mode returns reviewed deterministic
 text. Ollama posts schema-constrained requests to the local `/api/chat` endpoint.
@@ -88,6 +104,10 @@ The context packet excludes execution results and decisions until those stages
 have run. This keeps each specialist scoped to the information it needs.
 
 ## Deployment posture
+
+The workflow can be exposed through the optional Foundry Agent Service entrypoint
+in `concord.ms_agent.foundry_hosted_entrypoint`. The host requires explicit cloud
+permission and at least one configured cloud IQ provider before it starts.
 
 Cloud calls are disabled by default. Opening the UI, listing providers, running
 tests, and using `LocalProvider` or `ReplayProvider` make no Microsoft request.

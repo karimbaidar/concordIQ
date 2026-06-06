@@ -9,8 +9,12 @@ integration are different claims.
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode | None |
 | `ReplayProvider` | Rehearsal from a reviewed real-IQ capture | None |
-| `FoundryIQProvider` | Azure AI Search knowledge-base retrieval | Guarded HTTPS |
-| `FabricIQProvider` | Fabric IQ ontology MCP access | Guarded HTTPS/MCP |
+| `FabricIQProvider` | Primary semantic grounding through ontology MCP | Guarded HTTPS/MCP |
+| `FoundryIQProvider` | Fallback Azure AI Search knowledge-base retrieval | Guarded HTTPS |
+
+When the Agent Framework tool receives `provider=auto`, it selects configured
+Fabric IQ first. Foundry IQ is used only when Fabric IQ is unavailable. Explicit
+provider names never fall back silently, and local mode remains the default.
 
 The Foundry adapter calls the Azure AI Search knowledge-base `retrieve` action.
 The default API version is `2026-04-01`, which uses semantic intents and returns
@@ -24,6 +28,8 @@ adapter can be described as verified.
 
 Official references:
 
+- [Microsoft Agent Framework workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/)
+- [Foundry hosted agents](https://learn.microsoft.com/en-us/agent-framework/hosting/foundry-hosted-agent)
 - [Azure AI Search knowledge-base retrieval](https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-retrieve)
 - [Foundry IQ and agentic retrieval](https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-overview)
 - [Fabric IQ overview](https://learn.microsoft.com/en-us/fabric/iq/overview)
@@ -54,6 +60,15 @@ FABRIC_IQ_ACCESS_TOKEN=<short-lived-token>
 
 Secrets are represented as Pydantic secret values and are never included in
 provider status output, replay metadata, or logs.
+
+## Foundry Agent Service
+
+`concord.ms_agent.foundry_hosted_entrypoint` wraps the typed Microsoft Agent
+Framework workflow in the optional Foundry responses host. It refuses to start
+unless `ALLOW_CLOUD=true`, `MAX_CLOUD_CALLS` is positive, and Fabric IQ or Foundry
+IQ configuration is present. See the
+[integration README](../backend/concord/ms_agent/README.md) for environment
+variables and smoke commands.
 
 ## What counts as real integration
 

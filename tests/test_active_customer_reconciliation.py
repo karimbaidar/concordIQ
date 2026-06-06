@@ -166,6 +166,7 @@ def test_api_health(
     assert health.status_code == 200
     assert health.json() == {
         "status": "ok",
+        "orchestration": "Microsoft Agent Framework",
         "provider": "LocalProvider",
         "cloud_enabled": False,
         "data_type": "synthetic",
@@ -196,6 +197,7 @@ def test_api_post_reconcile(
     assert response.status_code == 200
     payload = response.json()
     assert UUID(payload["run_id"])
+    assert payload["request"]["question"] == "Why do our active customer dashboards disagree?"
     assert payload["verdict"] == "conflict"
     assert payload["state"] == "COMPLETE"
     assert payload["verifier_report"]["passed"] is True

@@ -14,6 +14,11 @@
 
 ## Provider readiness
 
+- [x] Microsoft Agent Framework is the primary API orchestration layer.
+- [x] All ten specialist roles are represented as typed workflow nodes.
+- [x] The existing `ReconciliationRunner` is exposed as a callable domain tool.
+- [x] Foundry Agent Service deployment scaffolding fails closed by default.
+- [x] Fabric IQ is preferred over the Foundry IQ fallback in automatic cloud mode.
 - [x] Local, Replay, Foundry IQ, and Fabric IQ modes share one typed contract.
 - [x] Cloud adapters fail closed and honor a hard request budget.
 - [x] Provider readiness is visible without making cloud calls.

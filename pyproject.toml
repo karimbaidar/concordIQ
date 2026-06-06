@@ -9,6 +9,7 @@ description = "A semantic reconciliation agent that proves when operational defi
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "agent-framework-core>=1.8,<2",
   "duckdb>=1.2,<2",
   "fastapi>=0.115,<1",
   "psycopg[binary]>=3.2,<4",
@@ -23,6 +24,10 @@ dev = [
   "pytest>=8.3,<9",
   "ruff>=0.9,<1",
 ]
+foundry-hosting = [
+  "agent-framework-foundry-hosting==1.0.0a260604",
+  "mcp>=1.24,<2",
+]
 
 [tool.setuptools]
 package-dir = {"" = "backend"}
@@ -34,6 +39,8 @@ where = ["backend"]
 addopts = "-q"
 filterwarnings = [
   "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
+  "ignore:\\[SKILLS\\].*:FutureWarning",
+  "ignore:\\[HARNESS\\].*:FutureWarning",
 ]
 pythonpath = ["backend"]
 testpaths = ["tests"]

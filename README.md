@@ -6,7 +6,7 @@
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-P6_local_ready-orange)](#implementation-status)
+[![Status](https://img.shields.io/badge/Status-Agent_Framework_ready-0078D4)](#implementation-status)
 [![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
@@ -21,15 +21,18 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 
 ## Implementation status
 
-The deterministic product runs all three synthetic scenarios end to end through
-the typed state machine, specialist agents, skeptical verifier, PostgreSQL
-evidence store, API, headless demo, and React reviewer workbench.
+Concord IQ uses Microsoft Agent Framework as the orchestration layer. Specialist
+agents coordinate through a typed casefile and call deterministic reconciliation
+tools. The workflow can be deployed through Foundry Agent Service. Fabric IQ is
+the primary semantic grounding provider, with Foundry IQ as fallback and
+LocalProvider for reproducible public review.
 
 Phase P5 adds guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, a
 provider status endpoint, and product documentation. This workspace had no
 configured Microsoft tenant, so the required real IQ smoke capture remains
 blocked. No sanitized artifact or successful Microsoft IQ call is claimed.
-P6 optional local narration is implemented without weakening that limitation.
+P6 optional local narration and the Agent Framework integration are implemented
+without weakening that limitation.
 
 ## Why it matters
 
@@ -41,7 +44,7 @@ P6 optional local narration is implemented without weakening that limitation.
 
 ## What Concord IQ does
 
-When complete, Concord IQ will:
+Concord IQ:
 
 1. Resolve a business term to every registered operational definition.
 2. Compare filters, time windows, grain, exclusions, source tables, and ownership.
@@ -126,20 +129,23 @@ reasoning timeline, verifier status, governed outcome, and exact SQL evidence.
 
 ## Architecture
 
-Concord IQ separates semantic grounding from optional language generation. The
-deterministic truth path is SQL result-set comparison plus authority-rule lookup.
-An optional local LLM can narrate verified evidence, but its text-only contract
-cannot alter a conflict verdict, authority decision, or stored result.
+Microsoft Agent Framework owns application orchestration. Its specialist workflow
+nodes pass a typed casefile and call the existing deterministic
+`ReconciliationRunner` as a domain tool. The truth path remains SQL result-set
+comparison plus authority-rule lookup. Optional local narration cannot alter a
+conflict verdict, authority decision, or stored result.
 
 ```mermaid
 flowchart TD
-    UI["Chat and conflict dashboard"] --> DAG["Typed reconciliation state machine"]
-    DAG --> ENGINE["Deterministic reconciliation engine"]
+    UI["Chat and conflict dashboard"] --> MAF["Microsoft Agent Framework workflow"]
+    MAF --> NODES["Ten specialist workflow nodes"]
+    NODES --> TOOL["reconcile_business_term tool"]
+    TOOL --> ENGINE["Deterministic ReconciliationRunner"]
     ENGINE --> GROUNDING["GroundingProvider"]
+    GROUNDING --> FABRIC["FabricIQProvider"]
+    GROUNDING --> FOUNDRY["FoundryIQProvider fallback"]
     GROUNDING --> LOCAL["LocalProvider"]
     GROUNDING --> REPLAY["ReplayProvider"]
-    GROUNDING --> FOUNDRY["FoundryIQProvider"]
-    GROUNDING --> FABRIC["FabricIQProvider"]
     LOCAL --> DUCKDB[("DuckDB synthetic analytics")]
     ENGINE --> POSTGRES[("PostgreSQL registry and evidence")]
     ENGINE --> VERIFY["Deterministic verifier"]
@@ -173,7 +179,16 @@ flowchart TD
 
 ## How it reasons
 
-The orchestration is a blackboard casefile driven by a typed DAG:
+Microsoft Agent Framework coordinates these workflow nodes:
+
+```text
+CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
+-> ConflictHypothesisAgent -> DataExecutionAgent -> ImpactRankerAgent
+-> AuthorityResolverAgent -> ReconciliationAgent
+-> SkepticalVerifierAgent -> AuditAgent
+```
+
+The domain tool advances the existing typed reconciliation state machine:
 
 ```text
 START
@@ -189,8 +204,9 @@ START
   -> COMPLETE
 ```
 
-Each specialist receives a compact context packet and writes typed output back to
-the casefile. Blocking verifier checks remain deterministic. Advisory language-model
+The coordinator invokes `reconcile_business_term(term, period, provider)`. Each
+framework node then checks the corresponding typed casefile output before passing
+it onward. Blocking verifier checks remain deterministic. Advisory language-model
 critique can never pass unsupported evidence or overrule a refusal.
 
 ![Reasoning timeline placeholder](docs/assets/reasoning-placeholder.svg)
@@ -203,8 +219,8 @@ The grounding layer keeps four modes explicit:
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
 | `ReplayProvider` | Replays a reviewed real-IQ capture through the same typed contract | Implemented; refuses missing or unverified artifacts |
-| `FoundryIQProvider` | Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
-| `FabricIQProvider` | Fabric IQ ontology MCP | Guarded MCP adapter and injected-transport tests complete; tenant smoke test pending |
+| `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP | Guarded MCP adapter and injected-transport tests complete; tenant smoke test pending |
+| `FoundryIQProvider` | Fallback cloud grounding through Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
 
 `LocalProvider` is the reproducibility scaffold. It is not presented as Microsoft
 IQ and does not satisfy the final IQ-integration goal by itself. The cloud adapters
@@ -214,6 +230,22 @@ The real-integration gate requires a tiny manually enabled smoke test, ignored r
 response, reviewed sanitized copy, and successful `ReplayProvider` run. See
 [IQ integration](docs/iq-integration.md) and
 [replay artifact policy](artifacts/replay/README.md).
+
+## Foundry Agent Service deployment
+
+The Agent Framework workflow is the deployment unit for Foundry Agent Service.
+The optional hosted entrypoint fails closed unless cloud use and a positive call
+budget are explicit, then selects Fabric IQ first and Foundry IQ only as fallback.
+
+```bash
+make agent-smoke
+uv sync --extra dev --extra foundry-hosting
+python -m concord.ms_agent.foundry_hosted_entrypoint
+```
+
+See [the Agent Framework integration guide](backend/concord/ms_agent/README.md).
+The hosted package is preview scaffolding; no deployment or tenant smoke test is
+claimed in this repository.
 
 ## Cloud and cost safety
 
@@ -286,6 +318,7 @@ backend/concord/
   api/             FastAPI reconciliation and demo routes
   evals/           scenario evaluation
   llm/             disabled/local/cloud narration providers
+  ms_agent/        Microsoft Agent Framework workflow and Foundry host
   orchestration/   casefile and typed state machine
   providers/       Local, Replay, Foundry IQ, Fabric IQ
   seed/            fixed-seed synthetic generator
@@ -306,13 +339,15 @@ files.
 
 ## Hackathon alignment
 
-**Reasoning Agents:** Concord IQ decomposes reconciliation into concept resolution,
+**Reasoning Agents:** Microsoft Agent Framework coordinates ten typed specialist
+nodes. They call the deterministic reconciliation tool for concept resolution,
 binding inspection, data execution, impact ranking, authority resolution, proposal
 or refusal, verification, and audit.
 
-**Best Use of IQ Tools:** Fabric IQ is the target ontology surface, with an Azure
-AI Search knowledge base as the Foundry path. The integration claim becomes
-complete only after a real adapter smoke test and sanitized replay exist.
+**Best Use of IQ Tools:** Fabric IQ is the primary ontology grounding surface.
+Foundry IQ is the fallback knowledge layer, and Foundry Agent Service is the
+deployment path. The integration claim becomes complete only after a real adapter
+smoke test and sanitized replay exist.
 
 **Reliability and safety:** The system is designed to reject false conflicts, refuse
 unsupported governance choices, preserve evidence, and keep cloud access opt-in.
@@ -326,6 +361,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P4: demo-first React interface
 - [ ] P5: adapters, capture/replay, docs; real IQ capture still required
 - [x] P6: optional Ollama narration, advisory verifier critique, audit explanation
+- [x] Microsoft Agent Framework orchestration and Foundry Agent Service scaffold
 
 ## Limitations
 
@@ -335,6 +371,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - Behavioral equivalence is proven only over the bound data and period being tested.
 - Microsoft IQ preview surfaces, pricing, permissions, and availability can change.
 - The guarded adapters are not tenant-verified in this workspace.
+- The Foundry Agent Service entrypoint is scaffolding and is not tenant-deployed.
 - No production-readiness claim is made.
 
 ## AI-assisted development

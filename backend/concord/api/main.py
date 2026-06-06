@@ -9,6 +9,7 @@ from sqlalchemy import Engine
 from concord.api.routes import router
 from concord.config import Settings
 from concord.llm import LLMProvider, create_llm_provider
+from concord.ms_agent import ConcordAgentWorkflow
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import GroundingProvider, create_provider
 from concord.storage.db import create_database_engine
@@ -34,6 +35,7 @@ def create_app(
         settings=active_settings,
         llm_provider=active_llm_provider,
     )
+    agent_workflow = ConcordAgentWorkflow.from_runner(runner)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -46,6 +48,7 @@ def create_app(
         lifespan=lifespan,
     )
     app.state.reconciliation_runner = runner
+    app.state.agent_workflow = agent_workflow
     app.include_router(router)
     return app
 

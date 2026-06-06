@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Request, status
 
 from concord.agents.coordinator import UnsupportedScenario
 from concord.demo import DEMO_SCENARIOS, get_demo_scenario
+from concord.ms_agent import ConcordAgentWorkflow
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import provider_statuses
@@ -15,11 +16,16 @@ def _runner(request: Request) -> ReconciliationRunner:
     return request.app.state.reconciliation_runner
 
 
+def _workflow(request: Request) -> ConcordAgentWorkflow:
+    return request.app.state.agent_workflow
+
+
 @router.get("/health")
 def health(request: Request) -> dict[str, object]:
     runner = _runner(request)
     return {
         "status": "ok",
+        "orchestration": "Microsoft Agent Framework",
         "provider": runner.provider.name,
         "cloud_enabled": runner.settings.allow_cloud,
         "data_type": getattr(runner.provider, "data_type", "synthetic"),
@@ -36,12 +42,12 @@ def providers(request: Request) -> list[dict[str, object]]:
 
 
 @router.post("/reconcile", response_model=ReconciliationCase)
-def reconcile(
+async def reconcile(
     payload: ReconciliationRequest,
     request: Request,
 ) -> ReconciliationCase:
     try:
-        return _runner(request).run(payload)
+        return await _workflow(request).run(payload)
     except UnsupportedScenario as error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -55,7 +61,7 @@ def demo_scenarios() -> list[dict[str, str]]:
 
 
 @router.post("/demo/run/{scenario_id}", response_model=ReconciliationCase)
-def run_demo_scenario(
+async def run_demo_scenario(
     scenario_id: str,
     request: Request,
 ) -> ReconciliationCase:
@@ -66,4 +72,4 @@ def run_demo_scenario(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Unknown demo scenario: {scenario_id}",
         ) from error
-    return _runner(request).run(scenario.request())
+    return await _workflow(request).run(scenario.request())
