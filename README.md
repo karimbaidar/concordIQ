@@ -487,10 +487,12 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - The Foundry Agent Service entrypoint is scaffolding and is not tenant-deployed.
 - No production-readiness claim is made.
 
-## AI-assisted development
+## Development approach
 
-Concord IQ uses AI-assisted engineering with tests, deterministic data, reviewable
-code, and explicit status labels.
+Concord IQ was built with modern AI-assisted tooling, with deterministic tests,
+reviewable typed code, fixed-seed data, and honest status labels guarding every
+change. The problem framing, architecture, and engineering decisions are the
+author's.
 
 ## License
 
