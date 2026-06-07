@@ -20,7 +20,13 @@ code-review-style, owner-only approval.
 Microsoft Agent Framework coordinates ten typed specialist workflow nodes for
 concept resolution, binding inspection, conflict hypothesis, data execution,
 impact ranking, authority resolution, reconciliation, skeptical verification,
-and audit. The existing deterministic runner is exposed as their domain tool.
+and audit. A **strict** workflow mode makes the framework own the progression —
+each node executes exactly one stage and writes typed output into the casefile —
+while **fast** mode exposes the deterministic runner's trace. The skeptical
+verifier blocks unsupported or incomplete cases (`blocked` / `needs_review`, one
+recovery retry, never inventing evidence), and every run emits a typed agent trace
+served at `GET /runs/{run_id}/agent-trace`. The whole workflow is hosted through a
+Foundry Agent Service entrypoint validated with a cloud-free hosted smoke test.
 
 ### Best Use of IQ Tools
 

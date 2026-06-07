@@ -138,11 +138,15 @@ authority rules, and secret hygiene. It then runs the demo with
 ## Foundry Agent Service
 
 `concord.ms_agent.foundry_hosted_entrypoint` wraps the typed Microsoft Agent
-Framework workflow in the optional Foundry responses host. It refuses to start
-unless `ALLOW_CLOUD=true`, `MAX_CLOUD_CALLS` is positive, and Fabric IQ or Foundry
-IQ configuration is present. See the
-[integration README](../backend/concord/ms_agent/README.md) for environment
-variables and smoke commands.
+Framework workflow in the optional Foundry responses host. The hosting protocol is
+validated **cloud-free**: `make foundry-agent-dry-run` constructs the host and
+checks its routes with no socket or cloud call, and `make foundry-agent-smoke`
+exercises the full in-process `/responses` path over LocalProvider (or a verified
+ReplayProvider artifact) with no Fabric credentials. Real `auto` hosting refuses to
+start unless `ALLOW_CLOUD=true`, `MAX_CLOUD_CALLS` is positive, and a real IQ
+provider is configured. See [Foundry Agent Service](foundry-agent-service.md) and
+the [integration README](../backend/concord/ms_agent/README.md). The repository
+validates the protocol locally and does not claim a tenant deployment.
 
 ## What counts as real integration
 

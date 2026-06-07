@@ -42,8 +42,14 @@ CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
 -> SkepticalVerifierAgent -> AuditAgent
 ```
 
-The coordinator calls the deterministic domain tool once. Each later workflow
-node validates its corresponding typed output before forwarding the casefile.
+The workflow runs in two modes. **Fast** mode (default) calls the deterministic
+domain tool once and exposes the resulting trace; each later node validates its
+corresponding typed output before forwarding the casefile. **Strict** mode
+(`AGENT_WORKFLOW_MODE=strict`) makes the Agent Framework own the progression — each
+specialist node executes exactly one stage and writes its typed output into the
+casefile, so no single call performs the whole reasoning. Both modes share the same
+deterministic truth path and reach the same verdict.
+
 The domain tool retains the tested state machine:
 
 ```mermaid
@@ -60,8 +66,35 @@ stateDiagram-v2
     AUDIT --> COMPLETE
 ```
 
-The skeptical verifier blocks unsupported proposals. The audit agent persists the
-result, evidence references, exact SQL, decision, and complete state timeline.
+The skeptical verifier blocks unsupported proposals: it checks required evidence
+IDs, stored SQL, divergent-vs-equal result sets, authority status, and
+proposal/refusal validity. On failure the case is marked `blocked` or
+`needs_review`; one recovery retry is allowed for a recoverable missing-step
+output, and the verifier never invents evidence to pass. The audit agent persists
+the result, evidence references, exact SQL, decision, and complete state timeline.
+
+Every run also emits a typed **agent trace** (step number, agent, input/output
+summary, evidence IDs, provider mode, verifier status, duration), persisted and
+served at `GET /runs/{run_id}/agent-trace` and shown in the reviewer workbench so
+the multi-agent pattern is explicit.
+
+## Hosting and layering
+
+```text
+Foundry Agent Service   hosts/deploys the Agent Framework workflow
+Microsoft Agent Framework   orchestrates specialist agents and workflow states
+Concord IQ deterministic tools   execute SQL, evidence, authority, verifier, audit
+Fabric IQ   primary semantic ontology grounding
+Foundry IQ   fallback knowledge grounding
+ReplayProvider   sanitized Microsoft IQ replay
+LocalProvider   deterministic reviewer mode
+```
+
+The Foundry Agent Service hosting protocol is validated cloud-free with
+`make foundry-agent-dry-run` and `make foundry-agent-smoke` (LocalProvider or a
+verified ReplayProvider artifact, no Fabric credentials). A real tenant deployment
+and a real Fabric IQ capture remain deliberately deferred. See
+[Foundry Agent Service](foundry-agent-service.md).
 
 ## Provider model
 

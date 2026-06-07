@@ -44,7 +44,10 @@ not free-text search — then proves the answer on data."*
    `DefinitionDiff`.
 2. Point to executed counts **1,600 / 1,500 / 1,334** and the **$33.2M ARR delta**
    in the `ImpactPanel` (ranked high).
-3. Walk the ten-state `ReasoningTimeline` and the green skeptical-verifier badge.
+3. Walk the ten-step **agent trace** / `ReasoningTimeline` — each specialist node,
+   its evidence IDs, and the green skeptical-verifier status. Mention that in
+   strict mode (`AGENT_WORKFLOW_MODE=strict`) the Agent Framework drives each stage
+   one at a time, and the same trace is served at `GET /runs/{run_id}/agent-trace`.
 4. Expand one evidence item to show the exact SQL.
 
 Say: *"The conflict is decided by executing both definitions and comparing the
@@ -96,7 +99,9 @@ thing people open every Monday."*
 
 Point to the `ProviderBadge` / `GET /providers`:
 
-- Microsoft Agent Framework orchestrates the specialist workflow.
+- Microsoft Agent Framework orchestrates the specialist workflow (fast + strict
+  modes); the workflow is hosted through a Foundry Agent Service entrypoint
+  validated cloud-free (`make foundry-agent-smoke`).
 - **Fabric IQ** ontology + NL2Ontology is the semantic source of truth; the
   `nl_query` path is genuinely IQ-served. REST/MCP surfaces are verified against
   current Microsoft Learn (see `docs/iq-integration.md`).
