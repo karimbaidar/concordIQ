@@ -34,7 +34,12 @@ The architecture uses:
 
 - Fabric IQ ontology MCP + NL2Ontology as the primary semantic grounding provider.
   The `nl_query` / `POST /ask` path is genuinely IQ-served: on Fabric/Foundry it
-  calls the real NL2Ontology/retrieve surface.
+  calls the real NL2Ontology/retrieve surface. Capture has two honest modes —
+  full-snapshot when Fabric returns the scenario JSON, and **semantic-proof mode**
+  when the ontology MCP only matches the governed entity type, in which case the
+  real Fabric proof is recorded and the deterministic LocalProvider snapshot
+  supplies the SQL/evidence (transparently marked via `iq_proof_mode`). The project
+  never claims Fabric returned the full snapshot unless full-snapshot mode succeeds.
 - Foundry IQ knowledge-base retrieval as the fallback IQ provider.
 - Foundry Agent Service as the deployment path.
 

@@ -221,22 +221,31 @@ expose the scenario **snapshot JSON** (the bootstrap uploads
 PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make fabric-mcp-diagnose
 ```
 
-This prints the discovered MCP tools and response shape and says whether valid
-snapshot JSON was found (sanitized copy in `artifacts/replay/raw/diagnostic.json`,
-no tokens). Run capture only once it reports `FOUND`:
+It reports one of three states — `Full snapshot JSON: FOUND`, `Semantic proof:
+FOUND`, or `No useful Fabric content found` (sanitized copy in
+`artifacts/replay/raw/diagnostic.json`, no tokens). Run capture once it reports
+either FOUND:
 
 ```bash
 PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
 make replay-check
 ```
 
-Fabric capture uses three MCP setup calls and one semantic request for each of the
-three scenarios (six total — a budget locked by tests). `make replay-check` rejects
-shallow connectivity captures, unverified provenance, missing semantic evidence,
-missing scenarios, and obvious secrets before running the full demo through
-`ReplayProvider` with cloud disabled. A passing replay check is the gate for
-claiming verified Microsoft IQ retrieval. The capacity prerequisites and the F2
-pause-when-idle budget runbook (target well under EUR 100) are in
+**Two honest capture modes.** Fabric IQ is used as the semantic grounding layer.
+In tenants where ontology MCP returns searchable ontology concepts but not full
+scenario JSON, Concord IQ records the real Fabric semantic proof (the MCP matched
+`ActiveCustomer` / `NetRevenue` / `ChurnedCustomer`) and attaches the deterministic
+synthetic scenario snapshot from `LocalProvider` for SQL/evidence replay — marked
+transparently with `iq_proof_mode` and `snapshot_source`. Concord IQ does **not**
+claim Fabric returned the full snapshot unless full-snapshot mode actually
+succeeds; it claims "verified Fabric IQ semantic grounding" only after `make
+capture` and `make replay-check` pass with real Fabric calls.
+
+`make replay-check` rejects shallow connectivity captures, unverified provenance,
+missing semantic evidence, missing scenarios, fake or incomplete semantic proof,
+and obvious secrets before running the full demo through `ReplayProvider` with
+cloud disabled. The capacity prerequisites and the F2 pause-when-idle budget
+runbook (target well under EUR 100) are in
 [cost controls](docs/cost-controls.md) and [IQ integration](docs/iq-integration.md).
 
 ## Architecture

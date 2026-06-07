@@ -52,7 +52,14 @@ class ReplayScenarioSnapshot(ContractModel):
 
 
 class ReplayCaptureMetadata(ContractModel):
-    """Non-secret provenance for a replay artifact."""
+    """Non-secret provenance for a replay artifact.
+
+    The optional `iq_proof_mode` / semantic-proof fields are populated when Fabric
+    IQ proved the governed concept exists (semantic grounding) but did not return a
+    full scenario snapshot, in which case the deterministic LocalProvider snapshot
+    supplies the SQL/evidence used for replay. Old artifacts omit them and still
+    load (full-snapshot mode).
+    """
 
     provider_name: str
     provider_mode: ProviderMode
@@ -60,6 +67,12 @@ class ReplayCaptureMetadata(ContractModel):
     verified_real_iq: bool
     data_classification: str = "synthetic"
     api_version: str | None = None
+    iq_proof_mode: str | None = None
+    snapshot_source: str | None = None
+    fabric_tools_used: tuple[str, ...] = ()
+    fabric_matched_concepts: dict[str, str] = Field(default_factory=dict)
+    fabric_response_shapes: tuple[str, ...] = ()
+    semantic_proof_terms: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def validate_provenance(self) -> "ReplayCaptureMetadata":
@@ -120,6 +133,12 @@ def build_replay_artifact(
     verified_real_iq: bool,
     api_version: str | None = None,
     captured_at: datetime | None = None,
+    iq_proof_mode: str | None = None,
+    snapshot_source: str | None = None,
+    fabric_tools_used: tuple[str, ...] = (),
+    fabric_matched_concepts: dict[str, str] | None = None,
+    fabric_response_shapes: tuple[str, ...] = (),
+    semantic_proof_terms: tuple[str, ...] = (),
 ) -> ReplayArtifact:
     """Build a versioned artifact after snapshots pass typed validation."""
     return ReplayArtifact(
@@ -129,6 +148,12 @@ def build_replay_artifact(
             captured_at=captured_at or datetime.now(UTC),
             verified_real_iq=verified_real_iq,
             api_version=api_version,
+            iq_proof_mode=iq_proof_mode,
+            snapshot_source=snapshot_source,
+            fabric_tools_used=fabric_tools_used,
+            fabric_matched_concepts=fabric_matched_concepts or {},
+            fabric_response_shapes=fabric_response_shapes,
+            semantic_proof_terms=semantic_proof_terms,
         ),
         scenarios=scenarios,
     )
@@ -244,3 +269,57 @@ def find_snapshot(value: Any) -> ReplayScenarioSnapshot:
         "The Fabric ontology likely exposes entity types but no retrievable scenario "
         "content — run `make fabric-mcp-diagnose` to inspect the live response."
     )
+
+
+def expected_entity_type(term: str) -> str:
+    """Map a business term to the PascalCase ontology entity type it should match.
+
+    "Active Customer" -> "ActiveCustomer"; "Net Revenue" -> "NetRevenue".
+    """
+    return "".join(part.capitalize() for part in re.split(r"[\s_]+", term.strip()) if part)
+
+
+def response_shape(value: Any, depth: int = 0) -> str:
+    """Summarize a JSON value's structure without revealing its contents."""
+    if isinstance(value, dict):
+        if depth >= 3:
+            return "{...}"
+        return (
+            "{" + ", ".join(f"{k}: {response_shape(v, depth + 1)}" for k, v in value.items()) + "}"
+        )
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return "[]"
+        return f"[{response_shape(value[0], depth + 1)} x{len(value)}]"
+    if isinstance(value, str):
+        return f"str(len={len(value)})"
+    return type(value).__name__
+
+
+def _gather_strings(value: Any) -> list[str]:
+    strings: list[str] = []
+    if isinstance(value, str):
+        strings.append(value)
+    elif isinstance(value, dict):
+        strings.extend(str(key) for key in value)
+        for nested in value.values():
+            strings.extend(_gather_strings(nested))
+    elif isinstance(value, (list, tuple)):
+        for nested in value:
+            strings.extend(_gather_strings(nested))
+    return strings
+
+
+def find_semantic_match(value: Any, expected_entity: str) -> bool:
+    """Return True if the response references the expected ontology entity type.
+
+    This is the Fabric *semantic proof*: ontology search returned the governed
+    concept/entity type for the requested term, even when it did not return the
+    full scenario snapshot. The match is a whole-token, case-insensitive comparison
+    so `ActiveCustomer` does not match inside an unrelated longer identifier.
+    """
+    pattern = re.compile(
+        rf"(?<![A-Za-z0-9]){re.escape(expected_entity)}(?![A-Za-z0-9])",
+        re.IGNORECASE,
+    )
+    return any(pattern.search(text) for text in _gather_strings(value))

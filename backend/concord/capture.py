@@ -11,6 +11,7 @@ from concord.demo import DEMO_SCENARIOS
 from concord.providers import FabricIQProvider, FoundryIQProvider, create_provider
 from concord.providers.base import ProviderNotConfigured
 from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
+from concord.providers.fabric_iq import SEMANTIC_PROOF_MODE, SEMANTIC_SNAPSHOT_SOURCE
 from concord.providers.replay_schema import build_replay_artifact, snapshot_provider_scenario
 
 GUID_PATTERN = re.compile(
@@ -61,6 +62,25 @@ def _write_raw_responses(
     return path
 
 
+def _fabric_proof_provenance(provider: object) -> dict[str, object]:
+    """Provenance kwargs when Fabric IQ proved concepts but returned no full snapshot."""
+    if not isinstance(provider, FabricIQProvider) or not provider.semantic_proofs:
+        return {}
+    proofs = provider.semantic_proofs
+    return {
+        "iq_proof_mode": SEMANTIC_PROOF_MODE,
+        "snapshot_source": SEMANTIC_SNAPSHOT_SOURCE,
+        "fabric_tools_used": provider.fabric_tool_names,
+        "fabric_matched_concepts": {
+            term: proof["matched_entity_type"] for term, proof in proofs.items()
+        },
+        "fabric_response_shapes": tuple(
+            dict.fromkeys(proof["response_shape"] for proof in proofs.values())
+        ),
+        "semantic_proof_terms": tuple(proofs),
+    }
+
+
 def capture(settings: Settings) -> Path:
     """Capture all demo scenarios from one explicitly configured cloud provider."""
     settings.require_cloud_access(settings.provider)
@@ -90,6 +110,7 @@ def capture(settings: Settings) -> Path:
         scenarios=snapshots,
         verified_real_iq=True,
         api_version=api_version,
+        **_fabric_proof_provenance(provider),
     )
     sanitized = sanitize_value(
         artifact.model_dump(mode="json"),

@@ -1,25 +1,66 @@
 """Fabric IQ provider boundary."""
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from concord.config import Settings
 from concord.providers.base import ProviderMode, ProviderNotConfigured
 from concord.providers.cloud import JsonTransport
 from concord.providers.cloud_snapshot import CloudSnapshotProvider
-from concord.providers.replay_schema import ReplayScenarioSnapshot, find_snapshot
+from concord.providers.replay_schema import (
+    ReplayScenarioSnapshot,
+    SnapshotNotFound,
+    expected_entity_type,
+    find_semantic_match,
+    find_snapshot,
+    response_shape,
+    snapshot_provider_scenario,
+)
+
+if TYPE_CHECKING:
+    from concord.providers.local import LocalProvider
+
+SEMANTIC_PROOF_MODE = "fabric_semantic_proof_with_deterministic_snapshot"
+SEMANTIC_SNAPSHOT_SOURCE = "LocalProvider synthetic snapshot"
 
 
 class FabricIQProvider(CloudSnapshotProvider):
-    """Fabric IQ ontology MCP adapter with explicit session and tool discovery."""
+    """Fabric IQ ontology MCP adapter with explicit session and tool discovery.
+
+    Two honest capture modes:
+
+    * **Full snapshot** — if the MCP returns a complete Concord IQ scenario
+      snapshot, it is used exactly as captured.
+    * **Semantic proof** — if the MCP only returns matching ontology entity types
+      (the common preview behavior), Fabric IQ is recorded as the semantic
+      grounding proof and the deterministic LocalProvider snapshot for the same
+      term supplies the SQL/evidence. Connectivity-only responses with no matching
+      concept are rejected.
+    """
 
     name = "FabricIQProvider"
     mode = ProviderMode.FABRIC_IQ
 
-    def __init__(self, settings: Settings, *, transport: JsonTransport | None = None) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        transport: JsonTransport | None = None,
+        local_provider: "LocalProvider | None" = None,
+    ) -> None:
         super().__init__(settings, transport=transport)
         self._session_id: str | None = None
         self._tools: tuple[dict[str, Any], ...] = ()
         self._request_id = 0
+        self._local_provider = local_provider
+        self._semantic_proofs: dict[str, dict[str, str]] = {}
+
+    @property
+    def fabric_tool_names(self) -> tuple[str, ...]:
+        return tuple(str(tool.get("name", "")) for tool in self._tools)
+
+    @property
+    def semantic_proofs(self) -> dict[str, dict[str, str]]:
+        return dict(self._semantic_proofs)
 
     def _next_id(self) -> int:
         self._request_id += 1
@@ -119,4 +160,35 @@ class FabricIQProvider(CloudSnapshotProvider):
                 "arguments": {argument_name: prompt},
             },
         )
-        return find_snapshot(called)
+        # Mode 1: Fabric returned a full Concord IQ scenario snapshot.
+        try:
+            return find_snapshot(called)
+        except SnapshotNotFound:
+            pass
+        # Mode 2: Fabric returned matching ontology content but no full snapshot.
+        expected = expected_entity_type(term)
+        if not find_semantic_match(called, expected):
+            raise ProviderNotConfigured(
+                f"Fabric IQ returned neither a full snapshot nor a matching concept for "
+                f"{term!r} (expected entity type {expected!r}). Connectivity-only responses "
+                "are rejected — run `make fabric-mcp-diagnose` to inspect the live response."
+            )
+        snapshot = self._materialize_local_snapshot(term)
+        self._semantic_proofs[term] = {
+            "matched_entity_type": expected,
+            "response_shape": response_shape(called),
+        }
+        return snapshot
+
+    def _materialize_local_snapshot(self, term: str) -> ReplayScenarioSnapshot:
+        """Build the deterministic LocalProvider snapshot for a proven term."""
+        from concord.demo import DEMO_SCENARIOS
+        from concord.providers.local import LocalProvider
+
+        scenario = next((item for item in DEMO_SCENARIOS if item.term == term), None)
+        if scenario is None:
+            raise ProviderNotConfigured(
+                f"No deterministic synthetic scenario is registered for {term!r}."
+            )
+        provider = self._local_provider or LocalProvider()
+        return snapshot_provider_scenario(provider, scenario)

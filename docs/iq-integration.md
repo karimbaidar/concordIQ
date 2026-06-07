@@ -152,20 +152,48 @@ JSON. If the automated upload cannot run (no OneLake storage token), upload
 `fabric_seed/concord_iq_scenarios.json` to the lakehouse manually.
 
 > **Limitation.** The public preview surfaces do not let the bootstrap create
-> bound ontology *instances* directly, so retrieval depends on Fabric IQ exposing
-> the uploaded `concord_iq_scenarios` content. Confirm this empirically before
+> bound ontology *instances* directly, and in many tenants the ontology MCP can
+> search entity types but will **not** return a Lakehouse `Files` JSON as a full
+> snapshot. So retrieval is not guaranteed — confirm empirically (diagnose) before
 > spending capture budget.
+
+## Two honest Fabric capture modes
+
+Fabric IQ is used as the semantic grounding layer. Capture has two modes:
+
+1. **Full snapshot mode** — if the ontology MCP returns a complete Concord IQ
+   scenario snapshot JSON, it is used exactly as captured.
+2. **Semantic-proof mode** — in tenants where ontology MCP returns searchable
+   ontology concepts but not full scenario JSON, Concord IQ records the real
+   Fabric semantic proof (the MCP matched the governed entity type — `Active
+   Customer` → `ActiveCustomer`, `Net Revenue` → `NetRevenue`, `Churned Customer`
+   → `ChurnedCustomer`) and attaches the deterministic synthetic scenario snapshot
+   from `LocalProvider` for the SQL/evidence used in replay.
+
+`FabricIQProvider` tries full-snapshot extraction first and only falls back to
+semantic proof when a concept is genuinely matched; a connectivity-only response
+with no matched concept is rejected. Semantic-proof artifacts are transparently
+marked: `iq_proof_mode = "fabric_semantic_proof_with_deterministic_snapshot"`,
+`snapshot_source = "LocalProvider synthetic snapshot"`, `data_classification =
+"synthetic"`, plus the matched concepts and tools used. `make replay-check`
+accepts a semantic-proof artifact only when Fabric matched every required concept.
+
+**Claims discipline.** Do not claim "Fabric returned the full scenario snapshot"
+unless full-snapshot mode actually succeeds. You may claim **"verified Fabric IQ
+semantic grounding"** only after `make capture` and `make replay-check` pass with
+real Fabric calls.
 
 ### Diagnose before you capture
 
-When capture fails, inspect the live MCP response first:
+Inspect the live MCP response first; it reports one of three states:
 
 ```bash
 PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make fabric-mcp-diagnose
 ```
 
-It makes one guarded round trip, prints the discovered tools and the response
-shape, says whether valid snapshot JSON was found, and writes a sanitized copy to
+It prints `Full snapshot JSON: FOUND`, `Semantic proof: FOUND`, or `No useful
+Fabric content found`, along with the discovered tools, the matched concept, and
+the response shape, and writes a sanitized copy to
 `artifacts/replay/raw/diagnostic.json` (gitignored, no tokens). It never writes
 `sanitized/latest.json`. Run `make capture` only once diagnose reports
 `Valid Concord IQ snapshot JSON: FOUND`.

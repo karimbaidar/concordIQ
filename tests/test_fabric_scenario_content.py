@@ -194,7 +194,7 @@ def test_fabric_mcp_diagnose_redacts_secrets_and_skips_capture_artifact(
 
     report = diagnose(settings, provider=provider)
 
-    assert report["snapshot_found"] is True
+    assert report["state"] == "full_snapshot"
     assert "search_ontology" in report["tools"]
 
     diagnostic_text = (tmp_path / "raw" / "diagnostic.json").read_text(encoding="utf-8")

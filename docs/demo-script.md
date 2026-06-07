@@ -102,14 +102,19 @@ Point to the `ProviderBadge` / `GET /providers`:
 - Microsoft Agent Framework orchestrates the specialist workflow (fast + strict
   modes); the workflow is hosted through a Foundry Agent Service entrypoint
   validated cloud-free (`make foundry-agent-smoke`).
-- **Fabric IQ** ontology + NL2Ontology is the semantic source of truth; the
+- **Fabric IQ** ontology + NL2Ontology is the semantic grounding layer; the
   `nl_query` path is genuinely IQ-served. REST/MCP surfaces are verified against
   current Microsoft Learn (see `docs/iq-integration.md`).
+- Capture is honest about what Fabric returns: **full-snapshot mode** when the MCP
+  returns the scenario JSON, or **semantic-proof mode** when it only matches the
+  governed entity type (`ActiveCustomer`, …) — then the deterministic LocalProvider
+  snapshot supplies the SQL/evidence, marked transparently with `iq_proof_mode`.
 - Foundry IQ is the fallback; Local is reproducibility mode; Replay shows a
   sanitized real-IQ capture; cloud is off until an operator opts in with a budget.
 
-Only claim a real IQ smoke test if the sanitized artifact is committed and the
-badge reads `FabricIQProvider`.
+Only say "verified Fabric IQ semantic grounding" if `make capture` and
+`make replay-check` passed with real Fabric calls and the badge reads
+`FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
 
 Close: *"Concord IQ finds where your enterprise's definitions silently disagree —
 proves it on data, scores it, and either reconciles it under governance or refuses.

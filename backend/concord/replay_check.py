@@ -8,7 +8,11 @@ from pathlib import Path
 from concord.config import Settings
 from concord.providers.base import ProviderMode
 from concord.providers.replay import ReplayProvider
-from concord.providers.replay_schema import ReplayArtifact, ReplayScenarioSnapshot
+from concord.providers.replay_schema import (
+    ReplayArtifact,
+    ReplayScenarioSnapshot,
+    expected_entity_type,
+)
 
 REQUIRED_SCENARIOS = {
     "active-customer": "Active Customer",
@@ -64,6 +68,32 @@ def _require_semantic_evidence(snapshot: ReplayScenarioSnapshot) -> None:
             )
 
 
+def _validate_fabric_semantic_proof(artifact: ReplayArtifact) -> None:
+    """Require honest Fabric semantic-proof provenance (not connectivity-only / fake)."""
+    capture = artifact.capture
+    if (capture.provider_name, capture.provider_mode) != (
+        "FabricIQProvider",
+        ProviderMode.FABRIC_IQ,
+    ):
+        raise ReplayCheckError("Semantic-proof artifacts must be FabricIQProvider / FABRIC_IQ.")
+    if not capture.fabric_tools_used:
+        raise ReplayCheckError("Fabric semantic proof must record the MCP tools used.")
+    if capture.snapshot_source != "LocalProvider synthetic snapshot":
+        raise ReplayCheckError(
+            "Semantic-proof artifacts must declare the deterministic snapshot source."
+        )
+    for term in REQUIRED_SCENARIOS.values():
+        expected = expected_entity_type(term)
+        matched = capture.fabric_matched_concepts.get(term)
+        if matched != expected:
+            raise ReplayCheckError(
+                f"Fabric did not prove the {term!r} concept "
+                f"(expected entity type {expected!r}, got {matched!r})."
+            )
+        if term not in capture.semantic_proof_terms:
+            raise ReplayCheckError(f"{term!r} is missing from semantic_proof_terms.")
+
+
 def validate_replay_artifact(path: Path) -> ReplayArtifact:
     """Validate provenance, scenarios, semantics, secret hygiene, and replayability."""
     if not path.exists():
@@ -105,6 +135,8 @@ def validate_replay_artifact(path: Path) -> ReplayArtifact:
         raise ReplayCheckError(
             "Active Customer must include Finance, Sales, and Customer Success definitions."
         )
+    if "semantic_proof" in (artifact.capture.iq_proof_mode or ""):
+        _validate_fabric_semantic_proof(artifact)
     ReplayProvider(path).resolve_concept("Active Customer")
     return artifact
 

@@ -1,10 +1,15 @@
 """Diagnose what the Fabric IQ ontology MCP actually returns.
 
-Run this when `make capture` fails with "did not contain a valid Concord IQ
-scenario snapshot". It makes one guarded MCP round trip using the current `.env`,
-prints the discovered tools and the response shape, says whether retrievable
-snapshot JSON was found, and writes a sanitized copy of the raw response to
-`artifacts/replay/raw/diagnostic.json` (gitignored). It never prints tokens and
+Run this before `make capture`. It makes one guarded MCP round trip using the
+current `.env` and reports one of three states:
+
+1. Full snapshot JSON: FOUND        -> capture in full-snapshot mode
+2. Semantic proof: FOUND            -> capture in Fabric semantic-proof mode
+3. No useful Fabric content found   -> do not capture
+
+It prints the discovered tools, the matched concept (if any), and the response
+shape, writes a sanitized copy of the raw response to
+`artifacts/replay/raw/diagnostic.json` (gitignored), never prints tokens, and
 never writes `sanitized/latest.json`.
 """
 
@@ -17,24 +22,9 @@ from concord.config import CloudAccessDisabled, Settings
 from concord.providers import FabricIQProvider
 from concord.providers.base import ProviderNotConfigured
 from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
-from concord.providers.replay_schema import SnapshotNotFound, find_snapshot
+from concord.providers.replay_schema import SnapshotNotFound, response_shape
 
 DEFAULT_DIAGNOSTIC_TERM = "Active Customer"
-
-
-def _shape(value: Any, depth: int = 0) -> str:
-    """Summarize the structure of a JSON value without revealing its contents."""
-    if isinstance(value, dict):
-        if depth >= 3:
-            return "{...}"
-        return "{" + ", ".join(f"{k}: {_shape(v, depth + 1)}" for k, v in value.items()) + "}"
-    if isinstance(value, list):
-        if not value:
-            return "[]"
-        return f"[{_shape(value[0], depth + 1)} x{len(value)}]"
-    if isinstance(value, str):
-        return f"str(len={len(value)})"
-    return type(value).__name__
 
 
 def diagnose(
@@ -45,28 +35,23 @@ def diagnose(
 ) -> dict[str, Any]:
     """Probe the Fabric MCP once and return a non-secret diagnostic summary."""
     provider = provider or FabricIQProvider(settings)
-    snapshot_found = False
-    snapshot_error: str | None = None
+    state = "none"
+    matched_concept: str | None = None
+    error: str | None = None
     try:
         provider.resolve_concept(term)
-        snapshot_found = True
-    except SnapshotNotFound as error:
-        snapshot_error = str(error)
-    except (ProviderNotConfigured, CloudTransportError, CloudCallBudgetExceeded) as error:
-        snapshot_error = f"{type(error).__name__}: {error}"
+        if term in provider.semantic_proofs:
+            state = "semantic_proof"
+            matched_concept = provider.semantic_proofs[term]["matched_entity_type"]
+        else:
+            state = "full_snapshot"
+    except SnapshotNotFound as exc:
+        error = str(exc)
+    except (ProviderNotConfigured, CloudTransportError, CloudCallBudgetExceeded) as exc:
+        error = f"{type(exc).__name__}: {exc}"
 
-    tools = [str(tool.get("name", "?")) for tool in provider._tools]
     raw_responses = provider.raw_responses
-    last_shape = _shape(raw_responses[-1]) if raw_responses else "no response captured"
-
-    # Independently re-test snapshot extraction against the last tool-call payload.
-    if not snapshot_found and raw_responses:
-        try:
-            find_snapshot(raw_responses[-1])
-            snapshot_found = True
-            snapshot_error = None
-        except SnapshotNotFound as error:
-            snapshot_error = str(error)
+    last_shape = response_shape(raw_responses[-1]) if raw_responses else "no response captured"
 
     sanitized_raw = sanitize_value(list(raw_responses), secret_values=_secret_values(settings))
     raw_dir = Path(settings.capture_raw_dir)
@@ -76,10 +61,11 @@ def diagnose(
 
     return {
         "term": term,
-        "tools": tools,
+        "tools": [str(tool.get("name", "?")) for tool in provider._tools],
         "response_shape": last_shape,
-        "snapshot_found": snapshot_found,
-        "snapshot_error": snapshot_error,
+        "state": state,
+        "matched_concept": matched_concept,
+        "error": error,
         "diagnostic_path": str(diagnostic_path),
         "cloud_calls": provider.cloud_call_count,
     }
@@ -98,18 +84,22 @@ def main() -> None:
 
     print(f"Term probed:       {report['term']}")
     print(f"MCP tools:         {', '.join(report['tools']) or 'none discovered'}")
+    print(f"Matched concept:   {report['matched_concept'] or 'none'}")
     print(f"Response shape:    {report['response_shape']}")
     print(f"Cloud calls used:  {report['cloud_calls']}")
     print(f"Sanitized raw ->   {report['diagnostic_path']} (gitignored; no tokens)")
-    if report["snapshot_found"]:
-        print("Valid Concord IQ snapshot JSON: FOUND. You can run `make capture`.")
+    state = report["state"]
+    if state == "full_snapshot":
+        print("Full snapshot JSON: FOUND")
+        print("Capture can proceed in full-snapshot mode (`make capture`).")
+    elif state == "semantic_proof":
+        print("Semantic proof: FOUND")
+        print("Full snapshot JSON: NOT FOUND")
+        print("Capture can proceed using Fabric semantic proof mode (`make capture`).")
     else:
-        print("Valid Concord IQ snapshot JSON: NOT FOUND.")
-        print(f"  Reason: {report['snapshot_error']}")
-        print(
-            "  Fix: ensure the `concord_iq_scenarios` content is uploaded and retrievable "
-            "(see docs/iq-integration.md). Do NOT run `make capture` until this reports FOUND."
-        )
+        print("No useful Fabric content found.")
+        print(f"  Reason: {report['error']}")
+        print("  Do NOT run `make capture`. See docs/iq-integration.md.")
 
 
 if __name__ == "__main__":
