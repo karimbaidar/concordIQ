@@ -834,7 +834,7 @@ summary:focus-visible {
   display: grid;
   grid-template-columns: 32px 1px 1fr;
   gap: 13px;
-  min-height: 70px;
+  min-height: 104px;
 }
 
 .timeline-index {
@@ -879,11 +879,41 @@ summary:focus-visible {
   font-size: 9px;
 }
 
+.reasoning-timeline li header .trace-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.reasoning-timeline li header .trace-meta span {
+  padding: 3px 6px;
+  border: 1px solid #dfe5ee;
+  border-radius: 999px;
+  background: #f7f8fb;
+}
+
 .reasoning-timeline li p {
-  margin: 5px 0 16px;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 7px;
+  margin: 6px 0 0;
   color: #68758a;
   font-size: 11px;
   line-height: 1.5;
+}
+
+.reasoning-timeline li p span {
+  color: #94a0b2;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reasoning-timeline li .trace-output {
+  margin-bottom: 18px;
+  color: #34445d;
 }
 
 .verifier-panel {

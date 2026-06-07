@@ -190,6 +190,38 @@ function makeCase(
       },
     ],
     evidence,
+    agent_trace: [
+      {
+        step_number: 1,
+        agent_name: "CoordinatorAgent",
+        input_summary: "Requested a governed reconciliation.",
+        output_summary: "Created the typed casefile and workflow plan.",
+        evidence_ids: [],
+        provider_mode: "local",
+        verifier_status: null,
+        duration_ms: 0.1,
+      },
+      {
+        step_number: 2,
+        agent_name: "DataExecutionAgent",
+        input_summary: `Execute ${bindings.length} trusted bindings.`,
+        output_summary: `Settled verdict as ${verdict}.`,
+        evidence_ids: evidence.map((item) => item.evidence_id),
+        provider_mode: "local",
+        verifier_status: null,
+        duration_ms: 2.4,
+      },
+      {
+        step_number: 3,
+        agent_name: "SkepticalVerifierAgent",
+        input_summary: `Verify ${evidence.length} evidence records.`,
+        output_summary: "Passed deterministic checks.",
+        evidence_ids: evidence.map((item) => item.evidence_id),
+        provider_mode: "local",
+        verifier_status: "passed",
+        duration_ms: 0.4,
+      },
+    ],
     audit_log: [
       {
         sequence: 1,
@@ -269,6 +301,9 @@ describe("Concord IQ demo", () => {
 
     expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
     expect(screen.getByText("Proposed canonical definition")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Agent trace" })).toBeInTheDocument();
+    expect(screen.getByText("DataExecutionAgent")).toBeInTheDocument();
+    expect(screen.getAllByText("3 evidence refs")).toHaveLength(2);
     expect(screen.getByText("Skeptical verifier passed")).toBeInTheDocument();
     expect(screen.getByLabelText("3 evidence records")).toBeInTheDocument();
     expect(screen.getByText("Evidence narration")).toBeInTheDocument();

@@ -159,6 +159,11 @@ def test_strict_agent_workflow_returns_blocked_case_without_persistence(
     assert result.case.verification_status == "blocked"
     assert result.case.verdict == "incomplete"
     assert result.case.state == ReconciliationState.VERIFY
+    assert tuple(step.agent_name for step in result.case.agent_trace) == tuple(
+        agent.name for agent in SPECIALIST_AGENTS
+    )
+    assert result.case.agent_trace[-2].verifier_status == "blocked"
+    assert result.case.agent_trace[-1].verifier_status == "blocked"
     assert result.case.verifier_report
     assert "every_result_has_matching_evidence" in result.case.verifier_report.failures
     with Session(postgres_engine) as session:

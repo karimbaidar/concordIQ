@@ -65,6 +65,27 @@ class TimelineEntry(CaseModel):
     status: Literal["completed", "failed"] = "completed"
 
 
+class AgentTraceStep(CaseModel):
+    """One typed specialist execution record for review and replay."""
+
+    step_number: int
+    agent_name: str
+    input_summary: str
+    output_summary: str
+    evidence_ids: tuple[UUID, ...] = ()
+    provider_mode: str
+    verifier_status: (
+        Literal[
+            "pending",
+            "passed",
+            "needs_review",
+            "blocked",
+        ]
+        | None
+    ) = None
+    duration_ms: float | None = None
+
+
 class ConflictHypothesis(CaseModel):
     """A possible semantic conflict to be settled by execution."""
 
@@ -180,6 +201,7 @@ class ReconciliationCase(CaseModel):
     verifier_report: VerifierReport | None = None
     narrations: tuple[NarrationResult, ...] = ()
     evidence: tuple[EvidenceRecord, ...] = ()
+    agent_trace: tuple[AgentTraceStep, ...] = ()
     audit_log: tuple[TimelineEntry, ...] = ()
 
     def transition(

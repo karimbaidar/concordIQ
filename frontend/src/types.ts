@@ -61,6 +61,17 @@ export interface TimelineEntry {
   status: "completed" | "failed";
 }
 
+export interface AgentTraceStep {
+  step_number: number;
+  agent_name: string;
+  input_summary: string;
+  output_summary: string;
+  evidence_ids: string[];
+  provider_mode: string;
+  verifier_status: "pending" | "passed" | "needs_review" | "blocked" | null;
+  duration_ms: number | null;
+}
+
 export interface ImpactAssessment {
   rank: number;
   severity: Severity;
@@ -249,5 +260,6 @@ export interface ReconciliationCase {
   verifier_report: VerifierReport | null;
   narrations: NarrationResult[];
   evidence: EvidenceRecord[];
+  agent_trace: AgentTraceStep[];
   audit_log: TimelineEntry[];
 }

@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Integer,
     MetaData,
     String,
     Text,
@@ -196,4 +197,22 @@ class AuditEvent(Base):
     event_type: Mapped[str] = mapped_column(String(100), index=True)
     actor: Mapped[str] = mapped_column(String(120), default="system")
     payload: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class AgentTraceEvent(Base):
+    __tablename__ = "agent_trace_events"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    run_id: Mapped[UUID] = mapped_column(
+        ForeignKey("reconciliation_runs.id", ondelete="CASCADE"), index=True
+    )
+    step_number: Mapped[int] = mapped_column(Integer)
+    agent_name: Mapped[str] = mapped_column(String(120), index=True)
+    input_summary: Mapped[str] = mapped_column(Text)
+    output_summary: Mapped[str] = mapped_column(Text)
+    evidence_ids: Mapped[list[str]] = mapped_column(JSON, default=list)
+    provider_mode: Mapped[str] = mapped_column(String(40))
+    verifier_status: Mapped[str | None] = mapped_column(String(40))
+    duration_ms: Mapped[float | None] = mapped_column(Float)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

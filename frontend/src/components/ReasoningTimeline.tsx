@@ -4,14 +4,6 @@ interface ReasoningTimelineProps {
   result: ReconciliationCase;
 }
 
-function stateLabel(state: string) {
-  return state
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 function checkLabel(check: string) {
   return check.replaceAll("_", " ");
 }
@@ -21,22 +13,38 @@ export function ReasoningTimeline({ result }: ReasoningTimelineProps) {
     <section className="surface reasoning-timeline" aria-labelledby="timeline-title">
       <div className="section-heading">
         <div>
-          <span className="section-kicker">Blackboard execution</span>
-          <h2 id="timeline-title">Reasoning timeline</h2>
+          <span className="section-kicker">Microsoft Agent Framework</span>
+          <h2 id="timeline-title">Agent trace</h2>
         </div>
-        <span className="quiet-label">{result.audit_log.length} verified states</span>
+        <span className="quiet-label">{result.agent_trace.length} specialist steps</span>
       </div>
       <ol>
-        {result.audit_log.map((entry) => (
-          <li key={`${entry.sequence}-${entry.state}`}>
-            <span className="timeline-index">{entry.sequence.toString().padStart(2, "0")}</span>
+        {result.agent_trace.map((step) => (
+          <li key={`${step.step_number}-${step.agent_name}`}>
+            <span className="timeline-index">
+              {step.step_number.toString().padStart(2, "0")}
+            </span>
             <span className="timeline-line" aria-hidden="true" />
-            <div>
+            <div className="trace-step">
               <header>
-                <strong>{stateLabel(entry.state)}</strong>
-                <span>{entry.agent}</span>
+                <strong>{step.agent_name}</strong>
+                <span className="trace-meta">
+                  <span>{step.provider_mode}</span>
+                  {step.evidence_ids.length > 0 && (
+                    <span>{step.evidence_ids.length} evidence refs</span>
+                  )}
+                  {step.verifier_status && <span>{step.verifier_status}</span>}
+                  {step.duration_ms !== null && <span>{step.duration_ms.toFixed(1)} ms</span>}
+                </span>
               </header>
-              <p>{entry.summary}</p>
+              <p className="trace-input">
+                <span>Input</span>
+                {step.input_summary}
+              </p>
+              <p className="trace-output">
+                <span>Output</span>
+                {step.output_summary}
+              </p>
             </div>
           </li>
         ))}

@@ -9,8 +9,9 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from concord.orchestration.casefile import ReconciliationCase
+from concord.orchestration.casefile import AgentTraceStep, ReconciliationCase
 from concord.storage.models import (
+    AgentTraceEvent,
     AuditEvent,
     Base,
     BusinessTerm,
@@ -156,7 +157,45 @@ class ReconciliationRepository:
                 )
                 for entry in case.audit_log
             )
+            session.add_all(
+                AgentTraceEvent(
+                    run_id=case.run_id,
+                    step_number=step.step_number,
+                    agent_name=step.agent_name,
+                    input_summary=step.input_summary,
+                    output_summary=step.output_summary,
+                    evidence_ids=[str(evidence_id) for evidence_id in step.evidence_ids],
+                    provider_mode=step.provider_mode,
+                    verifier_status=step.verifier_status,
+                    duration_ms=step.duration_ms,
+                )
+                for step in case.agent_trace
+            )
         return case.run_id
+
+    def get_agent_trace(self, run_id: UUID) -> tuple[AgentTraceStep, ...] | None:
+        """Return the ordered specialist trace for one completed run."""
+        with self._sessions() as session:
+            if session.get(ReconciliationRun, run_id) is None:
+                return None
+            events = session.scalars(
+                select(AgentTraceEvent)
+                .where(AgentTraceEvent.run_id == run_id)
+                .order_by(AgentTraceEvent.step_number)
+            ).all()
+            return tuple(
+                AgentTraceStep(
+                    step_number=event.step_number,
+                    agent_name=event.agent_name,
+                    input_summary=event.input_summary,
+                    output_summary=event.output_summary,
+                    evidence_ids=tuple(UUID(value) for value in event.evidence_ids),
+                    provider_mode=event.provider_mode,
+                    verifier_status=event.verifier_status,
+                    duration_ms=event.duration_ms,
+                )
+                for event in events
+            )
 
     def get_proposal_state(self, run_id: UUID) -> dict[str, object] | None:
         """Return a non-secret view of a run's proposal for the approval gate."""

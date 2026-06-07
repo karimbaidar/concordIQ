@@ -1,6 +1,8 @@
 """Coordinator for deterministic semantic reconciliation scenarios."""
 
 from dataclasses import dataclass, field
+from time import perf_counter
+from uuid import UUID
 
 from concord.agents import (
     AuditAgent,
@@ -17,6 +19,7 @@ from concord.agents import (
 from concord.config import Settings
 from concord.llm import DisabledLLMProvider, LLMProvider
 from concord.orchestration.casefile import (
+    AgentTraceStep,
     AuthorityAssessment,
     ImpactAssessment,
     ReconciliationCase,
@@ -48,13 +51,26 @@ class ReconciliationRunner:
         if self.provider.uses_cloud:
             self.settings.require_cloud_access(self.provider.name)
 
-    @staticmethod
-    def create_case(request: ReconciliationRequest) -> ReconciliationCase:
+    def create_case(self, request: ReconciliationRequest) -> ReconciliationCase:
         """Create the typed blackboard before any specialist executes."""
-        return ReconciliationCase(request=request)
+        started = perf_counter()
+        case = ReconciliationCase(request=request)
+        self._record_trace(
+            case,
+            agent_name="CoordinatorAgent",
+            input_summary=(
+                f"Requested {request.term} for "
+                f"{request.period.start_date.isoformat()} to "
+                f"{request.period.end_date.isoformat()}."
+            ),
+            output_summary="Created the typed casefile and specialist workflow plan.",
+            started=started,
+        )
+        return case
 
     def resolve_concept(self, case: ReconciliationCase) -> ReconciliationCase:
         """Resolve one business term and advance only the concept stage."""
+        started = perf_counter()
         concept = ConceptResolverAgent(self.provider).run(case.request.term)
         CoordinatorAgent().require_supported(concept)
         case.resolved_concept = concept
@@ -64,10 +80,21 @@ class ReconciliationRunner:
             agent="ConceptResolverAgent",
             summary=(f"Resolved {case.request.term!r} to {concept.canonical_name}."),
         )
+        self._record_trace(
+            case,
+            agent_name="ConceptResolverAgent",
+            input_summary=f"Resolve business term {case.request.term!r}.",
+            output_summary=(
+                f"Resolved {concept.canonical_name} with "
+                f"{len(concept.definition_ids)} candidate definitions."
+            ),
+            started=started,
+        )
         return case
 
     def inspect_bindings(self, case: ReconciliationCase) -> ReconciliationCase:
         """Retrieve and normalize bindings for the resolved concept."""
+        started = perf_counter()
         concept = self._resolved_concept(case)
         bindings = BindingInspectorAgent(self.provider).run(concept.concept_id)
         case.binding_semantics = bindings
@@ -76,10 +103,21 @@ class ReconciliationRunner:
             agent="BindingInspectorAgent",
             summary=f"Normalized {len(bindings)} operational definitions.",
         )
+        self._record_trace(
+            case,
+            agent_name="BindingInspectorAgent",
+            input_summary=f"Inspect bindings for concept {concept.concept_id}.",
+            output_summary=(
+                f"Normalized {len(bindings)} bindings owned by "
+                f"{', '.join(binding.owner for binding in bindings)}."
+            ),
+            started=started,
+        )
         return case
 
     def hypothesize_conflicts(self, case: ReconciliationCase) -> ReconciliationCase:
         """Create pairwise hypotheses without deciding the final verdict."""
+        started = perf_counter()
         hypotheses = ConflictHypothesisAgent().run(case.binding_semantics)
         case.conflict_hypotheses = hypotheses
         case.transition(
@@ -87,10 +125,18 @@ class ReconciliationRunner:
             agent="ConflictHypothesisAgent",
             summary=f"Generated {len(hypotheses)} pairwise hypotheses for execution.",
         )
+        self._record_trace(
+            case,
+            agent_name="ConflictHypothesisAgent",
+            input_summary=f"Compare {len(case.binding_semantics)} normalized bindings.",
+            output_summary=f"Generated {len(hypotheses)} execution-testable hypotheses.",
+            started=started,
+        )
         return case
 
     def execute_definitions(self, case: ReconciliationCase) -> ReconciliationCase:
         """Execute every binding and settle conflict versus equivalence."""
+        started = perf_counter()
         execution = DataExecutionAgent(self.provider).run(
             str(case.run_id),
             case.binding_semantics,
@@ -108,10 +154,22 @@ class ReconciliationRunner:
                 else "Executed all definitions and found equal entity sets."
             ),
         )
+        counts = "/".join(str(result.entity_count) for result in execution.evaluations)
+        self._record_trace(
+            case,
+            agent_name="DataExecutionAgent",
+            input_summary=(
+                f"Execute {len(case.binding_semantics)} trusted bindings for the requested period."
+            ),
+            output_summary=(f"Settled verdict as {execution.verdict} with entity counts {counts}."),
+            evidence_ids=tuple(item.evidence_id for item in execution.evidence),
+            started=started,
+        )
         return case
 
     def rank_impact(self, case: ReconciliationCase) -> ReconciliationCase:
         """Compute deterministic materiality from executed definition results."""
+        started = perf_counter()
         impact = ImpactRankerAgent().run(
             case.binding_semantics,
             case.execution_results,
@@ -125,10 +183,24 @@ class ReconciliationRunner:
                 f"{impact.customer_count_delta} customers of population delta."
             ),
         )
+        self._record_trace(
+            case,
+            agent_name="ImpactRankerAgent",
+            input_summary=(
+                f"Rank materiality from {len(case.execution_results)} executed populations."
+            ),
+            output_summary=(
+                f"Ranked {impact.severity} impact: {impact.customer_count_delta} customers "
+                f"and {impact.arr_delta:,.0f} metric-value delta."
+            ),
+            evidence_ids=self._evidence_ids(case),
+            started=started,
+        )
         return case
 
     def resolve_authority(self, case: ReconciliationCase) -> ReconciliationCase:
         """Resolve governance rules and build the compact context packet."""
+        started = perf_counter()
         concept = self._resolved_concept(case)
         authority = AuthorityResolverAgent(self.provider).run(concept.concept_id)
         case.authority_assessment = authority
@@ -146,10 +218,23 @@ class ReconciliationRunner:
             agent="AuthorityResolverAgent",
             summary=f"Authority is {authority.status}: {authority.owner or 'no owner'}.",
         )
+        self._record_trace(
+            case,
+            agent_name="AuthorityResolverAgent",
+            input_summary=(
+                f"Resolve configured authority for {concept.concept_id} and its dimensions."
+            ),
+            output_summary=(
+                f"Authority is {authority.status}; owner is "
+                f"{authority.owner or 'not uniquely assigned'}."
+            ),
+            started=started,
+        )
         return case
 
     def reconcile_or_refuse(self, case: ReconciliationCase) -> ReconciliationCase:
         """Create a governed proposal, refusal, or no-action decision."""
+        started = perf_counter()
         concept = self._resolved_concept(case)
         impact = self._impact_assessment(case)
         authority = self._authority_assessment(case)
@@ -176,12 +261,22 @@ class ReconciliationRunner:
             agent="ReconciliationAgent",
             summary=decision_summaries[decision.action],
         )
+        self._record_trace(
+            case,
+            agent_name="ReconciliationAgent",
+            input_summary=(f"Apply verdict {case.verdict} under {authority.status} authority."),
+            output_summary=decision_summaries[decision.action],
+            evidence_ids=self._evidence_ids(case),
+            started=started,
+        )
         return case
 
     def verify(self, case: ReconciliationCase) -> ReconciliationCase:
         """Run the stable fast-mode verifier and raise on blocking failure."""
+        started = perf_counter()
         report = self._evaluate_verifier(case, attempt=1)
         self._finalize_verification(case, report)
+        self._record_verifier_trace(case, report, started=started)
         if not report.passed:
             case.verification_status = "blocked"
             case.verdict = "incomplete"
@@ -190,6 +285,7 @@ class ReconciliationRunner:
 
     def verify_strict(self, case: ReconciliationCase) -> ReconciliationCase:
         """Verify, retry one missing stage once, then return a safe status."""
+        started = perf_counter()
         report = self._evaluate_verifier(case, attempt=1)
         if not report.passed and report.recoverable and report.recovery_stage:
             case.verification_recovery = report.recovery_stage
@@ -199,6 +295,7 @@ class ReconciliationRunner:
         if not report.passed:
             case.verification_status = "needs_review" if case.verification_recovery else "blocked"
             case.verdict = "incomplete"
+        self._record_verifier_trace(case, report, started=started)
         return case
 
     def audit(self, case: ReconciliationCase) -> ReconciliationCase:
@@ -217,6 +314,18 @@ class ReconciliationRunner:
                     status="failed",
                 ),
             )
+            self._record_trace(
+                case,
+                agent_name="AuditAgent",
+                input_summary=(f"Finalize a case with verifier status {case.verification_status}."),
+                output_summary=(
+                    "Skipped complete persistence because deterministic verification "
+                    f"ended {case.verification_status}."
+                ),
+                evidence_ids=self._evidence_ids(case),
+                verifier_status=case.verification_status,
+                started=None,
+            )
             return case
         concept = self._resolved_concept(case)
         case.transition(
@@ -228,6 +337,19 @@ class ReconciliationRunner:
             ReconciliationState.COMPLETE,
             agent="CoordinatorAgent",
             summary=f"Completed the verified {concept.canonical_name} reconciliation.",
+        )
+        self._record_trace(
+            case,
+            agent_name="AuditAgent",
+            input_summary=(
+                f"Persist verifier-approved {concept.canonical_name} evidence and decisions."
+            ),
+            output_summary=(
+                f"Prepared {len(case.evidence)} evidence records and the complete audit artifact."
+            ),
+            evidence_ids=self._evidence_ids(case),
+            verifier_status=case.verification_status,
+            started=None,
         )
         AuditAgent(self.repository, self.llm_provider).run(case)
         return case
@@ -347,3 +469,64 @@ class ReconciliationRunner:
                 case.narrations = (*case.narrations, decision.narration)
             return
         raise ValueError(f"Unsupported verifier recovery stage: {stage}")
+
+    def _record_verifier_trace(
+        self,
+        case: ReconciliationCase,
+        report: VerifierReport,
+        *,
+        started: float,
+    ) -> None:
+        recovery = (
+            f" after one {case.verification_recovery} recovery"
+            if case.verification_recovery
+            else ""
+        )
+        output = (
+            f"Passed {len(report.checks)} deterministic checks{recovery}."
+            if report.passed
+            else f"Ended {case.verification_status}{recovery}: {', '.join(report.failures)}."
+        )
+        self._record_trace(
+            case,
+            agent_name="SkepticalVerifierAgent",
+            input_summary=(
+                f"Verify {len(case.evidence)} evidence records and the governed decision."
+            ),
+            output_summary=output,
+            evidence_ids=self._evidence_ids(case),
+            verifier_status=case.verification_status,
+            started=started,
+        )
+
+    def _record_trace(
+        self,
+        case: ReconciliationCase,
+        *,
+        agent_name: str,
+        input_summary: str,
+        output_summary: str,
+        evidence_ids: tuple[UUID, ...] = (),
+        verifier_status: str | None = None,
+        started: float | None,
+    ) -> None:
+        duration_ms = None
+        if started is not None:
+            duration_ms = round(max(0.0, (perf_counter() - started) * 1000), 3)
+        case.agent_trace = (
+            *case.agent_trace,
+            AgentTraceStep(
+                step_number=len(case.agent_trace) + 1,
+                agent_name=agent_name,
+                input_summary=input_summary,
+                output_summary=output_summary,
+                evidence_ids=evidence_ids,
+                provider_mode=self.provider.mode.value,
+                verifier_status=verifier_status,
+                duration_ms=duration_ms,
+            ),
+        )
+
+    @staticmethod
+    def _evidence_ids(case: ReconciliationCase) -> tuple[UUID, ...]:
+        return tuple(item.evidence_id for item in case.evidence)

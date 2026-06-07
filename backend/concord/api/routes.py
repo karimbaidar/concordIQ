@@ -8,7 +8,11 @@ from pydantic import BaseModel
 from concord.agents.coordinator import UnsupportedScenario
 from concord.demo import DEMO_SCENARIOS, get_demo_scenario
 from concord.ms_agent import ConcordAgentWorkflow
-from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
+from concord.orchestration.casefile import (
+    AgentTraceStep,
+    ReconciliationCase,
+    ReconciliationRequest,
+)
 from concord.orchestration.portfolio import ConcordScore, PortfolioScan, scan_portfolio
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import QueryResult, provider_statuses
@@ -136,6 +140,17 @@ def proposal_state(run_id: UUID, request: Request) -> dict[str, object]:
             detail=f"No governed proposal for run {run_id}.",
         )
     return state
+
+
+@router.get("/runs/{run_id}/agent-trace", response_model=list[AgentTraceStep])
+def agent_trace(run_id: UUID, request: Request) -> tuple[AgentTraceStep, ...]:
+    trace = _runner(request).repository.get_agent_trace(run_id)
+    if trace is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No completed reconciliation run {run_id}.",
+        )
+    return trace
 
 
 @router.post("/proposals/{run_id}/approve", response_model=ProposalDecisionResult)
