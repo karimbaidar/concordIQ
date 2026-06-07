@@ -124,6 +124,22 @@ def test_semantic_proof_mode_matches_concept_and_uses_local_snapshot(
     assert {b.owner for b in bindings} == {"Finance", "Sales", "Customer Success"}
 
 
+def test_provider_calls_list_entity_types_with_exact_name(
+    tmp_path: Path, p2_local_provider: LocalProvider
+) -> None:
+    transport = QueueTransport(_handshake() + [_semantic_text("ActiveCustomer")])
+    provider = FabricIQProvider(
+        _fabric_settings(tmp_path), transport=transport, local_provider=p2_local_provider
+    )
+
+    provider.resolve_concept("Active Customer")
+
+    tool_call = transport.requests[3]["body"]["params"]
+    assert tool_call["name"] == "list_ontology_entity_types"
+    assert tool_call["arguments"] == {"entityName": "ActiveCustomer", "includeProperties": True}
+    assert provider.semantic_proofs["Active Customer"]["tool"] == "list_ontology_entity_types"
+
+
 def test_connectivity_only_response_is_rejected(
     tmp_path: Path, p2_local_provider: LocalProvider
 ) -> None:
@@ -139,7 +155,7 @@ def test_connectivity_only_response_is_rejected(
     provider = FabricIQProvider(
         _fabric_settings(tmp_path), transport=transport, local_provider=p2_local_provider
     )
-    with pytest.raises(ProviderNotConfigured, match="matching concept"):
+    with pytest.raises(ProviderNotConfigured, match="did not match"):
         provider.resolve_concept("Active Customer")
 
 

@@ -125,60 +125,78 @@ class FabricIQProvider(CloudSnapshotProvider):
         if not self._tools:
             raise ProviderNotConfigured("Fabric ontology MCP returned no tools.")
 
-    def _retrieve_snapshot(self, term: str) -> ReplayScenarioSnapshot:
-        self._ensure_tools()
-        tool = next(
-            (
-                item
-                for name in ("search_ontology", "query_ontology")
-                for item in self._tools
-                if item.get("name") == name
-            ),
+    def _find_tool(self, names: tuple[str, ...]) -> dict[str, Any] | None:
+        return next(
+            (item for name in names for item in self._tools if item.get("name") == name),
             None,
         )
+
+    def _call_tool(self, tool: dict[str, Any], arguments: dict[str, Any]) -> dict[str, Any]:
+        properties = tool.get("inputSchema", {}).get("properties", {})
+        accepted = {key: value for key, value in arguments.items() if key in properties}
+        return self._mcp(
+            "tools/call",
+            {"name": tool["name"], "arguments": accepted or arguments},
+        )
+
+    @staticmethod
+    def _tool_arguments(tool: dict[str, Any], term: str, expected: str) -> dict[str, Any]:
+        if tool.get("name") == "list_ontology_entity_types":
+            # Ask the schema tool for the governed entity type by exact name.
+            return {"entityName": expected, "includeProperties": True}
+        properties = tool.get("inputSchema", {}).get("properties", {})
+        query_arg = next(
+            (
+                name
+                for name in ("naturalLanguageQuery", "query", "search", "text", "term")
+                if name in properties
+            ),
+            next(iter(properties), "naturalLanguageQuery"),
+        )
+        return {query_arg: f"Describe the {expected} entity type and its properties."}
+
+    def _record_semantic_proof(
+        self,
+        term: str,
+        expected: str,
+        tool_name: str,
+        response: dict[str, Any],
+    ) -> ReplayScenarioSnapshot:
+        snapshot = self._materialize_local_snapshot(term)
+        self._semantic_proofs[term] = {
+            "matched_entity_type": expected,
+            "tool": tool_name,
+            "response_shape": response_shape(response),
+        }
+        return snapshot
+
+    def _retrieve_snapshot(self, term: str) -> ReplayScenarioSnapshot:
+        self._ensure_tools()
+        expected = expected_entity_type(term)
+        # Prefer list_ontology_entity_types: it returns the governed entity types
+        # (the semantic proof). search_ontology queries instance data, which is
+        # empty for an unbound ontology and yields no proof. One call per scenario
+        # keeps capture within the six-call budget.
+        tool = self._find_tool(("list_ontology_entity_types", "search_ontology", "query_ontology"))
         if tool is None:
             raise ProviderNotConfigured(
-                "Fabric ontology MCP exposes neither search_ontology nor query_ontology."
+                "Fabric ontology MCP exposes no usable ontology tool "
+                "(expected list_ontology_entity_types or search_ontology)."
             )
-        prompt = (
-            f"Retrieve the Concord IQ scenario snapshot for {term!r} from the "
-            "`concord_iq_scenarios` content in this workspace. Return the stored JSON "
-            "verbatim, including scenario_id, term, data_classification, concept, "
-            "bindings, evaluations, subgraph, and authority_rules. Do not summarize, "
-            "reformat, or infer missing fields; return the exact JSON object."
-        )
-        schema = tool.get("inputSchema", {})
-        properties = schema.get("properties", {})
-        argument_name = next(
-            (name for name in ("query", "search", "text", "term") if name in properties),
-            next(iter(properties), "query"),
-        )
-        called = self._mcp(
-            "tools/call",
-            {
-                "name": tool["name"],
-                "arguments": {argument_name: prompt},
-            },
-        )
-        # Mode 1: Fabric returned a full Concord IQ scenario snapshot.
+        called = self._call_tool(tool, self._tool_arguments(tool, term, expected))
+        # Mode 1: a full Concord IQ scenario snapshot was returned.
         try:
             return find_snapshot(called)
         except SnapshotNotFound:
             pass
-        # Mode 2: Fabric returned matching ontology content but no full snapshot.
-        expected = expected_entity_type(term)
-        if not find_semantic_match(called, expected):
-            raise ProviderNotConfigured(
-                f"Fabric IQ returned neither a full snapshot nor a matching concept for "
-                f"{term!r} (expected entity type {expected!r}). Connectivity-only responses "
-                "are rejected — run `make fabric-mcp-diagnose` to inspect the live response."
-            )
-        snapshot = self._materialize_local_snapshot(term)
-        self._semantic_proofs[term] = {
-            "matched_entity_type": expected,
-            "response_shape": response_shape(called),
-        }
-        return snapshot
+        # Mode 2: the governed entity type was matched (semantic grounding proof).
+        if find_semantic_match(called, expected):
+            return self._record_semantic_proof(term, expected, str(tool["name"]), called)
+        raise ProviderNotConfigured(
+            f"Fabric IQ returned no full snapshot and did not match the {expected!r} entity "
+            f"type for {term!r}. Connectivity-only responses are rejected — run "
+            "`make fabric-mcp-diagnose` to inspect the live response."
+        )
 
     def _materialize_local_snapshot(self, term: str) -> ReplayScenarioSnapshot:
         """Build the deterministic LocalProvider snapshot for a proven term."""
