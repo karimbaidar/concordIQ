@@ -151,6 +151,8 @@ class RunnerReconciliationTool:
     def _require_provider(self, provider: str) -> None:
         requested = provider.strip().lower()
         configured = self.runner.provider.mode.value
+        if requested in {"auto", "cloud"} and self.runner.provider.uses_cloud:
+            return
         if requested not in {configured, self.runner.provider.name.lower()}:
             raise ProviderNotConfigured(
                 f"This workflow is configured for {configured}, not {provider}."

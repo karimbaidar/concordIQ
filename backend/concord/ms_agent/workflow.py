@@ -59,7 +59,7 @@ class AgentWorkflowRequest(BaseModel):
     term: str
     question: str | None = None
     period: str = DEFAULT_PERIOD
-    provider: str = "local"
+    provider: str | None = None
 
 
 class AgentWorkflowCasefile(BaseModel):
@@ -141,6 +141,7 @@ def _result(casefile: AgentWorkflowCasefile) -> AgentWorkflowResult:
 def _build_fast_coordinator(
     tool: ReconcileBusinessTerm,
     request_tool: ReconcileRequest | None,
+    default_provider: str,
 ):
     @executor(
         id="CoordinatorAgent",
@@ -152,18 +153,19 @@ def _build_fast_coordinator(
         ctx: WorkflowContext[AgentWorkflowCasefile],
     ) -> None:
         normalized = _normalize_request(request)
+        provider = normalized.provider or default_provider
         if request_tool is None:
             case = await asyncio.to_thread(
                 tool,
                 normalized.term,
                 normalized.period,
-                normalized.provider,
+                provider,
             )
         else:
             case = await asyncio.to_thread(
                 request_tool,
                 _domain_request(normalized),
-                normalized.provider,
+                provider,
             )
         SPECIALIST_AGENTS[0].inspect(case)
         await ctx.send_message(
@@ -209,7 +211,10 @@ def _build_fast_audit(spec: SpecialistAgentNode):
     return audit_case
 
 
-def _build_strict_coordinator(stage_tool: ReconciliationStageTool):
+def _build_strict_coordinator(
+    stage_tool: ReconciliationStageTool,
+    default_provider: str,
+):
     @executor(
         id="CoordinatorAgent",
         input=AgentWorkflowRequest | list[Message],
@@ -223,7 +228,7 @@ def _build_strict_coordinator(stage_tool: ReconciliationStageTool):
         case = await asyncio.to_thread(
             stage_tool.create_case,
             _domain_request(normalized),
-            normalized.provider,
+            normalized.provider or default_provider,
         )
         SPECIALIST_AGENTS[0].inspect(case)
         await ctx.send_message(
@@ -301,20 +306,21 @@ def build_concord_workflow(
     *,
     mode: str = "fast",
     stage_tool: ReconciliationStageTool | None = None,
+    default_provider: str = "local",
 ) -> Workflow:
     """Build a fresh fast or strict workflow because state is run-scoped."""
     workflow_mode = normalize_workflow_mode(mode)
     if workflow_mode == "strict":
         if stage_tool is None:
             raise ValueError("Strict workflow mode requires a deterministic stage tool.")
-        coordinator = _build_strict_coordinator(stage_tool)
+        coordinator = _build_strict_coordinator(stage_tool, default_provider)
         specialists = [
             _build_strict_specialist(spec, stage_tool) for spec in SPECIALIST_AGENTS[1:-1]
         ]
         audit = _build_strict_audit(SPECIALIST_AGENTS[-1], stage_tool)
         return _assemble_workflow(coordinator, specialists, audit)
 
-    coordinator = _build_fast_coordinator(tool, request_tool)
+    coordinator = _build_fast_coordinator(tool, request_tool, default_provider)
     specialists = [_build_fast_specialist(spec) for spec in SPECIALIST_AGENTS[1:-1]]
     audit = _build_fast_audit(SPECIALIST_AGENTS[-1])
     return _assemble_workflow(coordinator, specialists, audit)
@@ -360,6 +366,7 @@ class ConcordAgentWorkflow:
             self.request_tool,
             mode=self.mode,
             stage_tool=self.stage_tool,
+            default_provider=self.default_provider,
         )
 
     async def run_result(

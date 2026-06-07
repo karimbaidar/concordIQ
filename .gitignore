@@ -3,6 +3,8 @@
 .env.*
 !.env.example
 .venv/
+.checkpoints/
+.function_approvals/
 __pycache__/
 *.pyc
 .pytest_cache/

@@ -2,8 +2,12 @@ UV ?= uv
 PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
-.PHONY: setup postgres seed test lint dev frontend demo scan agent-smoke capture \
-	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
+.PHONY: setup postgres seed test lint dev frontend demo scan agent-smoke \
+	foundry-agent-dry-run foundry-agent-smoke capture fabric-bootstrap-dry-run \
+	fabric-bootstrap replay-check clean
+
+FOUNDRY_AGENT_PROVIDER ?= local
+FOUNDRY_AGENT_WORKFLOW_MODE ?= strict
 
 setup:
 	$(UV) sync --extra dev
@@ -49,6 +53,22 @@ agent-smoke: postgres seed
 		--term "Active Customer" \
 		--period "2026-03-04/2026-06-01" \
 		--provider local
+
+foundry-agent-dry-run:
+	PROVIDER=local ALLOW_CLOUD=false MAX_CLOUD_CALLS=0 \
+	$(UV) run --extra dev --extra foundry-hosting \
+		python -m concord.ms_agent.foundry_hosted_entrypoint \
+		--dry-run \
+		--provider local \
+		--workflow-mode $(FOUNDRY_AGENT_WORKFLOW_MODE)
+
+foundry-agent-smoke: postgres seed
+	PROVIDER=$(FOUNDRY_AGENT_PROVIDER) ALLOW_CLOUD=false MAX_CLOUD_CALLS=0 \
+	$(UV) run --extra dev --extra foundry-hosting \
+		python -m concord.ms_agent.foundry_hosted_entrypoint \
+		--smoke \
+		--provider $(FOUNDRY_AGENT_PROVIDER) \
+		--workflow-mode $(FOUNDRY_AGENT_WORKFLOW_MODE)
 
 capture:
 	$(PYTHON) -m concord.capture

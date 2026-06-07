@@ -83,14 +83,23 @@ Install the optional preview hosting packages:
 uv sync --extra dev --extra foundry-hosting
 ```
 
-The entrypoint is:
+Validate the real hosting adapter without cloud access or Fabric credentials:
 
 ```bash
-python -m concord.ms_agent.foundry_hosted_entrypoint
+make foundry-agent-dry-run
+make foundry-agent-smoke
 ```
 
-Start with explicit configuration. Use placeholders only in documentation and
-never commit real values:
+The dry-run constructs `ResponsesHostServer` and verifies its protocol routes.
+The smoke sends Active Customer through `/responses` in strict workflow mode,
+requires all ten specialist steps, and checks deterministic verifier approval.
+Set `FOUNDRY_AGENT_PROVIDER=replay` to exercise a verified sanitized capture.
+
+See [`docs/foundry-agent-service.md`](../../../docs/foundry-agent-service.md) for
+the full local protocol and deployment guide.
+
+For a real hosted process, start with explicit configuration. Use placeholders
+only in documentation and never commit real values:
 
 ```text
 ALLOW_CLOUD=true
@@ -115,13 +124,10 @@ settings used by Foundry tooling when a model-backed hosted surface is attached.
 The deterministic Concord IQ workflow itself does not require a model call.
 
 The host fails closed unless `ALLOW_CLOUD=true`, `MAX_CLOUD_CALLS` is positive,
-and at least one real IQ provider is configured. A local deployment smoke command
-is:
+and at least one real IQ provider is configured. Then run:
 
 ```bash
-curl -sS http://127.0.0.1:8080/responses \
-  -H 'content-type: application/json' \
-  -d '{"input":"{\"term\":\"Active Customer\",\"provider\":\"auto\"}"}'
+python -m concord.ms_agent.foundry_hosted_entrypoint
 ```
 
 The exact Foundry deployment command and endpoint shape can change while hosted
