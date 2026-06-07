@@ -5,9 +5,13 @@ from concord.ms_agent.tools import (
     RunnerReconciliationTool,
     reconcile_business_term,
 )
-from concord.ms_agent.workflow import ConcordAgentWorkflow
+from concord.ms_agent.workflow import (
+    AgentWorkflowMode,
+    ConcordAgentWorkflow,
+)
 
 __all__ = [
+    "AgentWorkflowMode",
     "ConcordAgentWorkflow",
     "RunnerReconciliationTool",
     "SPECIALIST_AGENTS",

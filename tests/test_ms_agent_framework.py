@@ -66,6 +66,54 @@ def test_default_agent_framework_mode_makes_no_cloud_calls(
     assert reconciliation_runner.provider.name == "LocalProvider"
 
 
+def test_strict_workflow_executes_specialist_stages_without_giant_runner_call(
+    reconciliation_runner: ReconciliationRunner,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = ReconciliationRequest(
+        question="Why do our Active Customer dashboards disagree?",
+        term="Active Customer",
+    )
+    fast_result = asyncio.run(
+        ConcordAgentWorkflow.from_runner(reconciliation_runner, mode="fast").run_result(request)
+    )
+
+    def unexpected_runner_call(*args, **kwargs):
+        raise AssertionError("strict workflow called the complete runner path")
+
+    monkeypatch.setattr(ReconciliationRunner, "run", unexpected_runner_call)
+    strict_result = asyncio.run(
+        ConcordAgentWorkflow.from_runner(reconciliation_runner, mode="strict").run_result(request)
+    )
+
+    assert strict_result.workflow_mode == "strict"
+    assert strict_result.workflow_plan == tuple(agent.name for agent in SPECIALIST_AGENTS)
+    assert strict_result.agent_trace == strict_result.workflow_plan
+    assert strict_result.case.verdict == fast_result.case.verdict == "conflict"
+    assert [evaluation.entity_count for evaluation in strict_result.case.execution_results] == [
+        evaluation.entity_count for evaluation in fast_result.case.execution_results
+    ]
+    assert strict_result.case.authority_assessment == fast_result.case.authority_assessment
+    assert strict_result.case.reconciliation_proposal is not None
+    assert fast_result.case.reconciliation_proposal is not None
+    assert (
+        strict_result.case.reconciliation_proposal.canonical_definition
+        == fast_result.case.reconciliation_proposal.canonical_definition
+    )
+    assert tuple(entry.agent for entry in strict_result.case.audit_log) == (
+        "ConceptResolverAgent",
+        "BindingInspectorAgent",
+        "ConflictHypothesisAgent",
+        "DataExecutionAgent",
+        "ImpactRankerAgent",
+        "AuthorityResolverAgent",
+        "ReconciliationAgent",
+        "SkepticalVerifierAgent",
+        "AuditAgent",
+        "CoordinatorAgent",
+    )
+
+
 def test_fabric_iq_is_preferred_when_both_cloud_providers_are_configured() -> None:
     settings = Settings(
         _env_file=None,

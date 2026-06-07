@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
+from typing import Protocol
 
 from sqlalchemy import Engine
 
@@ -22,6 +23,34 @@ from concord.storage.repositories import ReconciliationRepository
 DEFAULT_PERIOD = "2026-03-04/2026-06-01"
 ReconcileBusinessTerm = Callable[[str, str, str], ReconciliationCase]
 ReconcileRequest = Callable[[ReconciliationRequest, str], ReconciliationCase]
+
+
+class ReconciliationStageTool(Protocol):
+    """Deterministic stage contract used by strict Agent Framework mode."""
+
+    def create_case(
+        self,
+        request: ReconciliationRequest,
+        provider: str,
+    ) -> ReconciliationCase: ...
+
+    def resolve_concept(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def inspect_bindings(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def hypothesize_conflicts(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def execute_definitions(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def rank_impact(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def resolve_authority(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def reconcile_or_refuse(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def verify(self, case: ReconciliationCase) -> ReconciliationCase: ...
+
+    def audit(self, case: ReconciliationCase) -> ReconciliationCase: ...
 
 
 def parse_period(period: str) -> EvaluationPeriod:
@@ -59,6 +88,41 @@ class RunnerReconciliationTool:
 
     runner: ReconciliationRunner
 
+    def create_case(
+        self,
+        request: ReconciliationRequest,
+        provider: str,
+    ) -> ReconciliationCase:
+        self._require_provider(provider)
+        return self.runner.create_case(request)
+
+    def resolve_concept(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.resolve_concept(case)
+
+    def inspect_bindings(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.inspect_bindings(case)
+
+    def hypothesize_conflicts(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.hypothesize_conflicts(case)
+
+    def execute_definitions(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.execute_definitions(case)
+
+    def rank_impact(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.rank_impact(case)
+
+    def resolve_authority(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.resolve_authority(case)
+
+    def reconcile_or_refuse(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.reconcile_or_refuse(case)
+
+    def verify(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.verify(case)
+
+    def audit(self, case: ReconciliationCase) -> ReconciliationCase:
+        return self.runner.audit(case)
+
     def reconcile_business_term(
         self,
         term: str,
@@ -81,13 +145,16 @@ class RunnerReconciliationTool:
         provider: str,
     ) -> ReconciliationCase:
         """Run an existing typed request while enforcing the configured provider."""
+        self._require_provider(provider)
+        return self.runner.run(request)
+
+    def _require_provider(self, provider: str) -> None:
         requested = provider.strip().lower()
         configured = self.runner.provider.mode.value
         if requested not in {configured, self.runner.provider.name.lower()}:
             raise ProviderNotConfigured(
                 f"This workflow is configured for {configured}, not {provider}."
             )
-        return self.runner.run(request)
 
 
 def _run_with_new_dependencies(

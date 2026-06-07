@@ -16,10 +16,15 @@ from concord.agents import (
 )
 from concord.config import Settings
 from concord.llm import DisabledLLMProvider, LLMProvider
-from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
+from concord.orchestration.casefile import (
+    AuthorityAssessment,
+    ImpactAssessment,
+    ReconciliationCase,
+    ReconciliationRequest,
+)
 from concord.orchestration.context_packet import build_context_packet
 from concord.orchestration.state_machine import ReconciliationState
-from concord.providers import GroundingProvider
+from concord.providers import ConceptResolution, GroundingProvider
 from concord.storage.repositories import ReconciliationRepository
 
 
@@ -29,7 +34,7 @@ class VerificationFailed(RuntimeError):
 
 @dataclass(slots=True)
 class ReconciliationRunner:
-    """Drive specialist agents through the typed reconciliation state machine."""
+    """Expose deterministic reconciliation as composable specialist stages."""
 
     provider: GroundingProvider
     repository: ReconciliationRepository
@@ -40,19 +45,27 @@ class ReconciliationRunner:
         if self.provider.uses_cloud:
             self.settings.require_cloud_access(self.provider.name)
 
-    def run(self, request: ReconciliationRequest) -> ReconciliationCase:
-        case = ReconciliationCase(request=request)
+    @staticmethod
+    def create_case(request: ReconciliationRequest) -> ReconciliationCase:
+        """Create the typed blackboard before any specialist executes."""
+        return ReconciliationCase(request=request)
 
-        concept = ConceptResolverAgent(self.provider).run(request.term)
+    def resolve_concept(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Resolve one business term and advance only the concept stage."""
+        concept = ConceptResolverAgent(self.provider).run(case.request.term)
         CoordinatorAgent().require_supported(concept)
         case.resolved_concept = concept
         case.candidate_definitions = concept.definition_ids
         case.transition(
             ReconciliationState.RESOLVE_CONCEPT,
             agent="ConceptResolverAgent",
-            summary=f"Resolved {request.term!r} to {concept.canonical_name}.",
+            summary=(f"Resolved {case.request.term!r} to {concept.canonical_name}."),
         )
+        return case
 
+    def inspect_bindings(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Retrieve and normalize bindings for the resolved concept."""
+        concept = self._resolved_concept(case)
         bindings = BindingInspectorAgent(self.provider).run(concept.concept_id)
         case.binding_semantics = bindings
         case.transition(
@@ -60,19 +73,25 @@ class ReconciliationRunner:
             agent="BindingInspectorAgent",
             summary=f"Normalized {len(bindings)} operational definitions.",
         )
+        return case
 
-        hypotheses = ConflictHypothesisAgent().run(bindings)
+    def hypothesize_conflicts(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Create pairwise hypotheses without deciding the final verdict."""
+        hypotheses = ConflictHypothesisAgent().run(case.binding_semantics)
         case.conflict_hypotheses = hypotheses
         case.transition(
             ReconciliationState.HYPOTHESIZE_CONFLICTS,
             agent="ConflictHypothesisAgent",
             summary=f"Generated {len(hypotheses)} pairwise hypotheses for execution.",
         )
+        return case
 
+    def execute_definitions(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Execute every binding and settle conflict versus equivalence."""
         execution = DataExecutionAgent(self.provider).run(
             str(case.run_id),
-            bindings,
-            request.period,
+            case.binding_semantics,
+            case.request.period,
         )
         case.execution_results = execution.evaluations
         case.evidence = execution.evidence
@@ -86,8 +105,14 @@ class ReconciliationRunner:
                 else "Executed all definitions and found equal entity sets."
             ),
         )
+        return case
 
-        impact = ImpactRankerAgent().run(bindings, execution.evaluations)
+    def rank_impact(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Compute deterministic materiality from executed definition results."""
+        impact = ImpactRankerAgent().run(
+            case.binding_semantics,
+            case.execution_results,
+        )
         case.impact_assessment = impact
         case.transition(
             ReconciliationState.RANK_IMPACT,
@@ -97,15 +122,19 @@ class ReconciliationRunner:
                 f"{impact.customer_count_delta} customers of population delta."
             ),
         )
+        return case
 
+    def resolve_authority(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Resolve governance rules and build the compact context packet."""
+        concept = self._resolved_concept(case)
         authority = AuthorityResolverAgent(self.provider).run(concept.concept_id)
         case.authority_assessment = authority
         subgraph = self.provider.get_subgraph(concept.concept_id)
         case.context_packet = build_context_packet(
-            request.question,
+            case.request.question,
             self.provider,
             concept,
-            list(bindings),
+            list(case.binding_semantics),
             subgraph,
             list(authority.rules),
         )
@@ -114,14 +143,20 @@ class ReconciliationRunner:
             agent="AuthorityResolverAgent",
             summary=f"Authority is {authority.status}: {authority.owner or 'no owner'}.",
         )
+        return case
 
+    def reconcile_or_refuse(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Create a governed proposal, refusal, or no-action decision."""
+        concept = self._resolved_concept(case)
+        impact = self._impact_assessment(case)
+        authority = self._authority_assessment(case)
         decision = ReconciliationAgent(self.llm_provider).run(
             concept.concept_id,
-            execution.verdict,
-            bindings,
+            case.verdict,
+            case.binding_semantics,
             impact,
             authority,
-            execution.evidence,
+            case.evidence,
         )
         case.reconciliation_proposal = decision.proposal
         case.refusal_reason = decision.refusal_reason
@@ -138,7 +173,10 @@ class ReconciliationRunner:
             agent="ReconciliationAgent",
             summary=decision_summaries[decision.action],
         )
+        return case
 
+    def verify(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Run deterministic blocking checks over the assembled casefile."""
         verifier = SkepticalVerifierAgent(self.llm_provider).run(case)
         case.verifier_report = verifier
         if verifier.narration:
@@ -155,7 +193,11 @@ class ReconciliationRunner:
         if not verifier.passed:
             case.verdict = "incomplete"
             raise VerificationFailed(", ".join(verifier.failures))
+        return case
 
+    def audit(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Finalize the timeline and persist one verifier-approved case."""
+        concept = self._resolved_concept(case)
         case.transition(
             ReconciliationState.AUDIT,
             agent="AuditAgent",
@@ -168,3 +210,34 @@ class ReconciliationRunner:
         )
         AuditAgent(self.repository, self.llm_provider).run(case)
         return case
+
+    def run(self, request: ReconciliationRequest) -> ReconciliationCase:
+        """Run the stable fast path through the same deterministic stages."""
+        case = self.create_case(request)
+        self.resolve_concept(case)
+        self.inspect_bindings(case)
+        self.hypothesize_conflicts(case)
+        self.execute_definitions(case)
+        self.rank_impact(case)
+        self.resolve_authority(case)
+        self.reconcile_or_refuse(case)
+        self.verify(case)
+        return self.audit(case)
+
+    @staticmethod
+    def _resolved_concept(case: ReconciliationCase) -> ConceptResolution:
+        if case.resolved_concept is None:
+            raise ValueError("The concept resolution stage must complete first.")
+        return case.resolved_concept
+
+    @staticmethod
+    def _impact_assessment(case: ReconciliationCase) -> ImpactAssessment:
+        if case.impact_assessment is None:
+            raise ValueError("The impact ranking stage must complete first.")
+        return case.impact_assessment
+
+    @staticmethod
+    def _authority_assessment(case: ReconciliationCase) -> AuthorityAssessment:
+        if case.authority_assessment is None:
+            raise ValueError("The authority resolution stage must complete first.")
+        return case.authority_assessment

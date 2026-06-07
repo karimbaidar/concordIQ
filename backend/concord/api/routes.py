@@ -55,6 +55,7 @@ def health(request: Request) -> dict[str, object]:
     return {
         "status": "ok",
         "orchestration": "Microsoft Agent Framework",
+        "workflow_mode": _workflow(request).mode,
         "provider": runner.provider.name,
         "cloud_enabled": runner.settings.allow_cloud,
         "data_type": getattr(runner.provider, "data_type", "synthetic"),

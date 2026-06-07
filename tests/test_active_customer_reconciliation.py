@@ -167,6 +167,7 @@ def test_api_health(
     assert health.json() == {
         "status": "ok",
         "orchestration": "Microsoft Agent Framework",
+        "workflow_mode": "fast",
         "provider": "LocalProvider",
         "cloud_enabled": False,
         "data_type": "synthetic",

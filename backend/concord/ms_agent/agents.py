@@ -33,8 +33,14 @@ class SpecialistAgentNode:
 SPECIALIST_AGENTS: tuple[SpecialistAgentNode, ...] = (
     SpecialistAgentNode(
         "CoordinatorAgent",
-        "a completed deterministic reconciliation case",
-        lambda case: case.state is ReconciliationState.COMPLETE,
+        "a typed reconciliation case and workflow plan",
+        lambda case: (
+            case.state
+            in {
+                ReconciliationState.START,
+                ReconciliationState.COMPLETE,
+            }
+        ),
     ),
     SpecialistAgentNode(
         "ConceptResolverAgent",

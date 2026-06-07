@@ -1,9 +1,16 @@
 # Microsoft Agent Framework integration
 
 Concord IQ uses Microsoft Agent Framework as the application orchestration layer.
-Ten typed workflow nodes coordinate a `ReconciliationCase`; the coordinator calls
-the existing deterministic `ReconciliationRunner` through
-`reconcile_business_term(term, period, provider)`.
+Ten typed workflow nodes coordinate a `ReconciliationCase` in two modes:
+
+- `fast` is the stable default. The coordinator calls the complete deterministic
+  `ReconciliationRunner`, and each specialist validates its typed stage output.
+- `strict` lets Agent Framework own progression. The coordinator creates the case
+  and plan, then every specialist invokes exactly one deterministic runner stage
+  before passing the typed casefile onward.
+
+Both modes use the same SQL execution, evidence, authority, reconciliation,
+verifier, and audit methods. Optional narration cannot change their decisions.
 
 ## Local smoke test
 
@@ -11,7 +18,11 @@ Local mode is deterministic, uses synthetic data, and makes no Microsoft call:
 
 ```bash
 make agent-smoke
+AGENT_WORKFLOW_MODE=strict make agent-smoke
 ```
+
+The command prints `workflow=fast` or `workflow=strict`. Strict mode never invokes
+the runner's complete `run()` path.
 
 The period format is `YYYY-MM-DD/YYYY-MM-DD`. Hosted messages may be a plain term
 or a JSON object:

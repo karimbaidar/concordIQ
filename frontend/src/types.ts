@@ -3,6 +3,7 @@ export type Severity = "low" | "medium" | "high";
 
 export interface HealthStatus {
   status: string;
+  workflow_mode: "fast" | "strict";
   provider: string;
   cloud_enabled: boolean;
   data_type: string;

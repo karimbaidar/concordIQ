@@ -1,6 +1,7 @@
 """Runtime configuration with cloud access disabled by default."""
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,6 +17,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     provider: str = "local"
+    agent_workflow_mode: Literal["fast", "strict"] = "fast"
     allow_cloud: bool = False
     max_cloud_calls: int = 0
     llm_provider: str = "disabled"
