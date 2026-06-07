@@ -387,9 +387,28 @@ response, reviewed sanitized copy, and successful `ReplayProvider` run. See
 
 ## Foundry Agent Service deployment
 
-The Agent Framework workflow is the deployment unit for Foundry Agent Service.
-Concord IQ is **Foundry Agent Service-ready**: the hosting protocol is validated
-**without any cloud call or Fabric credentials**.
+**Foundry Agent Service is the intended cloud runtime for Concord IQ.** Microsoft
+Agent Framework (strict mode) is the multi-agent orchestration layer; the Foundry
+Agent Service runtime path is implemented and locally smoke-tested. **Real cloud
+smoke is pending** — until it passes, the project does not claim a Foundry tenant
+deployment. LocalProvider and ReplayProvider remain fallback / reviewer modes.
+
+The intended runtime — once a hosted agent is deployed — uses **ReplayProvider**,
+so the hosted agent needs **no Fabric credentials or capacity**:
+
+```bash
+make foundry-hosted-dry-run    # no cloud: checks the entrypoint + committed replay artifact, prints required env
+make foundry-hosted-package    # no cloud: writes artifacts/foundry/package-report.md (what to deploy)
+# after deploying, with FOUNDRY_HOSTED_ENDPOINT + FOUNDRY_ACCESS_TOKEN set:
+ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 make foundry-hosted-smoke   # one real call to the deployed agent
+```
+
+The hosted smoke asserts the deployed agent's response proves
+**provider_mode=replay, workflow_mode=strict, term=Active Customer,
+verdict=conflict, verification_status=passed, specialist_steps=10**. The
+deployment runbook is in [Foundry Agent Service](docs/foundry-agent-service.md).
+
+The in-process protocol smoke (no tenant) is also available:
 
 ```bash
 make foundry-agent-dry-run     # constructs the host, checks routes, no cloud, no socket
@@ -397,17 +416,11 @@ make foundry-agent-smoke       # full /responses path in process over LocalProvi
 FOUNDRY_AGENT_PROVIDER=replay make foundry-agent-smoke   # same path over a verified replay artifact
 ```
 
-The smoke proves the full chain end to end with no tenant:
-**Foundry hosted entrypoint → Microsoft Agent Framework workflow → Concord IQ
-deterministic tool → ReplayProvider or LocalProvider → semantic reconciliation
-result** (verifier `passed`, all ten specialist trace steps). Real `auto` hosting
-fails closed unless cloud access, a positive budget, and a real IQ provider are
-explicit, and never falls back to local silently.
-
-See [Foundry Agent Service](docs/foundry-agent-service.md) and
-[the Agent Framework integration guide](backend/concord/ms_agent/README.md). This
-repository validates the hosting protocol locally; it does **not** claim a Foundry
-Agent Service tenant deployment.
+It proves the chain with no tenant: **Foundry hosted entrypoint → Microsoft Agent
+Framework strict workflow → Concord IQ deterministic tool → ReplayProvider /
+LocalProvider → semantic reconciliation result**. Real `auto` hosting fails closed
+unless cloud access, a positive budget, and a real IQ provider are explicit, and
+never falls back to local silently.
 
 ## Cloud and cost safety
 

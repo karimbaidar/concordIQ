@@ -27,3 +27,6 @@ artifacts/replay/raw/*
 !artifacts/replay/raw/.gitkeep
 !artifacts/replay/sanitized/
 !artifacts/replay/sanitized/**
+
+# Foundry deployment build output
+artifacts/foundry/

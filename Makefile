@@ -3,7 +3,8 @@ PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
 .PHONY: setup postgres seed test lint dev frontend demo scan agent-smoke \
-	foundry-agent-dry-run foundry-agent-smoke capture fabric-mcp-diagnose \
+	foundry-agent-dry-run foundry-agent-smoke foundry-hosted-dry-run \
+	foundry-hosted-package foundry-hosted-smoke capture fabric-mcp-diagnose \
 	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
 
 FOUNDRY_AGENT_PROVIDER ?= local
@@ -69,6 +70,15 @@ foundry-agent-smoke: postgres seed
 		--smoke \
 		--provider $(FOUNDRY_AGENT_PROVIDER) \
 		--workflow-mode $(FOUNDRY_AGENT_WORKFLOW_MODE)
+
+foundry-hosted-dry-run:
+	$(PYTHON) -m concord.ms_agent.foundry_hosted --dry-run
+
+foundry-hosted-package:
+	$(PYTHON) -m concord.ms_agent.foundry_hosted --package
+
+foundry-hosted-smoke:
+	$(PYTHON) -m concord.ms_agent.foundry_hosted --smoke
 
 capture:
 	$(PYTHON) -m concord.capture

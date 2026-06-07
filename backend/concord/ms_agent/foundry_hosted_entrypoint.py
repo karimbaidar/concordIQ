@@ -221,7 +221,10 @@ def _case_from_response(payload: dict[str, Any]) -> ReconciliationCase:
             continue
         for content in output.get("content", []):
             if content.get("type") == "output_text" and content.get("text"):
-                return ReconciliationCase.model_validate_json(content["text"])
+                document = json.loads(content["text"])
+                # Accept the self-describing envelope or a bare casefile.
+                case_document = document.get("case", document)
+                return ReconciliationCase.model_validate(case_document)
     raise RuntimeError("Foundry Responses host returned no Concord IQ casefile.")
 
 

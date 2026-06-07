@@ -96,8 +96,26 @@ class AgentWorkflowResult(BaseModel):
     workflow_plan: tuple[str, ...]
     agent_trace: tuple[str, ...]
 
+    def proof(self) -> dict[str, object]:
+        """A self-describing, non-secret summary a remote caller can validate."""
+        provider_mode = "unknown"
+        if self.case.context_packet is not None:
+            provider_mode = str(self.case.context_packet.provider_metadata.get("mode", "unknown"))
+        return {
+            "provider_mode": provider_mode,
+            "workflow_mode": self.workflow_mode,
+            "term": self.case.request.term,
+            "verdict": self.case.verdict,
+            "verification_status": self.case.verification_status,
+            "specialist_steps": len(self.agent_trace),
+        }
+
     def __str__(self) -> str:
-        return self.case.model_dump_json()
+        # Self-describing envelope so a remote (Foundry-hosted) caller can verify
+        # provider/workflow mode and the verdict without out-of-band knowledge.
+        return json.dumps(
+            {"concord_iq_proof": self.proof(), "case": self.case.model_dump(mode="json")}
+        )
 
 
 def _request_from_messages(messages: list[Message]) -> AgentWorkflowRequest:

@@ -91,7 +91,58 @@ cloud mode. Keep datasets tiny, use cloud only for smoke tests, pause or delete
 idle resources, and replay sanitized captured responses through ReplayProvider
 for demo rehearsal.
 
-Current Microsoft references:
+## Hosted deployment runbook (real cloud runtime)
+
+Foundry Agent Service is the intended cloud runtime. The hosted agent runs over
+**ReplayProvider**, so it needs no Fabric credentials or capacity — the committed
+verified Fabric IQ replay artifact carries the grounding. Deployment automation
+depends on tenant-specific preview APIs, so this is a manual runbook; the smoke
+runs against an already-deployed endpoint. Do not fake a deployment.
+
+1. **Prepare locally (no cloud).**
+   ```bash
+   make foundry-hosted-dry-run     # checks the entrypoint + committed replay artifact
+   make foundry-hosted-package      # writes artifacts/foundry/package-report.md
+   ```
+2. **Create or select a Microsoft Foundry project** in the Foundry portal.
+3. **Deploy Concord IQ as a hosted/containerized agent** using the existing
+   entrypoint as the start command:
+   ```bash
+   python -m concord.ms_agent.foundry_hosted_entrypoint
+   ```
+   Install the app with the `foundry-hosting` extra. Ship the application package,
+   `pyproject.toml`/`uv.lock`, `ontology/`, `data/synthetic/`, and the committed
+   `artifacts/replay/sanitized/latest.json`. **Never** ship `.env`, tokens,
+   `.venv/`, `node_modules/`, `artifacts/replay/raw/`, diagnostics, planning files,
+   or screenshots.
+4. **Configure the hosted environment** (inside the deployed app):
+   ```text
+   PROVIDER=replay
+   AGENT_WORKFLOW_MODE=strict
+   ALLOW_CLOUD=false
+   MAX_CLOUD_CALLS=0
+   REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/latest.json
+   ```
+5. **Configure the local smoke caller** (your machine, reaching the deployed agent):
+   ```text
+   ALLOW_CLOUD=true
+   MAX_CLOUD_CALLS=1
+   FOUNDRY_HOSTED_ENDPOINT=https://<your-deployed-agent>
+   FOUNDRY_ACCESS_TOKEN=<short-lived bearer token>
+   ```
+6. **Run the real cloud smoke** (one call):
+   ```bash
+   ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 make foundry-hosted-smoke
+   ```
+   It sends *"Why do our Active Customer dashboards disagree?"*, then asserts the
+   response proves `provider_mode=replay`, `workflow_mode=strict`,
+   `term=Active Customer`, `verdict=conflict`, `verification_status=passed`,
+   `specialist_steps=10`, and writes `artifacts/foundry/hosted-smoke-report.md`
+   (no token). Only after this passes may docs say
+   **"Foundry Agent Service cloud runtime smoke verified."**
+7. **Delete or stop the hosted resources** afterward to avoid charges.
+
+## Current Microsoft references
 
 - [Foundry hosted agents](https://learn.microsoft.com/en-us/agent-framework/hosting/foundry-hosted-agent)
 - [Hosted agents concepts](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/hosted-agents)

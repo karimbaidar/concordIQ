@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     foundry_iq_api_version: str = "2026-04-01"
     foundry_iq_access_token: SecretStr | None = None
     foundry_iq_api_key: SecretStr | None = None
+    foundry_hosted_endpoint: str | None = None
+    foundry_hosted_agent_id: str | None = None
+    foundry_access_token: SecretStr | None = None
     fabric_iq_mcp_endpoint: str | None = None
     fabric_iq_access_token: SecretStr | None = None
     fabric_workspace_name: str = "ConcordIQHackathon"
