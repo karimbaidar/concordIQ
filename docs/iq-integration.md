@@ -135,6 +135,41 @@ scenario completeness, ontology and definition evidence, executed evaluations,
 authority rules, and secret hygiene. It then runs the demo with
 `PROVIDER=replay`, `ALLOW_CLOUD=false`, and `MAX_CLOUD_CALLS=0`.
 
+## Scenario content: why entity types are not enough
+
+A Fabric ontology entity *type* (for example `ActiveCustomer` with `DisplayName`,
+`Description`, `ScenarioId`) is only a schema — it carries no instance values.
+`FabricIQProvider` does not need types; it needs the full scenario **snapshot
+JSON** (`scenario_id`, `term`, `concept`, `bindings`, `evaluations`, `subgraph`,
+`authority_rules`) to be *retrievable* through the MCP. If the ontology exposes
+only types, capture fails with "did not contain a Concord IQ scenario snapshot".
+
+The bootstrap therefore also produces `fabric_seed/concord_iq_scenarios.json` —
+one self-contained snapshot per capture scenario — and best-effort uploads it to
+the lakehouse at `Files/concord_iq_scenarios.json` (OneLake). `FabricIQProvider`
+asks Fabric IQ to retrieve that `concord_iq_scenarios` content and return the exact
+JSON. If the automated upload cannot run (no OneLake storage token), upload
+`fabric_seed/concord_iq_scenarios.json` to the lakehouse manually.
+
+> **Limitation.** The public preview surfaces do not let the bootstrap create
+> bound ontology *instances* directly, so retrieval depends on Fabric IQ exposing
+> the uploaded `concord_iq_scenarios` content. Confirm this empirically before
+> spending capture budget.
+
+### Diagnose before you capture
+
+When capture fails, inspect the live MCP response first:
+
+```bash
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make fabric-mcp-diagnose
+```
+
+It makes one guarded round trip, prints the discovered tools and the response
+shape, says whether valid snapshot JSON was found, and writes a sanitized copy to
+`artifacts/replay/raw/diagnostic.json` (gitignored, no tokens). It never writes
+`sanitized/latest.json`. Run `make capture` only once diagnose reports
+`Valid Concord IQ snapshot JSON: FOUND`.
+
 ## Foundry Agent Service
 
 `concord.ms_agent.foundry_hosted_entrypoint` wraps the typed Microsoft Agent

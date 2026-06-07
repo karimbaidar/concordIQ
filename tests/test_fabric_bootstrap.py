@@ -164,6 +164,12 @@ def test_fabric_bootstrap_creates_resources_and_prints_no_token(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     transport = StubFabricTransport()
+    uploads: list[tuple[str, str, str]] = []
+
+    def stub_uploader(workspace_id: str, lakehouse_id: str, content: str) -> str:
+        uploads.append((workspace_id, lakehouse_id, content))
+        return "uploaded (stub)"
+
     result = bootstrap(
         Settings(
             _env_file=None,
@@ -174,6 +180,7 @@ def test_fabric_bootstrap_creates_resources_and_prints_no_token(
         output_dir=tmp_path / "fabric_seed",
         data_dir=tmp_path / "synthetic",
         transport=transport,
+        content_uploader=stub_uploader,
     )
 
     output = capsys.readouterr().out
@@ -181,7 +188,11 @@ def test_fabric_bootstrap_creates_resources_and_prints_no_token(
     assert result.lakehouse.resource_id == "lakehouse-id"
     assert result.ontology.resource_id == "ontology-id"
     assert result.ontology_seeded is True
+    assert result.scenario_content == "uploaded (stub)"
+    # The uploaded content is the retrievable scenario snapshot JSON.
+    assert uploads and '"scenarios"' in uploads[0][2]
     assert "FABRIC_IQ_MCP_ENDPOINT=" in output
+    assert "fabric-mcp-diagnose" in output
     assert "test-token" not in output
     assert not (tmp_path / ".env").exists()
 
@@ -202,6 +213,7 @@ def test_fabric_seed_contains_typed_synthetic_snapshots(tmp_path: Path) -> None:
         "authority_rules.csv",
         "bootstrap-report.md",
         "README.md",
+        "concord_iq_scenarios.json",
     }
     assert expected == {path.name for path in manifest.files}
     for scenario in DEMO_SCENARIOS:

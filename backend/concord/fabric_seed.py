@@ -314,6 +314,30 @@ def build_ontology_definition(
     return {"parts": parts}
 
 
+SCENARIO_CONTENT_NAME = "concord_iq_scenarios.json"
+
+
+def build_scenario_content(snapshots: tuple[ReplayScenarioSnapshot, ...]) -> str:
+    """Build the retrievable `concord_iq_scenarios` content for Fabric IQ.
+
+    Fabric ontology entity *types* carry no instance values, so the scenario
+    snapshots cannot live in the ontology definition. This is the content that the
+    bootstrap uploads to the lakehouse (and that FabricIQProvider asks Fabric IQ to
+    return verbatim): one self-contained, indexable JSON object per scenario.
+    """
+    documents = [
+        {
+            "scenario_id": snapshot.scenario_id,
+            "term": snapshot.term,
+            "concept_id": snapshot.concept.concept_id,
+            "aliases": list(snapshot.concept.aliases),
+            "snapshot": snapshot.model_dump(mode="json"),
+        }
+        for snapshot in snapshots
+    ]
+    return json.dumps({"scenarios": documents}, indent=2, ensure_ascii=True)
+
+
 def export_fabric_seed(
     settings: Settings | None = None,
     *,
@@ -338,6 +362,7 @@ def export_fabric_seed(
         "authority_rules.csv": _authority_rules_csv(snapshots),
         "bootstrap-report.md": _bootstrap_report_text(),
         "README.md": _readme_text(),
+        SCENARIO_CONTENT_NAME: build_scenario_content(snapshots),
     }
     for name, content in generated.items():
         path = output_dir / name

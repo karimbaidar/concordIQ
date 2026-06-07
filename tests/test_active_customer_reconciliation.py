@@ -155,8 +155,10 @@ def test_api_health(
     postgres_engine: Engine,
     p2_local_provider: LocalProvider,
 ) -> None:
+    # Isolate from any developer .env (e.g. ALLOW_CLOUD/AGENT_WORKFLOW_MODE set for
+    # a real Fabric bootstrap); health reflects the default local posture.
     app = create_app(
-        Settings(),
+        Settings(_env_file=None),
         provider=p2_local_provider,
         engine=postgres_engine,
     )

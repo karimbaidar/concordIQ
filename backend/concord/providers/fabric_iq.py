@@ -100,9 +100,11 @@ class FabricIQProvider(CloudSnapshotProvider):
                 "Fabric ontology MCP exposes neither search_ontology nor query_ontology."
             )
         prompt = (
-            f"Find the Concord IQ synthetic scenario snapshot for {term!r}. "
-            "Return the registered JSON with concept, bindings, evaluations, subgraph, "
-            "and authority_rules. Do not infer missing fields."
+            f"Retrieve the Concord IQ scenario snapshot for {term!r} from the "
+            "`concord_iq_scenarios` content in this workspace. Return the stored JSON "
+            "verbatim, including scenario_id, term, data_classification, concept, "
+            "bindings, evaluations, subgraph, and authority_rules. Do not summarize, "
+            "reformat, or infer missing fields; return the exact JSON object."
         )
         schema = tool.get("inputSchema", {})
         properties = schema.get("properties", {})

@@ -1,11 +1,12 @@
 """Typed, synthetic-only artifact schema shared by capture and replay."""
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field, model_validator
+from pydantic import Field, ValidationError, model_validator
 
 from concord.providers.base import (
     AuthorityRule,
@@ -133,29 +134,113 @@ def build_replay_artifact(
     )
 
 
+REQUIRED_SNAPSHOT_FIELDS: tuple[str, ...] = (
+    "scenario_id",
+    "term",
+    "concept",
+    "bindings",
+    "evaluations",
+    "subgraph",
+)
+_FENCE_PATTERN = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL)
+
+
+class SnapshotNotFound(ValueError):
+    """Raised when an IQ response carries no valid Concord IQ scenario snapshot.
+
+    Carries ``missing_fields`` when a partial snapshot object was located, so the
+    caller can explain exactly what the IQ surface failed to return.
+    """
+
+    def __init__(self, message: str, *, missing_fields: tuple[str, ...] = ()) -> None:
+        super().__init__(message)
+        self.missing_fields = tuple(missing_fields)
+
+
+def _json_candidates(text: str) -> list[str]:
+    """Yield JSON candidate substrings from raw, fenced, or wrapped text."""
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def add(candidate: str) -> None:
+        cleaned = candidate.strip()
+        if cleaned and cleaned not in seen:
+            seen.add(cleaned)
+            candidates.append(cleaned)
+
+    add(text)
+    for match in _FENCE_PATTERN.finditer(text):
+        add(match.group(1))
+    start, end = text.find("{"), text.rfind("}")
+    if start != -1 and end > start:
+        add(text[start : end + 1])
+    return candidates
+
+
 def find_snapshot(value: Any) -> ReplayScenarioSnapshot:
-    """Find a snapshot in direct JSON, nested provider output, or text content."""
-    if isinstance(value, dict):
-        required = {"scenario_id", "term", "concept", "bindings", "evaluations", "subgraph"}
-        if required.issubset(value):
-            return ReplayScenarioSnapshot.model_validate(value)
-        for nested in value.values():
-            try:
-                return find_snapshot(nested)
-            except (TypeError, ValueError):
-                continue
-    elif isinstance(value, list):
-        for nested in value:
-            try:
-                return find_snapshot(nested)
-            except (TypeError, ValueError):
-                continue
-    elif isinstance(value, str):
-        candidate = value.strip()
-        if candidate.startswith("```") and candidate.endswith("```"):
-            candidate = candidate.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
-        try:
-            return find_snapshot(json.loads(candidate))
-        except json.JSONDecodeError:
-            pass
-    raise ValueError("Provider response did not contain a valid Concord IQ scenario snapshot")
+    """Find a snapshot in direct JSON, markdown fences, or MCP content blocks.
+
+    Handles JSON returned directly, JSON inside ```json fences, JSON embedded in
+    surrounding prose, and Fabric/MCP wrappers whose ``content``/``text`` blocks
+    carry the JSON. On failure it raises :class:`SnapshotNotFound` naming the
+    missing required fields when a partial snapshot was located.
+    """
+    diagnostics: dict[str, Any] = {"missing": None, "best": 0, "invalid": None}
+
+    def search(node: Any) -> ReplayScenarioSnapshot:
+        if isinstance(node, dict):
+            present = [field for field in REQUIRED_SNAPSHOT_FIELDS if field in node]
+            if len(present) == len(REQUIRED_SNAPSHOT_FIELDS):
+                try:
+                    return ReplayScenarioSnapshot.model_validate(node)
+                except ValidationError as error:
+                    diagnostics["invalid"] = str(error).splitlines()[0]
+            elif present and len(present) > diagnostics["best"]:
+                diagnostics["best"] = len(present)
+                diagnostics["missing"] = tuple(
+                    field for field in REQUIRED_SNAPSHOT_FIELDS if field not in node
+                )
+            for nested in node.values():
+                try:
+                    return search(nested)
+                except SnapshotNotFound:
+                    continue
+        elif isinstance(node, (list, tuple)):
+            for nested in node:
+                try:
+                    return search(nested)
+                except SnapshotNotFound:
+                    continue
+        elif isinstance(node, str):
+            for candidate in _json_candidates(node):
+                try:
+                    parsed = json.loads(candidate)
+                except json.JSONDecodeError:
+                    continue
+                try:
+                    return search(parsed)
+                except SnapshotNotFound:
+                    continue
+        raise SnapshotNotFound("no snapshot in this node")
+
+    try:
+        return search(value)
+    except SnapshotNotFound:
+        pass
+    if diagnostics["missing"]:
+        raise SnapshotNotFound(
+            "Provider response contained a partial Concord IQ snapshot but is missing "
+            f"required fields: {', '.join(diagnostics['missing'])}.",
+            missing_fields=diagnostics["missing"],
+        )
+    if diagnostics["invalid"]:
+        raise SnapshotNotFound(
+            "Provider response had snapshot-shaped JSON that failed validation: "
+            f"{diagnostics['invalid']}."
+        )
+    raise SnapshotNotFound(
+        "Provider response did not contain a Concord IQ scenario snapshot. Expected a "
+        "JSON object with scenario_id, term, concept, bindings, evaluations, and subgraph. "
+        "The Fabric ontology likely exposes entity types but no retrievable scenario "
+        "content — run `make fabric-mcp-diagnose` to inspect the live response."
+    )

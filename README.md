@@ -212,7 +212,18 @@ plus the ontology MCP endpoint for manual `.env` entry. It never writes `.env` o
 prints the token. If preview import fails, the created resources are preserved and
 the command prints a Fabric UI fallback using `fabric_seed/`.
 
-Once the ontology is published and the MCP endpoint and fresh token are configured:
+Once the ontology is published and the MCP endpoint and fresh token are configured,
+diagnose first — entity types alone carry no retrievable content, so Fabric IQ must
+expose the scenario **snapshot JSON** (the bootstrap uploads
+`fabric_seed/concord_iq_scenarios.json` to the lakehouse for exactly this):
+
+```bash
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make fabric-mcp-diagnose
+```
+
+This prints the discovered MCP tools and response shape and says whether valid
+snapshot JSON was found (sanitized copy in `artifacts/replay/raw/diagnostic.json`,
+no tokens). Run capture only once it reports `FOUND`:
 
 ```bash
 PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture

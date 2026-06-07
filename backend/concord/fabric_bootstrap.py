@@ -20,6 +20,7 @@ from concord.fabric_seed import (
     DEFAULT_OUTPUT_DIR,
     FabricSeedManifest,
     build_ontology_definition,
+    build_scenario_content,
     export_fabric_seed,
 )
 
@@ -135,7 +136,13 @@ class FabricBootstrapResult:
     mcp_endpoint: str
     ontology_seeded: bool
     capacity_assignment: str
+    scenario_content: str
     warnings: tuple[str, ...]
+
+
+ONELAKE_DFS_ROOT = "https://onelake.dfs.fabric.microsoft.com"
+ONELAKE_TOKEN_RESOURCE = "https://storage.azure.com"
+SCENARIO_CONTENT_RELATIVE_PATH = "Files/concord_iq_scenarios.json"
 
 
 def fabric_mcp_endpoint(workspace_id: str, ontology_id: str) -> str:
@@ -144,6 +151,11 @@ def fabric_mcp_endpoint(workspace_id: str, ontology_id: str) -> str:
         f"{FABRIC_API_ROOT}/mcp/dataPlane/workspaces/{workspace_id}/"
         f"items/{ontology_id}/ontologyEndpoint"
     )
+
+
+def onelake_dfs_url(workspace_id: str, lakehouse_id: str, relative_path: str) -> str:
+    """Build the OneLake ADLS Gen2 (DFS) URL for a lakehouse file."""
+    return f"{ONELAKE_DFS_ROOT}/{workspace_id}/{lakehouse_id}/{relative_path.lstrip('/')}"
 
 
 def _azure_cli_token() -> str:
@@ -177,6 +189,73 @@ def _azure_cli_token() -> str:
     if not token:
         raise FabricBootstrapError("Azure CLI returned an empty Fabric access token.")
     return token
+
+
+def _azure_cli_storage_token() -> str:
+    """Obtain a OneLake/storage-scoped token (distinct audience from Fabric API)."""
+    completed = subprocess.run(
+        [
+            "az",
+            "account",
+            "get-access-token",
+            "--resource",
+            ONELAKE_TOKEN_RESOURCE,
+            "--query",
+            "accessToken",
+            "-o",
+            "tsv",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    token = completed.stdout.strip()
+    if not token:
+        raise FabricBootstrapError("Azure CLI returned an empty OneLake storage token.")
+    return token
+
+
+OneLakeSender = Callable[[str, str, bytes | None, dict[str, str]], int]
+
+
+def _onelake_send(method: str, url: str, data: bytes | None, headers: dict[str, str]) -> int:
+    request = Request(url, data=data, headers=headers, method=method)  # noqa: S310
+    try:
+        with urlopen(request, timeout=30) as response:  # noqa: S310
+            return response.status
+    except HTTPError as error:
+        raise FabricApiError(error.code, error.read().decode("utf-8", "replace")[:200]) from error
+    except URLError as error:
+        raise FabricBootstrapError(f"OneLake upload failed: {error.reason}") from error
+
+
+def upload_scenario_content(
+    workspace_id: str,
+    lakehouse_id: str,
+    content: str,
+    *,
+    token_loader: Callable[[], str] = _azure_cli_storage_token,
+    sender: OneLakeSender = _onelake_send,
+) -> str:
+    """Best-effort upload of the scenario content JSON to OneLake (ADLS Gen2 DFS).
+
+    Returns a human-readable status. Raises FabricBootstrapError on failure so the
+    caller can record a warning and fall back to manual upload — it never aborts
+    the bootstrap.
+    """
+    url = onelake_dfs_url(workspace_id, lakehouse_id, SCENARIO_CONTENT_RELATIVE_PATH)
+    body = content.encode("utf-8")
+    try:
+        token = token_loader()
+    except (FileNotFoundError, subprocess.CalledProcessError) as error:
+        raise FabricBootstrapError(
+            "Could not obtain a OneLake storage token (run `az login`)."
+        ) from error
+    headers = {"Authorization": f"Bearer {token}", "x-ms-version": "2023-11-03"}
+    sender("PUT", f"{url}?resource=file", None, headers)
+    sender("PATCH", f"{url}?action=append&position=0", body, headers)
+    sender("PATCH", f"{url}?action=flush&position={len(body)}", None, headers)
+    return "uploaded concord_iq_scenarios.json to lakehouse Files"
 
 
 class FabricApiClient:
@@ -477,6 +556,7 @@ def bootstrap(
     transport: FabricTransport | None = None,
     token_loader: Callable[[], str] = _azure_cli_token,
     sleep: Callable[[float], None] = time.sleep,
+    content_uploader: Callable[[str, str, str], str] = upload_scenario_content,
 ) -> FabricBootstrapResult:
     """Create or reuse supported Fabric resources after explicit opt-in."""
     active_settings = settings or Settings()
@@ -535,6 +615,15 @@ def bootstrap(
         except FabricBootstrapError as error:
             ontology_seeded = False
             warnings.append(f"Preview ontology definition import failed: {error}")
+        try:
+            scenario_content = content_uploader(
+                workspace.resource_id,
+                lakehouse.resource_id,
+                build_scenario_content(manifest.snapshots),
+            )
+        except FabricBootstrapError as error:
+            scenario_content = "manual upload required"
+            warnings.append(f"Scenario content upload failed: {error}")
         result = FabricBootstrapResult(
             workspace=workspace,
             lakehouse=lakehouse,
@@ -545,6 +634,7 @@ def bootstrap(
             ),
             ontology_seeded=ontology_seeded,
             capacity_assignment=capacity_assignment,
+            scenario_content=scenario_content,
             warnings=tuple(warnings),
         )
     except FabricBootstrapError as error:
@@ -559,6 +649,15 @@ def bootstrap(
     print(f"FABRIC_ONTOLOGY_ID={result.ontology.resource_id}")
     print(f"FABRIC_IQ_MCP_ENDPOINT={result.mcp_endpoint}")
     print("FABRIC_IQ_ACCESS_TOKEN was neither printed nor persisted.")
+    print(f"Scenario content: {result.scenario_content}")
+    print(
+        "Entity types alone carry no retrievable content. Fabric IQ must expose the "
+        "scenario snapshots. If the content upload did not succeed, upload "
+        f"{DEFAULT_OUTPUT_DIR / 'concord_iq_scenarios.json'} to the lakehouse "
+        "(Files/concord_iq_scenarios.json) manually."
+    )
+    print("Next: run `make fabric-mcp-diagnose` to confirm the MCP returns valid")
+    print("snapshot JSON, then run `make capture` only once diagnose reports a match.")
     if not result.ontology_seeded:
         print(_manual_fallback(active_settings.fabric_ontology_name))
     for warning in result.warnings:

@@ -364,8 +364,9 @@ def test_provider_status_endpoint_never_calls_cloud(
     postgres_engine: Engine,
     p2_local_provider: LocalProvider,
 ) -> None:
+    # Isolate from a developer .env that configures Fabric/Foundry for a real run.
     app = create_app(
-        Settings(),
+        Settings(_env_file=None),
         provider=p2_local_provider,
         engine=postgres_engine,
     )
