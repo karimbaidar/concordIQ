@@ -430,13 +430,25 @@ cloud mode. Keep datasets tiny, use cloud only for smoke tests, pause or delete
 idle resources, and replay sanitized captured responses through ReplayProvider
 for demo rehearsal.**
 
-Raw provider responses belong in `artifacts/replay/raw/` and are ignored. Only a
-reviewed, synthetic-only, secret-free response may be placed in
-`artifacts/replay/sanitized/`.
+Raw provider responses belong in `artifacts/replay/raw/` and stay gitignored. The
+reviewed, synthetic-only, secret-free capture is intentionally committed at
+`artifacts/replay/sanitized/latest.json`.
 
-The complete bootstrap, capture, and replay workflow is documented in
+A **verified Fabric IQ semantic-proof capture is committed** at
+`artifacts/replay/sanitized/latest.json`. It contains no secrets (tokens, tenant
+IDs, GUIDs, and emails are redacted), and it lets judges replay the verified
+Fabric IQ semantic grounding **without any Fabric tenant, token, or paid
+capacity**:
+
+```bash
+make replay-check
+PROVIDER=replay ALLOW_CLOUD=false MAX_CLOUD_CALLS=0 make demo
+```
+
+Raw responses and diagnostics under `artifacts/replay/raw/` remain gitignored. The
+complete bootstrap, capture, and replay workflow is in
 [IQ integration](docs/iq-integration.md) and
-[cost controls](docs/cost-controls.md). No verified capture is currently committed.
+[cost controls](docs/cost-controls.md).
 
 ## Reliability principles
 

@@ -221,6 +221,14 @@ The acceptance gate is:
 4. A reviewed, secret-free sanitized artifact is committed.
 5. `ReplayProvider` runs the same typed contract from that artifact.
 
-This repository currently implements and tests both adapters with injected
-transports, but no tenant was available for a real smoke test. Therefore no
-sanitized capture is committed and the final IQ-integration gate remains open.
+A **verified Fabric IQ semantic-proof capture has been made against a real tenant**
+and the reviewed, secret-free sanitized artifact is committed at
+`artifacts/replay/sanitized/latest.json`. It was produced in semantic-proof mode:
+the Fabric ontology MCP matched the governed entity types (`ActiveCustomer`,
+`NetRevenue`, `ChurnedCustomer`) via `list_ontology_entity_types`, and the
+deterministic LocalProvider snapshot supplies the SQL/evidence. `make replay-check`
+validates it (provenance, matched concepts, evidence, secret hygiene) and the demo
+replays from it with cloud disabled — so judges need no Fabric tenant, token, or
+capacity. Raw responses and `artifacts/replay/raw/diagnostic.json` stay gitignored.
+The claim is precisely "verified Fabric IQ semantic grounding" — not that Fabric
+returned the full scenario snapshot.

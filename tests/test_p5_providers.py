@@ -363,13 +363,21 @@ def test_capture_writes_raw_ignored_shape_and_sanitized_replay(
 def test_provider_status_endpoint_never_calls_cloud(
     postgres_engine: Engine,
     p2_local_provider: LocalProvider,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # Isolate from a developer .env that configures Fabric/Foundry for a real run.
-    app = create_app(
-        Settings(_env_file=None),
-        provider=p2_local_provider,
-        engine=postgres_engine,
-    )
+    # Isolate from a developer .env (Fabric/Foundry config) and from the committed
+    # sanitized replay artifact: point the replay path at a non-existent file so
+    # `replay.configured` is deterministically False. Replay configuration is based
+    # only on whether that sanitized artifact exists; it never contacts the cloud.
+    def unexpected_cloud_call(*args: object, **kwargs: object) -> None:
+        raise AssertionError("/providers must not contact Fabric or Foundry IQ")
+
+    monkeypatch.setattr(FabricIQProvider, "_retrieve_snapshot", unexpected_cloud_call)
+    monkeypatch.setattr(FoundryIQProvider, "_retrieve_snapshot", unexpected_cloud_call)
+
+    settings = Settings(_env_file=None, replay_artifact_path=tmp_path / "missing.json")
+    app = create_app(settings, provider=p2_local_provider, engine=postgres_engine)
 
     with TestClient(app) as client:
         response = client.get("/providers")
@@ -377,9 +385,30 @@ def test_provider_status_endpoint_never_calls_cloud(
     assert response.status_code == 200
     statuses = {item["mode"]: item for item in response.json()}
     assert statuses["local"]["configured"] is True
+    # No artifact at the configured path -> replay is not configured.
     assert statuses["replay"]["configured"] is False
     assert statuses["foundry_iq"]["configured"] is False
     assert statuses["fabric_iq"]["configured"] is False
+
+
+def test_provider_status_marks_replay_configured_when_artifact_exists(
+    postgres_engine: Engine,
+    p2_local_provider: LocalProvider,
+    tmp_path: Path,
+) -> None:
+    # Replay becomes configured purely because a verified sanitized artifact exists
+    # at the configured path — still without any cloud call.
+    artifact_path = tmp_path / "sanitized" / "latest.json"
+    _write_test_artifact(artifact_path, p2_local_provider)
+    settings = Settings(_env_file=None, replay_artifact_path=artifact_path)
+    app = create_app(settings, provider=p2_local_provider, engine=postgres_engine)
+
+    with TestClient(app) as client:
+        statuses = {item["mode"]: item for item in client.get("/providers").json()}
+
+    assert statuses["replay"]["configured"] is True
+    assert statuses["fabric_iq"]["configured"] is False
+    assert statuses["foundry_iq"]["configured"] is False
 
 
 def test_product_docs_exist() -> None:
