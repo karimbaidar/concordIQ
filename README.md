@@ -29,9 +29,16 @@ LocalProvider for reproducible public review.
 
 Guarded Foundry IQ and Fabric IQ adapters, typed capture/replay, Fabric bootstrap
 helpers, optional local narration, and the Agent Framework integration are
-implemented. This workspace had no configured Microsoft tenant, so the required
-real IQ smoke capture remains open. No sanitized artifact or successful Microsoft
-IQ call is claimed.
+implemented. The Fabric REST and MCP surfaces are verified against current
+Microsoft Learn (see [IQ integration](docs/iq-integration.md)). This workspace had
+no configured Microsoft tenant, so the required real IQ smoke capture remains open.
+No sanitized artifact or successful Microsoft IQ call is claimed.
+
+Beyond one-off detection, Concord IQ **watches, scores, and gates**: an autonomous
+portfolio scan ranks every conflict, a Concord Score grades organizational
+semantic health, a natural-language chat surface grounds questions through
+NL2Ontology, and a Semantic-PR approval gate merges canonical definitions only
+with the configured authority owner.
 
 ## Why it matters
 
@@ -53,15 +60,43 @@ Concord IQ:
 6. Consult deterministic authority rules before proposing a canonical definition.
 7. Refuse automatic reconciliation when ownership is shared, missing, or ambiguous.
 8. Persist the SQL, evidence, verifier result, proposal, and audit trail.
+9. Answer natural-language questions grounded in the ontology (`POST /ask`).
+10. Sweep every concept and rank conflicts by business impact (`make scan`, `GET /scan`).
+11. Grade organizational semantic health as a single Concord Score (`GET /score`).
+12. Gate canonical definitions behind owner-only approval (`POST /proposals/{id}/approve`).
 
-## The three demo cases
+## Beyond detection — watch, score, and gate
+
+A conflict report gets read once. Concord IQ is built to be returned to, because
+it inserts itself into a workflow teams cannot skip:
+
+- **Ask in business terms.** `POST /ask` resolves a natural-language question
+  through the ontology (NL2Ontology on Fabric IQ, deterministic locally), names
+  the competing definitions, and runs the proof. Not free-text retrieval.
+- **The autonomous scan.** `make scan` / `GET /scan` sweeps every governed
+  concept, ranks conflicts by ARR impact, and surfaces problems nobody asked
+  about — the agent that watches, not just answers.
+- **The Concord Score.** `GET /score` grades organizational semantic health on a
+  single 0–100 scale with a per-business-unit leaderboard.
+- **Semantic pull requests.** A canonical definition is reviewed like code:
+  `POST /proposals/{id}/approve|reject` merges only with the configured authority
+  owner, is idempotent, and is written to the audit trail. Ambiguous ownership is
+  refused, not guessed.
+
+All four are deterministic and evidence-backed; the LLM never decides any of them.
+
+## The demo scenarios
 
 | Business term | Seeded operational difference | Intended behavior |
 | --- | --- | --- |
-| Active Customer | Finance uses recent recognized revenue, Sales uses recent open/won opportunity, Customer Success uses an active contract plus qualifying usage | Detect a material three-way conflict and rank it high |
-| Net Revenue | Finance and Sales wording differs while both bindings select the same seeded result | Rule it consistent by result-set equality |
-| Churned Customer | Finance uses contract end; Customer Success uses prolonged inactivity and grace | Detect divergence, then refuse because authority is shared |
+| Active Customer | Finance uses recent recognized revenue, Sales uses recent open/won opportunity, Customer Success uses an active contract plus qualifying usage | Detect a material three-way conflict (1,600 / 1,500 / 1,334; $33.2M ARR delta) and rank it high |
+| Net Revenue | Finance and Sales wording differs while both bindings select the same seeded result | Rule it consistent by result-set equality (1,600 / 1,600) |
+| Churned Customer | Finance uses contract end; Customer Success uses prolonged inactivity and grace | Detect divergence (333 / 666), then refuse because authority is shared |
+| Qualified Lead | Sales counts open/won; Marketing also counts a small `nurturing` cohort | Catch the subtle 20-customer (1.3%, $2.26M) gap and quantify it |
 
+The first three drive `make demo` and the Fabric capture set. Qualified Lead is
+the "subtle catch" — it surfaces in `make scan` and the chat/`/reconcile` path
+and is deliberately kept out of the capture set to keep cloud spend at six calls.
 The deterministic generator creates the synthetic analytical tables and cohorts.
 No real customer or tenant data is used.
 
@@ -99,8 +134,10 @@ make test
 ```
 
 The suite covers seed determinism, provider and replay contracts, conflict and
-equivalence verdicts, authority-driven refusal, evidence persistence, cloud
-budgets, capture sanitization, context scope, the demo, and the API.
+equivalence verdicts, the subtle Qualified Lead catch, authority-driven refusal,
+the portfolio scan and Concord Score, the owner-only approval gate, NL-query
+grounding, evidence persistence, cloud budgets (including the six-call Fabric
+capture), capture sanitization, context scope, the demo, and the API.
 
 ### Run all three scenarios headlessly
 
@@ -111,9 +148,27 @@ make demo
 Expected verdicts:
 
 ```text
-Active Customer: CONFLICT | counts=96/90/80 | proposal drafted; human approval required
-Net Revenue: CONSISTENT | counts=96/96 | decoy ruled out; no reconciliation needed
-Churned Customer: CONFLICT | counts=20/40 | automatic reconciliation refused; human approval required
+Active Customer: CONFLICT | counts=1600/1500/1334 | proposal drafted; human approval required
+Net Revenue: CONSISTENT | counts=1600/1600 | decoy ruled out; no reconciliation needed
+Churned Customer: CONFLICT | counts=333/666 | automatic reconciliation refused; human approval required
+```
+
+### Scan the whole semantic portfolio
+
+```bash
+make scan
+```
+
+This sweeps every concept and prints the Concord Score, the impact-ranked
+conflict board (including the concepts it checked and cleared), and the per-team
+semantic-health leaderboard:
+
+```text
+Concord Score: 60/100 (grade D) | 3 conflicts, 1 consistent, 1 refusal(s) across 4 concepts
+  [ #1] Churned Customer   CONFLICT   ... action=refuse  authority=ambiguous
+  [ #2] Active Customer    CONFLICT   ... action=propose authority=clear
+  [ #3] Qualified Lead     CONFLICT   ... action=propose authority=clear
+  [ ok] Net Revenue        CONSISTENT ... action=monitor authority=clear
 ```
 
 ### Run the reviewer workbench
@@ -156,10 +211,13 @@ make replay-check
 ```
 
 Fabric capture uses three MCP setup calls and one semantic request for each of the
-three scenarios. `make replay-check` rejects shallow connectivity captures,
-unverified provenance, missing semantic evidence, missing scenarios, and obvious
-secrets before running the full demo through `ReplayProvider` with cloud disabled.
-A passing replay check is the gate for claiming verified Microsoft IQ retrieval.
+three scenarios (six total — a budget locked by tests). `make replay-check` rejects
+shallow connectivity captures, unverified provenance, missing semantic evidence,
+missing scenarios, and obvious secrets before running the full demo through
+`ReplayProvider` with cloud disabled. A passing replay check is the gate for
+claiming verified Microsoft IQ retrieval. The capacity prerequisites and the F2
+pause-when-idle budget runbook (target well under EUR 100) are in
+[cost controls](docs/cost-controls.md) and [IQ integration](docs/iq-integration.md).
 
 ## Architecture
 
@@ -253,8 +311,14 @@ The grounding layer keeps four modes explicit:
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
 | `ReplayProvider` | Replays a reviewed real-IQ capture through the same typed contract | Implemented; refuses missing or unverified artifacts |
-| `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP | Guarded MCP adapter and injected-transport tests complete; tenant smoke test pending |
+| `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP + NL2Ontology | Guarded MCP adapter; REST/MCP surfaces verified against Microsoft Learn (2026-06); tenant smoke test pending |
 | `FoundryIQProvider` | Fallback cloud grounding through Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
+
+The `nl_query` path is genuinely IQ-served: on Fabric/Foundry it calls the real
+NL2Ontology/retrieve surface, while Local/Replay answer the same typed contract
+deterministically. The Fabric bootstrap and adapter endpoints (create ontology,
+`updateDefinition`, list items by `ItemType=Ontology`, the MCP `ontologyEndpoint`)
+are confirmed against current Microsoft Learn; F2 is the minimum supported SKU.
 
 `LocalProvider` is the reproducibility scaffold. It is not presented as Microsoft
 IQ and does not satisfy the final IQ-integration goal by itself. The cloud adapters
@@ -338,10 +402,11 @@ Narration never replaces evidence, SQL execution, verdicts, or authority rules.
 
 ## Synthetic data contract
 
-The generator uses seed `20260606`, reference date `2026-06-01`, 120 customers,
+The generator uses seed `20260606`, reference date `2026-06-01`, 2,000 customers,
 stable identifiers, and deterministic cohorts, amounts, dates, regions, and
-segments. Committed CSVs make the fixtures inspectable; the reproducible DuckDB
-file remains local-only.
+segments — enough scale for the demo numbers to read like a real board metric
+while staying tiny for DuckDB and any Fabric capture. Committed CSVs make the
+fixtures inspectable; the reproducible DuckDB file remains local-only.
 
 ## Project structure
 
@@ -377,12 +442,19 @@ files.
 **Reasoning Agents:** Microsoft Agent Framework coordinates ten typed specialist
 nodes. They call the deterministic reconciliation tool for concept resolution,
 binding inspection, data execution, impact ranking, authority resolution, proposal
-or refusal, verification, and audit.
+or refusal, verification, and audit. The autonomous portfolio scan adds genuine
+multi-concept reasoning beyond single-question Q&A.
 
-**Best Use of IQ Tools:** Fabric IQ is the primary ontology grounding surface.
-Foundry IQ is the fallback knowledge layer, and Foundry Agent Service is the
-deployment path. The integration claim becomes complete only after a real adapter
-smoke test and sanitized replay exist.
+**Best Use of IQ Tools:** Fabric IQ ontology + NL2Ontology is the semantic source
+of truth, and the `nl_query` path is genuinely IQ-served. The bootstrap and
+adapter REST/MCP surfaces are verified against current Microsoft Learn. Foundry IQ
+is the fallback knowledge layer, and Foundry Agent Service is the deployment path.
+The integration claim becomes complete only after a real adapter smoke test and
+sanitized replay exist.
+
+**Creativity and UX:** Concord IQ reasons about *meaning*, not answers — and turns
+governance into a product: ask in plain English, an autonomous semantic scan, a
+single Concord Score with a team leaderboard, and code-review-style approval gates.
 
 **Reliability and safety:** The system is designed to reject false conflicts, refuse
 unsupported governance choices, preserve evidence, and keep cloud access opt-in.
@@ -398,6 +470,10 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] P6: optional Ollama narration, advisory verifier critique, audit explanation
 - [x] Microsoft Agent Framework orchestration and Foundry Agent Service scaffold
 - [x] Fabric bootstrap dry run, synthetic seed package, and strict replay check
+- [x] Enterprise-scale data and the subtle Qualified Lead conflict
+- [x] Engagement layer: autonomous scan, Concord Score, Semantic-PR approval gate
+- [x] Natural-language chat (`/ask`) with a genuinely IQ-served `nl_query` path
+- [x] Fabric REST/MCP surfaces verified against Microsoft Learn; F2 budget runbook
 - [ ] Real tenant capture and reviewed sanitized replay
 
 ## Limitations

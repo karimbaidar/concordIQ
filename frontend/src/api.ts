@@ -1,4 +1,11 @@
-import type { DemoScenario, HealthStatus, ReconciliationCase } from "./types";
+import type {
+  AskResponse,
+  DemoScenario,
+  HealthStatus,
+  PortfolioScan,
+  ProposalDecisionResult,
+  ReconciliationCase,
+} from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -28,5 +35,37 @@ export function fetchDemoScenarios(): Promise<DemoScenario[]> {
 export function runDemoScenario(scenarioId: string): Promise<ReconciliationCase> {
   return requestJson<ReconciliationCase>(`/demo/run/${scenarioId}`, {
     method: "POST",
+  });
+}
+
+export function fetchPortfolioScan(): Promise<PortfolioScan> {
+  return requestJson<PortfolioScan>("/scan");
+}
+
+export function askConcord(question: string): Promise<AskResponse> {
+  return requestJson<AskResponse>("/ask", {
+    method: "POST",
+    body: JSON.stringify({ question }),
+  });
+}
+
+export function reconcileTerm(term: string): Promise<ReconciliationCase> {
+  return requestJson<ReconciliationCase>("/reconcile", {
+    method: "POST",
+    body: JSON.stringify({
+      term,
+      question: `Why do our ${term} definitions disagree?`,
+    }),
+  });
+}
+
+export function decideProposal(
+  runId: string,
+  decision: "approve" | "reject",
+  approver: string,
+): Promise<ProposalDecisionResult> {
+  return requestJson<ProposalDecisionResult>(`/proposals/${runId}/${decision}`, {
+    method: "POST",
+    body: JSON.stringify({ approver }),
   });
 }

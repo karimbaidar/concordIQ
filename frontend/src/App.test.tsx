@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -274,7 +274,9 @@ describe("Concord IQ demo", () => {
     render(<App />);
 
     await waitFor(() => expect(screen.getByText("Net Revenue")).toBeInTheDocument());
-    await user.click(screen.getByRole("button", { name: /net revenue/i }));
+    // Scope to the scenario picker so the NL chat suggestions don't disambiguate.
+    const scenarioList = screen.getByRole("list");
+    await user.click(within(scenarioList).getByRole("button", { name: /net revenue/i }));
     await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
 
     expect(
@@ -282,7 +284,7 @@ describe("Concord IQ demo", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText("2 evidence records")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /churned customer/i }));
+    await user.click(within(scenarioList).getByRole("button", { name: /churned customer/i }));
     await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
 
     expect(

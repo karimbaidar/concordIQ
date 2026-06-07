@@ -12,7 +12,9 @@ from pathlib import Path
 
 FIXED_SEED = 20260606
 REFERENCE_DATE = date(2026, 6, 1)
-CUSTOMER_COUNT = 120
+# Enterprise-scale synthetic book so demo numbers read like a real board metric
+# (≈1,600 / 1,500 / 1,333 Active Customers) while staying tiny for DuckDB/Fabric.
+CUSTOMER_COUNT = 2000
 
 type Scalar = str | int | float
 type Row = dict[str, Scalar]
@@ -147,15 +149,23 @@ def generate_synthetic_data(seed: int = FIXED_SEED) -> SyntheticDataset:
         )
 
         sales_active = index % 4 != 0
+        # Small "nurturing" cohort (multiples of 100, all otherwise closed_lost) drives
+        # the subtle Qualified Lead conflict: Marketing counts nurturing, Sales does not.
+        nurturing_lead = index % 100 == 0
+        if nurturing_lead:
+            opportunity_stage = "nurturing"
+            opportunity_updated = REFERENCE_DATE - timedelta(days=index % 30)
+        else:
+            opportunity_stage = ("open" if index % 2 else "won") if sales_active else "closed_lost"
+            opportunity_updated = REFERENCE_DATE - timedelta(
+                days=index % 150 if sales_active else 190 + index % 80
+            )
         tables["opportunities"].append(
             {
                 "opportunity_id": f"OPP{index:04d}",
                 "customer_id": customer_id,
-                "stage": ("open" if index % 2 else "won") if sales_active else "closed_lost",
-                "updated_at": _iso(
-                    REFERENCE_DATE
-                    - timedelta(days=index % 150 if sales_active else 190 + index % 80)
-                ),
+                "stage": opportunity_stage,
+                "updated_at": _iso(opportunity_updated),
                 "amount": round(arr * rng.uniform(0.8, 1.25), 2),
             }
         )
@@ -245,6 +255,20 @@ def generate_synthetic_data(seed: int = FIXED_SEED) -> SyntheticDataset:
             "report_name": "Retention Review",
             "business_term": "Churned Customer",
             "decision_criticality": "high",
+        },
+        {
+            "report_id": "RPT007",
+            "business_unit": "Sales",
+            "report_name": "Pipeline Qualified Leads",
+            "business_term": "Qualified Lead",
+            "decision_criticality": "medium",
+        },
+        {
+            "report_id": "RPT008",
+            "business_unit": "Marketing",
+            "report_name": "Demand Funnel",
+            "business_term": "Qualified Lead",
+            "decision_criticality": "medium",
         },
     ]
 

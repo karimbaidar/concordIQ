@@ -49,6 +49,20 @@
       "status": "ambiguous",
       "owner": null,
       "rationale": "No approved enterprise owner or precedence rule exists."
+    },
+    {
+      "concept_id": "qualified_lead",
+      "semantic_dimension": "lead-stage-definition",
+      "status": "clear",
+      "owner": "Revenue Operations",
+      "rationale": "Revenue Operations governs the shared lead lifecycle and stage taxonomy."
+    },
+    {
+      "concept_id": "qualified_lead",
+      "semantic_dimension": "canonical-qualified-lead",
+      "status": "clear",
+      "owner": "Revenue Operations",
+      "rationale": "Revenue Operations owns the cross-team funnel metric and can approve a canonical definition."
     }
   ]
 }

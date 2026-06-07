@@ -133,6 +133,82 @@ class AuthorityRule(ContractModel):
     rationale: str
 
 
+class QueryDefinitionSummary(ContractModel):
+    """A compact, ontology-grounded view of one competing definition."""
+
+    definition_id: str
+    name: str
+    owner: str
+    rule_text: str
+
+
+class QueryResult(ContractModel):
+    """An NL2Ontology-style grounded answer to a business question.
+
+    The answer is grounded in the ontology — the resolved concept and its
+    competing definitions — never free-text retrieval. The deterministic
+    reconciliation engine still owns conflict quantification; this only resolves
+    the question to governed meaning.
+    """
+
+    question: str
+    matched: bool
+    grounding_provider: str
+    concept_id: str | None = None
+    canonical_name: str | None = None
+    answer: str
+    definitions: tuple[QueryDefinitionSummary, ...] = ()
+    citations: tuple[str, ...] = ()
+
+
+def build_query_result(
+    question: str,
+    *,
+    provider_name: str,
+    concept: ConceptResolution,
+    bindings: tuple[DefinitionBinding, ...],
+) -> QueryResult:
+    """Compose a deterministic, ontology-grounded answer (no LLM, no retrieval)."""
+    definitions = tuple(
+        QueryDefinitionSummary(
+            definition_id=binding.definition_id,
+            name=binding.name,
+            owner=binding.owner,
+            rule_text=binding.rule_text,
+        )
+        for binding in bindings
+    )
+    owners = sorted({definition.owner for definition in definitions})
+    detail = " ".join(
+        f"{definition.owner} defines it as: {definition.rule_text}" for definition in definitions
+    )
+    answer = (
+        f"{concept.canonical_name} has {len(definitions)} competing definitions across "
+        f"{', '.join(owners)}. {detail} Run a reconciliation to quantify whether these "
+        "definitions select different populations."
+    )
+    return QueryResult(
+        question=question,
+        matched=True,
+        grounding_provider=provider_name,
+        concept_id=concept.concept_id,
+        canonical_name=concept.canonical_name,
+        answer=answer,
+        definitions=definitions,
+        citations=tuple(definition.definition_id for definition in definitions),
+    )
+
+
+def unmatched_query_result(question: str, *, provider_name: str) -> QueryResult:
+    """Return a grounded 'no match' answer when no concept resolves."""
+    return QueryResult(
+        question=question,
+        matched=False,
+        grounding_provider=provider_name,
+        answer="No governed concept in the ontology matched this question.",
+    )
+
+
 @runtime_checkable
 class GroundingProvider(Protocol):
     """Backend-independent semantic grounding and execution contract."""
@@ -159,3 +235,6 @@ class GroundingProvider(Protocol):
 
     def get_authority_rules(self, concept_id: str) -> list[AuthorityRule]:
         """Return configured authority rules without inferring missing ownership."""
+
+    def nl_query(self, question: str) -> QueryResult:
+        """Resolve a natural-language business question to grounded meaning."""

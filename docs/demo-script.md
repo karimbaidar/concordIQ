@@ -1,85 +1,111 @@
 # Five-minute demo script
 
-## Before the demo
+The judged artifact is the recorded video, never a live tenant. Record against
+the local/replay stack. This script is the click order and the line for each beat.
+
+## Before recording
 
 ```bash
 make setup
 make seed
-make test
+make test     # 65 backend + 2 frontend green
 make dev
 ```
 
-Open `http://127.0.0.1:5173`. Confirm the provider badge says
-`LocalProvider`, cloud is disabled, and data is synthetic.
-Run `make agent-smoke` once to show the same deterministic case through Microsoft
-Agent Framework.
+Open `http://127.0.0.1:5173`. Confirm the `ProviderBadge` reads `LocalProvider`,
+cloud disabled, data synthetic. Keep `make scan` and `http://127.0.0.1:8000/docs`
+in a second terminal/tab for the closing beats.
 
-For a verified IQ demo, also run:
+If a sanitized Fabric capture is committed, also run `make replay-check` and have
+`PROVIDER=replay make dev` ready so the badge can read `FabricIQProvider`.
 
-```bash
-make replay-check
-```
+## 0:00–0:30 — The pain
 
-This must pass against `artifacts/replay/sanitized/latest.json`. If it does not,
-use the local demo and state that the tenant capture gate remains open.
+Say: *"Before a board meeting, three dashboards disagree on Active Enterprise
+Customers: Finance 1,600, Sales 1,500, Customer Success 1,334. Same metric, three
+numbers. The data is fine — the **definitions** disagree, and nobody reconciled
+them."*
 
-## 0:00–0:35 — The problem
+Show the `DashboardDisagreement` hook with the three numbers.
 
-Say: “Enterprises created a single source of truth for data, but not for
-meaning. Concord IQ finds when teams share a term but not an operational
-definition.”
+## 0:30–1:10 — Ask in plain English (NL2Ontology)
 
-Point to the three terms in the scenario selector.
-If Ollama is enabled, point out its model name in the runtime badge. Otherwise,
-explain that deterministic narration fallback is active.
+1. In the **Ask Concord IQ** box, type *"Why do our active customer numbers
+   disagree?"* (or click the suggestion chip).
+2. Concord IQ grounds the question in the ontology, names the three competing
+   definitions, then runs the full reconciliation and drops you into the workbench.
 
-## 0:35–2:10 — Active Customer
+Say: *"You ask in business terms. It resolves the meaning against the ontology —
+not free-text search — then proves the answer on data."*
 
-1. Select **Active Customer** and run reconciliation.
-2. Show the three definitions and 30/90/180-day differences.
-3. Point out the executed counts: 96, 90, and 80.
-4. Show high impact and the affected reports.
-5. Walk through the ten-state reasoning timeline and verifier pass.
-6. Open the draft semantic pull request and emphasize human approval.
-7. Expand one evidence item to show exact SQL.
-8. Show the evidence narration panel and its provenance label.
+## 1:10–2:20 — The proven conflict
 
-Judge takeaway: the conflict is proven by data, not guessed from wording.
+1. Show the three definitions and their 30 / 90 / 180-day windows in the
+   `DefinitionDiff`.
+2. Point to executed counts **1,600 / 1,500 / 1,334** and the **$33.2M ARR delta**
+   in the `ImpactPanel` (ranked high).
+3. Walk the ten-state `ReasoningTimeline` and the green skeptical-verifier badge.
+4. Expand one evidence item to show the exact SQL.
 
-## 2:10–3:05 — Net Revenue decoy
+Say: *"The conflict is decided by executing both definitions and comparing the
+result sets — behaviour on data, not wording. Every claim has stored SQL."*
 
-1. Select **Net Revenue** and run reconciliation.
-2. Show that the wording differs.
-3. Show equal 96/96 entity sets and equal totals.
+## 2:20–2:55 — It does not cry wolf (the decoy)
 
-Judge takeaway: Concord IQ can rule out a false conflict.
+1. Return home; ask *"Are our net revenue definitions equivalent?"*
+2. Show the two differently-worded definitions and the **equal 1,600 / 1,600**
+   result sets and equal totals → **consistent, no action**.
 
-## 3:05–4:00 — Churned Customer refusal
+Say: *"A naive tool screams CONFLICT on different wording. Concord runs both and
+proves they are identical. It earns the right to be believed when it does flag
+one."*
 
-1. Select **Churned Customer** and run reconciliation.
-2. Show divergent 20/40 populations.
-3. Show shared or ambiguous authority.
-4. Show the refusal card and required human approval.
+## 2:55–3:30 — The subtle catch (Qualified Lead)
 
-Judge takeaway: the agent does not invent governance authority.
+1. From the autonomous board (or ask *"Do Sales and Marketing agree on a qualified
+   lead?"*), open **Qualified Lead**.
+2. Show the small **20-customer / 1.3%** gap: Marketing counts a `nurturing`
+   cohort that Sales does not — a silent **$2.26M** divergence — caught and
+   quantified, and (authority is clear) drafted as a proposal.
 
-## 4:00–4:35 — IQ architecture
+Say: *"It does not only catch the obvious three-way splits. It catches the silent
+one-status-value gaps too, and tells you exactly what they cost."*
 
-Open `GET /providers` in the API docs. Explain:
+## 3:30–4:00 — Governance: refuse, then gate
+
+1. Open **Churned Customer**: divergent **333 / 666** populations, but authority
+   is shared/ambiguous → the `RefusalCard` refuses to auto-pick a winner.
+2. Back on a clear-authority case (Active Customer), open the
+   `SemanticPullRequest`: only the **authority owner** can **Approve & merge**;
+   the decision is recorded in the audit trail.
+
+Say: *"Definitions get reviewed like code. The agent refuses when no one owns the
+call, and gates the merge to the owner when someone does."*
+
+## 4:00–4:35 — Watch and score the whole org
+
+1. Run `make scan` in the terminal (or show the `PortfolioBoard`):
+   **Concord Score 60/100 (grade D)** — Churned #1, Active #2, Qualified Lead #3,
+   Net Revenue consistent — plus the per-team leaderboard.
+
+Say: *"This isn't a one-off report. It sweeps every governed concept, scores your
+semantic health, and ranks who has the most unreconciled meaning. That's the
+thing people open every Monday."*
+
+## 4:35–5:00 — The IQ layer and the close
+
+Point to the `ProviderBadge` / `GET /providers`:
 
 - Microsoft Agent Framework orchestrates the specialist workflow.
-- Foundry Agent Service is the deployment path.
-- Fabric IQ is the primary semantic grounding provider.
-- Foundry IQ is the fallback knowledge provider.
-- Local is reproducibility mode.
-- Replay is for a sanitized real-IQ capture that passes `make replay-check`.
-- Cloud remains off until an operator explicitly enables a budget.
+- **Fabric IQ** ontology + NL2Ontology is the semantic source of truth; the
+  `nl_query` path is genuinely IQ-served. REST/MCP surfaces are verified against
+  current Microsoft Learn (see `docs/iq-integration.md`).
+- Foundry IQ is the fallback; Local is reproducibility mode; Replay shows a
+  sanitized real-IQ capture; cloud is off until an operator opts in with a budget.
 
-Do not claim a real IQ smoke test until the sanitized artifact is present.
+Only claim a real IQ smoke test if the sanitized artifact is committed and the
+badge reads `FabricIQProvider`.
 
-## 4:35–5:00 — Close
-
-Say: “Concord IQ detects semantic drift, tests it against data, ranks its
-business impact, and either proposes a governed reconciliation or refuses.”
-
-End on the evidence and verifier panels.
+Close: *"Concord IQ finds where your enterprise's definitions silently disagree —
+proves it on data, scores it, and either reconciles it under governance or refuses.
+It's a single source of truth for **meaning**."*

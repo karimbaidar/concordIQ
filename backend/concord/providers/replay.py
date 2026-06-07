@@ -13,6 +13,9 @@ from concord.providers.base import (
     OntologySubgraph,
     ProviderMode,
     ProviderNotConfigured,
+    QueryResult,
+    build_query_result,
+    unmatched_query_result,
 )
 from concord.providers.replay_schema import ReplayArtifact, ReplayScenarioSnapshot
 
@@ -55,6 +58,31 @@ class ReplayProvider:
     @staticmethod
     def _normalize(value: str) -> str:
         return " ".join(value.casefold().replace("-", " ").split())
+
+    def list_concepts(self) -> list[ConceptResolution]:
+        """Enumerate every captured concept (used by the portfolio scan)."""
+        return [snapshot.concept for snapshot in self.artifact.scenarios]
+
+    def nl_query(self, question: str) -> QueryResult:
+        """Resolve a question against the captured concepts, grounded identically."""
+        normalized = self._normalize(question)
+        best: ReplayScenarioSnapshot | None = None
+        best_length = 0
+        for snapshot in self.artifact.scenarios:
+            names = (snapshot.term, snapshot.concept.canonical_name, *snapshot.concept.aliases)
+            for name in names:
+                candidate = self._normalize(name)
+                if candidate and candidate in normalized and len(candidate) > best_length:
+                    best = snapshot
+                    best_length = len(candidate)
+        if best is None:
+            return unmatched_query_result(question, provider_name=self.name)
+        return build_query_result(
+            question,
+            provider_name=self.name,
+            concept=best.concept,
+            bindings=best.bindings,
+        )
 
     def resolve_concept(self, term: str) -> ConceptResolution:
         snapshot = self._by_term.get(self._normalize(term))

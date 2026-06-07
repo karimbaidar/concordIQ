@@ -119,3 +119,1883 @@ C0117,Northstar Synthetic 117,Asia Pacific,Growth,185000,2024-05-30
 C0118,Northstar Synthetic 118,North America,Enterprise,112000,2025-03-17
 C0119,Northstar Synthetic 119,Europe,Mid-Market,198000,2024-11-22
 C0120,Northstar Synthetic 120,Asia Pacific,Growth,171000,2024-09-19
+C0121,Northstar Synthetic 121,North America,Enterprise,70000,2024-05-25
+C0122,Northstar Synthetic 122,Europe,Mid-Market,79000,2023-01-22
+C0123,Northstar Synthetic 123,Asia Pacific,Growth,55000,2024-03-13
+C0124,Northstar Synthetic 124,North America,Enterprise,191000,2023-12-27
+C0125,Northstar Synthetic 125,Europe,Mid-Market,44000,2025-01-06
+C0126,Northstar Synthetic 126,Asia Pacific,Growth,186000,2023-06-30
+C0127,Northstar Synthetic 127,North America,Enterprise,187000,2022-11-25
+C0128,Northstar Synthetic 128,Europe,Mid-Market,165000,2024-01-14
+C0129,Northstar Synthetic 129,Asia Pacific,Growth,207000,2024-07-01
+C0130,Northstar Synthetic 130,North America,Enterprise,126000,2023-12-08
+C0131,Northstar Synthetic 131,Europe,Mid-Market,224000,2023-05-21
+C0132,Northstar Synthetic 132,Asia Pacific,Growth,93000,2024-11-13
+C0133,Northstar Synthetic 133,North America,Enterprise,155000,2022-11-17
+C0134,Northstar Synthetic 134,Europe,Mid-Market,203000,2024-11-26
+C0135,Northstar Synthetic 135,Asia Pacific,Growth,227000,2023-11-22
+C0136,Northstar Synthetic 136,North America,Enterprise,87000,2024-02-03
+C0137,Northstar Synthetic 137,Europe,Mid-Market,42000,2024-10-31
+C0138,Northstar Synthetic 138,Asia Pacific,Growth,33000,2023-04-05
+C0139,Northstar Synthetic 139,North America,Enterprise,236000,2024-04-09
+C0140,Northstar Synthetic 140,Europe,Mid-Market,180000,2023-04-19
+C0141,Northstar Synthetic 141,Asia Pacific,Growth,151000,2023-04-23
+C0142,Northstar Synthetic 142,North America,Enterprise,104000,2023-06-14
+C0143,Northstar Synthetic 143,Europe,Mid-Market,72000,2023-08-10
+C0144,Northstar Synthetic 144,Asia Pacific,Growth,151000,2024-01-30
+C0145,Northstar Synthetic 145,North America,Enterprise,29000,2024-06-17
+C0146,Northstar Synthetic 146,Europe,Mid-Market,191000,2023-12-14
+C0147,Northstar Synthetic 147,Asia Pacific,Growth,239000,2023-12-24
+C0148,Northstar Synthetic 148,North America,Enterprise,206000,2024-09-15
+C0149,Northstar Synthetic 149,Europe,Mid-Market,173000,2023-03-10
+C0150,Northstar Synthetic 150,Asia Pacific,Growth,89000,2024-09-26
+C0151,Northstar Synthetic 151,North America,Enterprise,120000,2023-10-06
+C0152,Northstar Synthetic 152,Europe,Mid-Market,202000,2023-07-22
+C0153,Northstar Synthetic 153,Asia Pacific,Growth,135000,2022-12-01
+C0154,Northstar Synthetic 154,North America,Enterprise,157000,2024-01-31
+C0155,Northstar Synthetic 155,Europe,Mid-Market,132000,2024-10-16
+C0156,Northstar Synthetic 156,Asia Pacific,Growth,75000,2024-08-29
+C0157,Northstar Synthetic 157,North America,Enterprise,238000,2023-03-03
+C0158,Northstar Synthetic 158,Europe,Mid-Market,33000,2023-05-14
+C0159,Northstar Synthetic 159,Asia Pacific,Growth,163000,2025-01-13
+C0160,Northstar Synthetic 160,North America,Enterprise,80000,2023-01-09
+C0161,Northstar Synthetic 161,Europe,Mid-Market,119000,2025-02-02
+C0162,Northstar Synthetic 162,Asia Pacific,Growth,139000,2025-04-21
+C0163,Northstar Synthetic 163,North America,Enterprise,152000,2025-03-14
+C0164,Northstar Synthetic 164,Europe,Mid-Market,71000,2023-05-29
+C0165,Northstar Synthetic 165,Asia Pacific,Growth,60000,2023-08-05
+C0166,Northstar Synthetic 166,North America,Enterprise,133000,2023-06-07
+C0167,Northstar Synthetic 167,Europe,Mid-Market,48000,2024-01-16
+C0168,Northstar Synthetic 168,Asia Pacific,Growth,86000,2024-11-28
+C0169,Northstar Synthetic 169,North America,Enterprise,230000,2025-03-11
+C0170,Northstar Synthetic 170,Europe,Mid-Market,228000,2024-10-25
+C0171,Northstar Synthetic 171,Asia Pacific,Growth,58000,2023-06-14
+C0172,Northstar Synthetic 172,North America,Enterprise,86000,2023-07-31
+C0173,Northstar Synthetic 173,Europe,Mid-Market,237000,2024-12-10
+C0174,Northstar Synthetic 174,Asia Pacific,Growth,86000,2023-06-16
+C0175,Northstar Synthetic 175,North America,Enterprise,49000,2025-04-03
+C0176,Northstar Synthetic 176,Europe,Mid-Market,119000,2023-07-14
+C0177,Northstar Synthetic 177,Asia Pacific,Growth,66000,2023-09-19
+C0178,Northstar Synthetic 178,North America,Enterprise,115000,2024-11-01
+C0179,Northstar Synthetic 179,Europe,Mid-Market,100000,2023-11-26
+C0180,Northstar Synthetic 180,Asia Pacific,Growth,145000,2024-09-17
+C0181,Northstar Synthetic 181,North America,Enterprise,72000,2023-02-20
+C0182,Northstar Synthetic 182,Europe,Mid-Market,30000,2024-07-06
+C0183,Northstar Synthetic 183,Asia Pacific,Growth,36000,2023-12-15
+C0184,Northstar Synthetic 184,North America,Enterprise,91000,2024-03-24
+C0185,Northstar Synthetic 185,Europe,Mid-Market,82000,2024-03-10
+C0186,Northstar Synthetic 186,Asia Pacific,Growth,139000,2023-01-22
+C0187,Northstar Synthetic 187,North America,Enterprise,117000,2025-03-08
+C0188,Northstar Synthetic 188,Europe,Mid-Market,171000,2024-11-10
+C0189,Northstar Synthetic 189,Asia Pacific,Growth,60000,2024-11-07
+C0190,Northstar Synthetic 190,North America,Enterprise,186000,2023-08-21
+C0191,Northstar Synthetic 191,Europe,Mid-Market,70000,2023-11-25
+C0192,Northstar Synthetic 192,Asia Pacific,Growth,230000,2024-12-10
+C0193,Northstar Synthetic 193,North America,Enterprise,136000,2024-07-20
+C0194,Northstar Synthetic 194,Europe,Mid-Market,94000,2025-03-09
+C0195,Northstar Synthetic 195,Asia Pacific,Growth,94000,2024-12-19
+C0196,Northstar Synthetic 196,North America,Enterprise,129000,2022-12-13
+C0197,Northstar Synthetic 197,Europe,Mid-Market,107000,2023-06-23
+C0198,Northstar Synthetic 198,Asia Pacific,Growth,132000,2024-01-04
+C0199,Northstar Synthetic 199,North America,Enterprise,118000,2023-03-11
+C0200,Northstar Synthetic 200,Europe,Mid-Market,169000,2023-06-05
+C0201,Northstar Synthetic 201,Asia Pacific,Growth,44000,2023-03-10
+C0202,Northstar Synthetic 202,North America,Enterprise,71000,2023-06-14
+C0203,Northstar Synthetic 203,Europe,Mid-Market,27000,2024-12-30
+C0204,Northstar Synthetic 204,Asia Pacific,Growth,46000,2023-09-25
+C0205,Northstar Synthetic 205,North America,Enterprise,167000,2023-06-10
+C0206,Northstar Synthetic 206,Europe,Mid-Market,108000,2024-08-18
+C0207,Northstar Synthetic 207,Asia Pacific,Growth,219000,2023-09-06
+C0208,Northstar Synthetic 208,North America,Enterprise,77000,2024-06-28
+C0209,Northstar Synthetic 209,Europe,Mid-Market,42000,2025-01-23
+C0210,Northstar Synthetic 210,Asia Pacific,Growth,204000,2024-01-03
+C0211,Northstar Synthetic 211,North America,Enterprise,120000,2024-07-22
+C0212,Northstar Synthetic 212,Europe,Mid-Market,202000,2023-09-07
+C0213,Northstar Synthetic 213,Asia Pacific,Growth,133000,2022-11-30
+C0214,Northstar Synthetic 214,North America,Enterprise,187000,2024-04-09
+C0215,Northstar Synthetic 215,Europe,Mid-Market,121000,2024-01-17
+C0216,Northstar Synthetic 216,Asia Pacific,Growth,122000,2024-10-31
+C0217,Northstar Synthetic 217,North America,Enterprise,192000,2024-03-04
+C0218,Northstar Synthetic 218,Europe,Mid-Market,196000,2023-12-14
+C0219,Northstar Synthetic 219,Asia Pacific,Growth,96000,2023-10-06
+C0220,Northstar Synthetic 220,North America,Enterprise,28000,2024-05-30
+C0221,Northstar Synthetic 221,Europe,Mid-Market,225000,2022-12-22
+C0222,Northstar Synthetic 222,Asia Pacific,Growth,165000,2025-03-22
+C0223,Northstar Synthetic 223,North America,Enterprise,162000,2023-06-20
+C0224,Northstar Synthetic 224,Europe,Mid-Market,47000,2023-09-19
+C0225,Northstar Synthetic 225,Asia Pacific,Growth,171000,2024-12-04
+C0226,Northstar Synthetic 226,North America,Enterprise,210000,2024-12-29
+C0227,Northstar Synthetic 227,Europe,Mid-Market,96000,2025-04-27
+C0228,Northstar Synthetic 228,Asia Pacific,Growth,127000,2024-01-17
+C0229,Northstar Synthetic 229,North America,Enterprise,67000,2024-10-23
+C0230,Northstar Synthetic 230,Europe,Mid-Market,155000,2023-06-21
+C0231,Northstar Synthetic 231,Asia Pacific,Growth,153000,2024-11-23
+C0232,Northstar Synthetic 232,North America,Enterprise,225000,2023-07-26
+C0233,Northstar Synthetic 233,Europe,Mid-Market,115000,2024-01-20
+C0234,Northstar Synthetic 234,Asia Pacific,Growth,184000,2024-04-17
+C0235,Northstar Synthetic 235,North America,Enterprise,142000,2023-05-27
+C0236,Northstar Synthetic 236,Europe,Mid-Market,42000,2024-06-26
+C0237,Northstar Synthetic 237,Asia Pacific,Growth,112000,2022-12-01
+C0238,Northstar Synthetic 238,North America,Enterprise,214000,2022-11-16
+C0239,Northstar Synthetic 239,Europe,Mid-Market,155000,2025-01-16
+C0240,Northstar Synthetic 240,Asia Pacific,Growth,24000,2023-03-21
+C0241,Northstar Synthetic 241,North America,Enterprise,126000,2024-08-31
+C0242,Northstar Synthetic 242,Europe,Mid-Market,154000,2023-04-21
+C0243,Northstar Synthetic 243,Asia Pacific,Growth,104000,2023-04-28
+C0244,Northstar Synthetic 244,North America,Enterprise,53000,2024-12-16
+C0245,Northstar Synthetic 245,Europe,Mid-Market,162000,2024-07-19
+C0246,Northstar Synthetic 246,Asia Pacific,Growth,153000,2023-01-16
+C0247,Northstar Synthetic 247,North America,Enterprise,47000,2023-09-21
+C0248,Northstar Synthetic 248,Europe,Mid-Market,88000,2024-01-09
+C0249,Northstar Synthetic 249,Asia Pacific,Growth,236000,2024-12-04
+C0250,Northstar Synthetic 250,North America,Enterprise,191000,2024-02-26
+C0251,Northstar Synthetic 251,Europe,Mid-Market,138000,2025-03-15
+C0252,Northstar Synthetic 252,Asia Pacific,Growth,150000,2023-08-07
+C0253,Northstar Synthetic 253,North America,Enterprise,206000,2022-11-22
+C0254,Northstar Synthetic 254,Europe,Mid-Market,226000,2023-06-16
+C0255,Northstar Synthetic 255,Asia Pacific,Growth,148000,2024-02-27
+C0256,Northstar Synthetic 256,North America,Enterprise,181000,2023-11-24
+C0257,Northstar Synthetic 257,Europe,Mid-Market,80000,2025-01-27
+C0258,Northstar Synthetic 258,Asia Pacific,Growth,149000,2024-05-06
+C0259,Northstar Synthetic 259,North America,Enterprise,42000,2024-12-16
+C0260,Northstar Synthetic 260,Europe,Mid-Market,238000,2023-06-08
+C0261,Northstar Synthetic 261,Asia Pacific,Growth,197000,2023-10-30
+C0262,Northstar Synthetic 262,North America,Enterprise,230000,2024-12-05
+C0263,Northstar Synthetic 263,Europe,Mid-Market,204000,2022-11-23
+C0264,Northstar Synthetic 264,Asia Pacific,Growth,121000,2024-08-24
+C0265,Northstar Synthetic 265,North America,Enterprise,48000,2024-01-08
+C0266,Northstar Synthetic 266,Europe,Mid-Market,111000,2024-12-04
+C0267,Northstar Synthetic 267,Asia Pacific,Growth,53000,2024-04-20
+C0268,Northstar Synthetic 268,North America,Enterprise,41000,2024-09-30
+C0269,Northstar Synthetic 269,Europe,Mid-Market,171000,2025-04-11
+C0270,Northstar Synthetic 270,Asia Pacific,Growth,39000,2023-07-07
+C0271,Northstar Synthetic 271,North America,Enterprise,83000,2023-09-19
+C0272,Northstar Synthetic 272,Europe,Mid-Market,147000,2023-10-11
+C0273,Northstar Synthetic 273,Asia Pacific,Growth,148000,2023-11-04
+C0274,Northstar Synthetic 274,North America,Enterprise,63000,2023-11-24
+C0275,Northstar Synthetic 275,Europe,Mid-Market,202000,2023-10-16
+C0276,Northstar Synthetic 276,Asia Pacific,Growth,222000,2023-11-12
+C0277,Northstar Synthetic 277,North America,Enterprise,133000,2024-10-29
+C0278,Northstar Synthetic 278,Europe,Mid-Market,47000,2023-01-27
+C0279,Northstar Synthetic 279,Asia Pacific,Growth,84000,2023-10-08
+C0280,Northstar Synthetic 280,North America,Enterprise,181000,2024-11-30
+C0281,Northstar Synthetic 281,Europe,Mid-Market,30000,2024-09-08
+C0282,Northstar Synthetic 282,Asia Pacific,Growth,127000,2024-10-02
+C0283,Northstar Synthetic 283,North America,Enterprise,158000,2023-11-11
+C0284,Northstar Synthetic 284,Europe,Mid-Market,98000,2024-12-18
+C0285,Northstar Synthetic 285,Asia Pacific,Growth,216000,2024-04-13
+C0286,Northstar Synthetic 286,North America,Enterprise,211000,2024-01-31
+C0287,Northstar Synthetic 287,Europe,Mid-Market,108000,2022-12-12
+C0288,Northstar Synthetic 288,Asia Pacific,Growth,95000,2023-08-29
+C0289,Northstar Synthetic 289,North America,Enterprise,218000,2024-01-09
+C0290,Northstar Synthetic 290,Europe,Mid-Market,45000,2024-03-09
+C0291,Northstar Synthetic 291,Asia Pacific,Growth,121000,2023-06-15
+C0292,Northstar Synthetic 292,North America,Enterprise,82000,2024-09-16
+C0293,Northstar Synthetic 293,Europe,Mid-Market,61000,2024-10-24
+C0294,Northstar Synthetic 294,Asia Pacific,Growth,170000,2023-07-20
+C0295,Northstar Synthetic 295,North America,Enterprise,184000,2024-08-19
+C0296,Northstar Synthetic 296,Europe,Mid-Market,194000,2024-02-20
+C0297,Northstar Synthetic 297,Asia Pacific,Growth,63000,2023-04-07
+C0298,Northstar Synthetic 298,North America,Enterprise,225000,2022-12-15
+C0299,Northstar Synthetic 299,Europe,Mid-Market,189000,2024-01-25
+C0300,Northstar Synthetic 300,Asia Pacific,Growth,170000,2025-03-27
+C0301,Northstar Synthetic 301,North America,Enterprise,113000,2023-06-15
+C0302,Northstar Synthetic 302,Europe,Mid-Market,78000,2024-10-01
+C0303,Northstar Synthetic 303,Asia Pacific,Growth,225000,2024-11-19
+C0304,Northstar Synthetic 304,North America,Enterprise,71000,2023-02-06
+C0305,Northstar Synthetic 305,Europe,Mid-Market,195000,2025-01-14
+C0306,Northstar Synthetic 306,Asia Pacific,Growth,83000,2024-01-21
+C0307,Northstar Synthetic 307,North America,Enterprise,86000,2024-12-18
+C0308,Northstar Synthetic 308,Europe,Mid-Market,135000,2024-04-20
+C0309,Northstar Synthetic 309,Asia Pacific,Growth,62000,2025-03-25
+C0310,Northstar Synthetic 310,North America,Enterprise,123000,2023-09-18
+C0311,Northstar Synthetic 311,Europe,Mid-Market,238000,2023-01-24
+C0312,Northstar Synthetic 312,Asia Pacific,Growth,138000,2025-02-09
+C0313,Northstar Synthetic 313,North America,Enterprise,212000,2023-12-26
+C0314,Northstar Synthetic 314,Europe,Mid-Market,223000,2022-12-18
+C0315,Northstar Synthetic 315,Asia Pacific,Growth,158000,2024-08-12
+C0316,Northstar Synthetic 316,North America,Enterprise,237000,2024-07-20
+C0317,Northstar Synthetic 317,Europe,Mid-Market,155000,2024-10-23
+C0318,Northstar Synthetic 318,Asia Pacific,Growth,116000,2024-07-19
+C0319,Northstar Synthetic 319,North America,Enterprise,136000,2025-03-12
+C0320,Northstar Synthetic 320,Europe,Mid-Market,147000,2024-09-25
+C0321,Northstar Synthetic 321,Asia Pacific,Growth,62000,2024-06-29
+C0322,Northstar Synthetic 322,North America,Enterprise,85000,2023-06-23
+C0323,Northstar Synthetic 323,Europe,Mid-Market,216000,2023-03-02
+C0324,Northstar Synthetic 324,Asia Pacific,Growth,182000,2024-06-19
+C0325,Northstar Synthetic 325,North America,Enterprise,155000,2025-01-03
+C0326,Northstar Synthetic 326,Europe,Mid-Market,39000,2025-02-13
+C0327,Northstar Synthetic 327,Asia Pacific,Growth,77000,2024-08-16
+C0328,Northstar Synthetic 328,North America,Enterprise,125000,2024-03-09
+C0329,Northstar Synthetic 329,Europe,Mid-Market,26000,2024-02-11
+C0330,Northstar Synthetic 330,Asia Pacific,Growth,223000,2023-02-15
+C0331,Northstar Synthetic 331,North America,Enterprise,109000,2024-12-27
+C0332,Northstar Synthetic 332,Europe,Mid-Market,86000,2025-03-02
+C0333,Northstar Synthetic 333,Asia Pacific,Growth,158000,2024-11-11
+C0334,Northstar Synthetic 334,North America,Enterprise,74000,2025-01-06
+C0335,Northstar Synthetic 335,Europe,Mid-Market,66000,2024-07-07
+C0336,Northstar Synthetic 336,Asia Pacific,Growth,48000,2024-05-04
+C0337,Northstar Synthetic 337,North America,Enterprise,67000,2024-03-20
+C0338,Northstar Synthetic 338,Europe,Mid-Market,225000,2024-12-15
+C0339,Northstar Synthetic 339,Asia Pacific,Growth,205000,2024-03-14
+C0340,Northstar Synthetic 340,North America,Enterprise,121000,2024-03-27
+C0341,Northstar Synthetic 341,Europe,Mid-Market,151000,2022-12-11
+C0342,Northstar Synthetic 342,Asia Pacific,Growth,116000,2024-10-19
+C0343,Northstar Synthetic 343,North America,Enterprise,44000,2023-02-27
+C0344,Northstar Synthetic 344,Europe,Mid-Market,26000,2023-04-17
+C0345,Northstar Synthetic 345,Asia Pacific,Growth,157000,2024-01-14
+C0346,Northstar Synthetic 346,North America,Enterprise,51000,2025-04-19
+C0347,Northstar Synthetic 347,Europe,Mid-Market,231000,2025-02-26
+C0348,Northstar Synthetic 348,Asia Pacific,Growth,80000,2023-11-30
+C0349,Northstar Synthetic 349,North America,Enterprise,161000,2024-02-17
+C0350,Northstar Synthetic 350,Europe,Mid-Market,168000,2023-04-25
+C0351,Northstar Synthetic 351,Asia Pacific,Growth,86000,2023-05-06
+C0352,Northstar Synthetic 352,North America,Enterprise,101000,2024-10-09
+C0353,Northstar Synthetic 353,Europe,Mid-Market,226000,2025-01-20
+C0354,Northstar Synthetic 354,Asia Pacific,Growth,212000,2023-02-01
+C0355,Northstar Synthetic 355,North America,Enterprise,231000,2024-03-26
+C0356,Northstar Synthetic 356,Europe,Mid-Market,206000,2023-01-27
+C0357,Northstar Synthetic 357,Asia Pacific,Growth,235000,2024-04-03
+C0358,Northstar Synthetic 358,North America,Enterprise,118000,2023-02-12
+C0359,Northstar Synthetic 359,Europe,Mid-Market,55000,2024-05-17
+C0360,Northstar Synthetic 360,Asia Pacific,Growth,183000,2023-06-28
+C0361,Northstar Synthetic 361,North America,Enterprise,77000,2023-07-22
+C0362,Northstar Synthetic 362,Europe,Mid-Market,118000,2023-02-07
+C0363,Northstar Synthetic 363,Asia Pacific,Growth,214000,2024-03-10
+C0364,Northstar Synthetic 364,North America,Enterprise,71000,2024-10-26
+C0365,Northstar Synthetic 365,Europe,Mid-Market,67000,2024-01-13
+C0366,Northstar Synthetic 366,Asia Pacific,Growth,39000,2023-02-24
+C0367,Northstar Synthetic 367,North America,Enterprise,24000,2024-11-09
+C0368,Northstar Synthetic 368,Europe,Mid-Market,52000,2023-12-22
+C0369,Northstar Synthetic 369,Asia Pacific,Growth,125000,2025-02-12
+C0370,Northstar Synthetic 370,North America,Enterprise,38000,2023-04-01
+C0371,Northstar Synthetic 371,Europe,Mid-Market,161000,2024-08-06
+C0372,Northstar Synthetic 372,Asia Pacific,Growth,141000,2025-01-29
+C0373,Northstar Synthetic 373,North America,Enterprise,214000,2024-03-02
+C0374,Northstar Synthetic 374,Europe,Mid-Market,177000,2023-08-26
+C0375,Northstar Synthetic 375,Asia Pacific,Growth,163000,2025-03-12
+C0376,Northstar Synthetic 376,North America,Enterprise,74000,2024-07-10
+C0377,Northstar Synthetic 377,Europe,Mid-Market,132000,2025-01-16
+C0378,Northstar Synthetic 378,Asia Pacific,Growth,199000,2023-01-07
+C0379,Northstar Synthetic 379,North America,Enterprise,75000,2024-12-11
+C0380,Northstar Synthetic 380,Europe,Mid-Market,100000,2023-10-23
+C0381,Northstar Synthetic 381,Asia Pacific,Growth,92000,2023-07-21
+C0382,Northstar Synthetic 382,North America,Enterprise,206000,2023-06-17
+C0383,Northstar Synthetic 383,Europe,Mid-Market,75000,2024-05-30
+C0384,Northstar Synthetic 384,Asia Pacific,Growth,180000,2024-08-14
+C0385,Northstar Synthetic 385,North America,Enterprise,138000,2024-09-20
+C0386,Northstar Synthetic 386,Europe,Mid-Market,114000,2024-01-20
+C0387,Northstar Synthetic 387,Asia Pacific,Growth,126000,2024-08-25
+C0388,Northstar Synthetic 388,North America,Enterprise,111000,2023-09-29
+C0389,Northstar Synthetic 389,Europe,Mid-Market,136000,2024-02-20
+C0390,Northstar Synthetic 390,Asia Pacific,Growth,56000,2024-01-22
+C0391,Northstar Synthetic 391,North America,Enterprise,73000,2023-05-09
+C0392,Northstar Synthetic 392,Europe,Mid-Market,144000,2024-04-13
+C0393,Northstar Synthetic 393,Asia Pacific,Growth,188000,2023-12-04
+C0394,Northstar Synthetic 394,North America,Enterprise,154000,2024-09-12
+C0395,Northstar Synthetic 395,Europe,Mid-Market,215000,2023-05-09
+C0396,Northstar Synthetic 396,Asia Pacific,Growth,199000,2024-02-13
+C0397,Northstar Synthetic 397,North America,Enterprise,145000,2023-02-19
+C0398,Northstar Synthetic 398,Europe,Mid-Market,126000,2024-10-21
+C0399,Northstar Synthetic 399,Asia Pacific,Growth,166000,2024-09-01
+C0400,Northstar Synthetic 400,North America,Enterprise,135000,2024-01-08
+C0401,Northstar Synthetic 401,Europe,Mid-Market,177000,2024-07-09
+C0402,Northstar Synthetic 402,Asia Pacific,Growth,40000,2024-08-14
+C0403,Northstar Synthetic 403,North America,Enterprise,199000,2023-01-27
+C0404,Northstar Synthetic 404,Europe,Mid-Market,182000,2022-12-24
+C0405,Northstar Synthetic 405,Asia Pacific,Growth,174000,2024-01-07
+C0406,Northstar Synthetic 406,North America,Enterprise,195000,2024-08-22
+C0407,Northstar Synthetic 407,Europe,Mid-Market,237000,2025-03-16
+C0408,Northstar Synthetic 408,Asia Pacific,Growth,169000,2024-02-04
+C0409,Northstar Synthetic 409,North America,Enterprise,151000,2023-10-05
+C0410,Northstar Synthetic 410,Europe,Mid-Market,98000,2023-12-07
+C0411,Northstar Synthetic 411,Asia Pacific,Growth,26000,2024-02-11
+C0412,Northstar Synthetic 412,North America,Enterprise,157000,2024-03-04
+C0413,Northstar Synthetic 413,Europe,Mid-Market,134000,2023-06-19
+C0414,Northstar Synthetic 414,Asia Pacific,Growth,154000,2024-11-21
+C0415,Northstar Synthetic 415,North America,Enterprise,190000,2023-05-06
+C0416,Northstar Synthetic 416,Europe,Mid-Market,27000,2023-11-08
+C0417,Northstar Synthetic 417,Asia Pacific,Growth,146000,2023-12-01
+C0418,Northstar Synthetic 418,North America,Enterprise,122000,2024-10-10
+C0419,Northstar Synthetic 419,Europe,Mid-Market,74000,2024-03-13
+C0420,Northstar Synthetic 420,Asia Pacific,Growth,134000,2024-07-26
+C0421,Northstar Synthetic 421,North America,Enterprise,86000,2024-03-26
+C0422,Northstar Synthetic 422,Europe,Mid-Market,75000,2023-11-05
+C0423,Northstar Synthetic 423,Asia Pacific,Growth,35000,2023-01-27
+C0424,Northstar Synthetic 424,North America,Enterprise,240000,2023-07-31
+C0425,Northstar Synthetic 425,Europe,Mid-Market,77000,2024-12-08
+C0426,Northstar Synthetic 426,Asia Pacific,Growth,83000,2025-04-21
+C0427,Northstar Synthetic 427,North America,Enterprise,224000,2023-06-24
+C0428,Northstar Synthetic 428,Europe,Mid-Market,122000,2024-03-30
+C0429,Northstar Synthetic 429,Asia Pacific,Growth,209000,2022-11-16
+C0430,Northstar Synthetic 430,North America,Enterprise,122000,2024-10-16
+C0431,Northstar Synthetic 431,Europe,Mid-Market,232000,2025-02-21
+C0432,Northstar Synthetic 432,Asia Pacific,Growth,68000,2023-10-06
+C0433,Northstar Synthetic 433,North America,Enterprise,186000,2023-02-02
+C0434,Northstar Synthetic 434,Europe,Mid-Market,199000,2023-04-29
+C0435,Northstar Synthetic 435,Asia Pacific,Growth,148000,2024-05-24
+C0436,Northstar Synthetic 436,North America,Enterprise,210000,2025-01-13
+C0437,Northstar Synthetic 437,Europe,Mid-Market,204000,2024-12-09
+C0438,Northstar Synthetic 438,Asia Pacific,Growth,100000,2023-10-30
+C0439,Northstar Synthetic 439,North America,Enterprise,66000,2024-08-10
+C0440,Northstar Synthetic 440,Europe,Mid-Market,42000,2023-03-30
+C0441,Northstar Synthetic 441,Asia Pacific,Growth,131000,2025-01-13
+C0442,Northstar Synthetic 442,North America,Enterprise,213000,2024-07-17
+C0443,Northstar Synthetic 443,Europe,Mid-Market,137000,2025-02-01
+C0444,Northstar Synthetic 444,Asia Pacific,Growth,124000,2023-09-06
+C0445,Northstar Synthetic 445,North America,Enterprise,147000,2024-02-25
+C0446,Northstar Synthetic 446,Europe,Mid-Market,136000,2023-09-06
+C0447,Northstar Synthetic 447,Asia Pacific,Growth,221000,2024-05-18
+C0448,Northstar Synthetic 448,North America,Enterprise,196000,2023-08-31
+C0449,Northstar Synthetic 449,Europe,Mid-Market,141000,2023-10-03
+C0450,Northstar Synthetic 450,Asia Pacific,Growth,173000,2024-06-25
+C0451,Northstar Synthetic 451,North America,Enterprise,155000,2024-09-26
+C0452,Northstar Synthetic 452,Europe,Mid-Market,166000,2025-03-13
+C0453,Northstar Synthetic 453,Asia Pacific,Growth,51000,2023-01-20
+C0454,Northstar Synthetic 454,North America,Enterprise,138000,2023-02-10
+C0455,Northstar Synthetic 455,Europe,Mid-Market,115000,2024-09-08
+C0456,Northstar Synthetic 456,Asia Pacific,Growth,163000,2023-07-11
+C0457,Northstar Synthetic 457,North America,Enterprise,228000,2024-03-26
+C0458,Northstar Synthetic 458,Europe,Mid-Market,147000,2024-10-18
+C0459,Northstar Synthetic 459,Asia Pacific,Growth,123000,2024-06-18
+C0460,Northstar Synthetic 460,North America,Enterprise,106000,2023-07-15
+C0461,Northstar Synthetic 461,Europe,Mid-Market,101000,2023-04-29
+C0462,Northstar Synthetic 462,Asia Pacific,Growth,44000,2023-01-27
+C0463,Northstar Synthetic 463,North America,Enterprise,67000,2023-06-01
+C0464,Northstar Synthetic 464,Europe,Mid-Market,176000,2024-11-22
+C0465,Northstar Synthetic 465,Asia Pacific,Growth,152000,2024-01-11
+C0466,Northstar Synthetic 466,North America,Enterprise,209000,2025-03-30
+C0467,Northstar Synthetic 467,Europe,Mid-Market,88000,2023-04-06
+C0468,Northstar Synthetic 468,Asia Pacific,Growth,49000,2023-08-14
+C0469,Northstar Synthetic 469,North America,Enterprise,176000,2023-06-25
+C0470,Northstar Synthetic 470,Europe,Mid-Market,177000,2024-02-24
+C0471,Northstar Synthetic 471,Asia Pacific,Growth,165000,2024-10-02
+C0472,Northstar Synthetic 472,North America,Enterprise,35000,2025-03-06
+C0473,Northstar Synthetic 473,Europe,Mid-Market,120000,2024-07-21
+C0474,Northstar Synthetic 474,Asia Pacific,Growth,213000,2023-12-01
+C0475,Northstar Synthetic 475,North America,Enterprise,84000,2024-05-06
+C0476,Northstar Synthetic 476,Europe,Mid-Market,233000,2023-12-25
+C0477,Northstar Synthetic 477,Asia Pacific,Growth,43000,2023-10-22
+C0478,Northstar Synthetic 478,North America,Enterprise,96000,2024-10-25
+C0479,Northstar Synthetic 479,Europe,Mid-Market,118000,2023-03-15
+C0480,Northstar Synthetic 480,Asia Pacific,Growth,113000,2023-12-13
+C0481,Northstar Synthetic 481,North America,Enterprise,113000,2023-12-11
+C0482,Northstar Synthetic 482,Europe,Mid-Market,60000,2024-01-20
+C0483,Northstar Synthetic 483,Asia Pacific,Growth,143000,2023-05-19
+C0484,Northstar Synthetic 484,North America,Enterprise,139000,2024-02-08
+C0485,Northstar Synthetic 485,Europe,Mid-Market,133000,2023-11-09
+C0486,Northstar Synthetic 486,Asia Pacific,Growth,160000,2024-04-25
+C0487,Northstar Synthetic 487,North America,Enterprise,24000,2023-06-07
+C0488,Northstar Synthetic 488,Europe,Mid-Market,106000,2023-07-22
+C0489,Northstar Synthetic 489,Asia Pacific,Growth,110000,2023-04-01
+C0490,Northstar Synthetic 490,North America,Enterprise,117000,2024-09-29
+C0491,Northstar Synthetic 491,Europe,Mid-Market,230000,2024-05-16
+C0492,Northstar Synthetic 492,Asia Pacific,Growth,99000,2023-03-15
+C0493,Northstar Synthetic 493,North America,Enterprise,62000,2024-08-20
+C0494,Northstar Synthetic 494,Europe,Mid-Market,147000,2024-11-18
+C0495,Northstar Synthetic 495,Asia Pacific,Growth,93000,2023-04-23
+C0496,Northstar Synthetic 496,North America,Enterprise,171000,2024-01-11
+C0497,Northstar Synthetic 497,Europe,Mid-Market,165000,2023-03-14
+C0498,Northstar Synthetic 498,Asia Pacific,Growth,34000,2024-05-29
+C0499,Northstar Synthetic 499,North America,Enterprise,198000,2024-09-03
+C0500,Northstar Synthetic 500,Europe,Mid-Market,53000,2023-07-30
+C0501,Northstar Synthetic 501,Asia Pacific,Growth,74000,2024-09-21
+C0502,Northstar Synthetic 502,North America,Enterprise,134000,2025-03-18
+C0503,Northstar Synthetic 503,Europe,Mid-Market,239000,2024-11-19
+C0504,Northstar Synthetic 504,Asia Pacific,Growth,118000,2024-06-22
+C0505,Northstar Synthetic 505,North America,Enterprise,198000,2022-12-05
+C0506,Northstar Synthetic 506,Europe,Mid-Market,136000,2024-03-24
+C0507,Northstar Synthetic 507,Asia Pacific,Growth,170000,2023-03-07
+C0508,Northstar Synthetic 508,North America,Enterprise,116000,2023-10-17
+C0509,Northstar Synthetic 509,Europe,Mid-Market,190000,2024-06-12
+C0510,Northstar Synthetic 510,Asia Pacific,Growth,155000,2023-02-08
+C0511,Northstar Synthetic 511,North America,Enterprise,181000,2024-08-05
+C0512,Northstar Synthetic 512,Europe,Mid-Market,113000,2024-09-08
+C0513,Northstar Synthetic 513,Asia Pacific,Growth,198000,2024-06-14
+C0514,Northstar Synthetic 514,North America,Enterprise,191000,2024-03-03
+C0515,Northstar Synthetic 515,Europe,Mid-Market,164000,2023-05-24
+C0516,Northstar Synthetic 516,Asia Pacific,Growth,132000,2022-12-19
+C0517,Northstar Synthetic 517,North America,Enterprise,64000,2022-11-10
+C0518,Northstar Synthetic 518,Europe,Mid-Market,205000,2022-12-31
+C0519,Northstar Synthetic 519,Asia Pacific,Growth,93000,2024-03-18
+C0520,Northstar Synthetic 520,North America,Enterprise,144000,2025-03-20
+C0521,Northstar Synthetic 521,Europe,Mid-Market,215000,2024-07-06
+C0522,Northstar Synthetic 522,Asia Pacific,Growth,44000,2024-07-17
+C0523,Northstar Synthetic 523,North America,Enterprise,127000,2024-11-02
+C0524,Northstar Synthetic 524,Europe,Mid-Market,214000,2023-04-18
+C0525,Northstar Synthetic 525,Asia Pacific,Growth,64000,2024-03-03
+C0526,Northstar Synthetic 526,North America,Enterprise,117000,2024-10-07
+C0527,Northstar Synthetic 527,Europe,Mid-Market,68000,2024-02-23
+C0528,Northstar Synthetic 528,Asia Pacific,Growth,138000,2022-12-26
+C0529,Northstar Synthetic 529,North America,Enterprise,97000,2023-10-01
+C0530,Northstar Synthetic 530,Europe,Mid-Market,230000,2025-02-14
+C0531,Northstar Synthetic 531,Asia Pacific,Growth,212000,2024-03-21
+C0532,Northstar Synthetic 532,North America,Enterprise,236000,2023-07-22
+C0533,Northstar Synthetic 533,Europe,Mid-Market,213000,2023-03-16
+C0534,Northstar Synthetic 534,Asia Pacific,Growth,110000,2023-01-29
+C0535,Northstar Synthetic 535,North America,Enterprise,204000,2022-12-29
+C0536,Northstar Synthetic 536,Europe,Mid-Market,138000,2023-11-17
+C0537,Northstar Synthetic 537,Asia Pacific,Growth,197000,2024-09-13
+C0538,Northstar Synthetic 538,North America,Enterprise,189000,2024-10-06
+C0539,Northstar Synthetic 539,Europe,Mid-Market,137000,2024-02-21
+C0540,Northstar Synthetic 540,Asia Pacific,Growth,31000,2024-11-10
+C0541,Northstar Synthetic 541,North America,Enterprise,30000,2024-08-13
+C0542,Northstar Synthetic 542,Europe,Mid-Market,174000,2023-11-18
+C0543,Northstar Synthetic 543,Asia Pacific,Growth,232000,2023-09-03
+C0544,Northstar Synthetic 544,North America,Enterprise,221000,2024-02-01
+C0545,Northstar Synthetic 545,Europe,Mid-Market,137000,2023-10-16
+C0546,Northstar Synthetic 546,Asia Pacific,Growth,49000,2024-03-26
+C0547,Northstar Synthetic 547,North America,Enterprise,187000,2024-01-25
+C0548,Northstar Synthetic 548,Europe,Mid-Market,176000,2023-06-26
+C0549,Northstar Synthetic 549,Asia Pacific,Growth,88000,2022-12-31
+C0550,Northstar Synthetic 550,North America,Enterprise,52000,2024-05-28
+C0551,Northstar Synthetic 551,Europe,Mid-Market,207000,2024-05-05
+C0552,Northstar Synthetic 552,Asia Pacific,Growth,157000,2024-03-21
+C0553,Northstar Synthetic 553,North America,Enterprise,173000,2024-11-30
+C0554,Northstar Synthetic 554,Europe,Mid-Market,230000,2024-08-19
+C0555,Northstar Synthetic 555,Asia Pacific,Growth,98000,2024-05-12
+C0556,Northstar Synthetic 556,North America,Enterprise,184000,2023-07-26
+C0557,Northstar Synthetic 557,Europe,Mid-Market,185000,2024-08-12
+C0558,Northstar Synthetic 558,Asia Pacific,Growth,154000,2022-12-02
+C0559,Northstar Synthetic 559,North America,Enterprise,204000,2023-07-09
+C0560,Northstar Synthetic 560,Europe,Mid-Market,52000,2025-01-05
+C0561,Northstar Synthetic 561,Asia Pacific,Growth,210000,2024-01-26
+C0562,Northstar Synthetic 562,North America,Enterprise,67000,2024-05-11
+C0563,Northstar Synthetic 563,Europe,Mid-Market,216000,2024-08-24
+C0564,Northstar Synthetic 564,Asia Pacific,Growth,141000,2023-05-26
+C0565,Northstar Synthetic 565,North America,Enterprise,218000,2024-10-30
+C0566,Northstar Synthetic 566,Europe,Mid-Market,240000,2023-04-15
+C0567,Northstar Synthetic 567,Asia Pacific,Growth,93000,2023-01-31
+C0568,Northstar Synthetic 568,North America,Enterprise,135000,2025-04-07
+C0569,Northstar Synthetic 569,Europe,Mid-Market,171000,2024-02-23
+C0570,Northstar Synthetic 570,Asia Pacific,Growth,108000,2023-11-28
+C0571,Northstar Synthetic 571,North America,Enterprise,133000,2023-02-13
+C0572,Northstar Synthetic 572,Europe,Mid-Market,177000,2025-03-11
+C0573,Northstar Synthetic 573,Asia Pacific,Growth,111000,2024-02-03
+C0574,Northstar Synthetic 574,North America,Enterprise,160000,2025-02-21
+C0575,Northstar Synthetic 575,Europe,Mid-Market,83000,2023-09-10
+C0576,Northstar Synthetic 576,Asia Pacific,Growth,207000,2023-12-11
+C0577,Northstar Synthetic 577,North America,Enterprise,140000,2023-03-26
+C0578,Northstar Synthetic 578,Europe,Mid-Market,40000,2023-07-18
+C0579,Northstar Synthetic 579,Asia Pacific,Growth,98000,2023-11-11
+C0580,Northstar Synthetic 580,North America,Enterprise,172000,2023-12-27
+C0581,Northstar Synthetic 581,Europe,Mid-Market,166000,2023-11-08
+C0582,Northstar Synthetic 582,Asia Pacific,Growth,185000,2023-12-23
+C0583,Northstar Synthetic 583,North America,Enterprise,141000,2023-03-11
+C0584,Northstar Synthetic 584,Europe,Mid-Market,211000,2024-03-07
+C0585,Northstar Synthetic 585,Asia Pacific,Growth,202000,2023-10-11
+C0586,Northstar Synthetic 586,North America,Enterprise,145000,2023-06-01
+C0587,Northstar Synthetic 587,Europe,Mid-Market,106000,2023-02-27
+C0588,Northstar Synthetic 588,Asia Pacific,Growth,104000,2025-04-14
+C0589,Northstar Synthetic 589,North America,Enterprise,235000,2024-01-17
+C0590,Northstar Synthetic 590,Europe,Mid-Market,33000,2024-07-12
+C0591,Northstar Synthetic 591,Asia Pacific,Growth,87000,2024-11-10
+C0592,Northstar Synthetic 592,North America,Enterprise,136000,2023-03-12
+C0593,Northstar Synthetic 593,Europe,Mid-Market,30000,2024-10-21
+C0594,Northstar Synthetic 594,Asia Pacific,Growth,136000,2024-02-16
+C0595,Northstar Synthetic 595,North America,Enterprise,164000,2025-01-07
+C0596,Northstar Synthetic 596,Europe,Mid-Market,195000,2025-02-19
+C0597,Northstar Synthetic 597,Asia Pacific,Growth,97000,2024-03-24
+C0598,Northstar Synthetic 598,North America,Enterprise,235000,2024-02-10
+C0599,Northstar Synthetic 599,Europe,Mid-Market,64000,2025-01-17
+C0600,Northstar Synthetic 600,Asia Pacific,Growth,145000,2023-04-01
+C0601,Northstar Synthetic 601,North America,Enterprise,90000,2023-02-05
+C0602,Northstar Synthetic 602,Europe,Mid-Market,101000,2023-01-15
+C0603,Northstar Synthetic 603,Asia Pacific,Growth,182000,2023-09-04
+C0604,Northstar Synthetic 604,North America,Enterprise,188000,2024-04-18
+C0605,Northstar Synthetic 605,Europe,Mid-Market,138000,2024-07-04
+C0606,Northstar Synthetic 606,Asia Pacific,Growth,160000,2024-03-17
+C0607,Northstar Synthetic 607,North America,Enterprise,168000,2024-02-17
+C0608,Northstar Synthetic 608,Europe,Mid-Market,147000,2023-02-18
+C0609,Northstar Synthetic 609,Asia Pacific,Growth,59000,2023-11-21
+C0610,Northstar Synthetic 610,North America,Enterprise,93000,2023-02-01
+C0611,Northstar Synthetic 611,Europe,Mid-Market,89000,2023-11-03
+C0612,Northstar Synthetic 612,Asia Pacific,Growth,217000,2023-04-12
+C0613,Northstar Synthetic 613,North America,Enterprise,163000,2023-01-25
+C0614,Northstar Synthetic 614,Europe,Mid-Market,234000,2023-04-28
+C0615,Northstar Synthetic 615,Asia Pacific,Growth,149000,2023-08-05
+C0616,Northstar Synthetic 616,North America,Enterprise,63000,2023-09-17
+C0617,Northstar Synthetic 617,Europe,Mid-Market,120000,2024-06-30
+C0618,Northstar Synthetic 618,Asia Pacific,Growth,58000,2024-12-04
+C0619,Northstar Synthetic 619,North America,Enterprise,163000,2023-08-08
+C0620,Northstar Synthetic 620,Europe,Mid-Market,167000,2025-02-11
+C0621,Northstar Synthetic 621,Asia Pacific,Growth,197000,2023-02-09
+C0622,Northstar Synthetic 622,North America,Enterprise,61000,2024-04-01
+C0623,Northstar Synthetic 623,Europe,Mid-Market,113000,2025-03-06
+C0624,Northstar Synthetic 624,Asia Pacific,Growth,137000,2023-07-03
+C0625,Northstar Synthetic 625,North America,Enterprise,153000,2024-12-02
+C0626,Northstar Synthetic 626,Europe,Mid-Market,109000,2023-03-10
+C0627,Northstar Synthetic 627,Asia Pacific,Growth,175000,2024-07-13
+C0628,Northstar Synthetic 628,North America,Enterprise,85000,2022-12-21
+C0629,Northstar Synthetic 629,Europe,Mid-Market,180000,2024-04-14
+C0630,Northstar Synthetic 630,Asia Pacific,Growth,114000,2024-05-14
+C0631,Northstar Synthetic 631,North America,Enterprise,52000,2025-02-21
+C0632,Northstar Synthetic 632,Europe,Mid-Market,84000,2025-02-06
+C0633,Northstar Synthetic 633,Asia Pacific,Growth,55000,2025-03-22
+C0634,Northstar Synthetic 634,North America,Enterprise,103000,2022-12-17
+C0635,Northstar Synthetic 635,Europe,Mid-Market,67000,2023-07-21
+C0636,Northstar Synthetic 636,Asia Pacific,Growth,39000,2023-03-19
+C0637,Northstar Synthetic 637,North America,Enterprise,79000,2023-11-13
+C0638,Northstar Synthetic 638,Europe,Mid-Market,30000,2024-01-11
+C0639,Northstar Synthetic 639,Asia Pacific,Growth,89000,2024-04-21
+C0640,Northstar Synthetic 640,North America,Enterprise,221000,2023-12-05
+C0641,Northstar Synthetic 641,Europe,Mid-Market,211000,2024-03-24
+C0642,Northstar Synthetic 642,Asia Pacific,Growth,78000,2024-09-14
+C0643,Northstar Synthetic 643,North America,Enterprise,54000,2025-03-26
+C0644,Northstar Synthetic 644,Europe,Mid-Market,138000,2024-10-30
+C0645,Northstar Synthetic 645,Asia Pacific,Growth,107000,2023-10-09
+C0646,Northstar Synthetic 646,North America,Enterprise,139000,2023-01-02
+C0647,Northstar Synthetic 647,Europe,Mid-Market,231000,2024-12-15
+C0648,Northstar Synthetic 648,Asia Pacific,Growth,142000,2022-12-01
+C0649,Northstar Synthetic 649,North America,Enterprise,44000,2024-01-13
+C0650,Northstar Synthetic 650,Europe,Mid-Market,137000,2024-04-07
+C0651,Northstar Synthetic 651,Asia Pacific,Growth,112000,2023-06-17
+C0652,Northstar Synthetic 652,North America,Enterprise,73000,2024-05-19
+C0653,Northstar Synthetic 653,Europe,Mid-Market,131000,2024-05-20
+C0654,Northstar Synthetic 654,Asia Pacific,Growth,42000,2024-02-22
+C0655,Northstar Synthetic 655,North America,Enterprise,211000,2023-03-15
+C0656,Northstar Synthetic 656,Europe,Mid-Market,90000,2023-01-10
+C0657,Northstar Synthetic 657,Asia Pacific,Growth,165000,2023-12-09
+C0658,Northstar Synthetic 658,North America,Enterprise,188000,2025-01-20
+C0659,Northstar Synthetic 659,Europe,Mid-Market,151000,2024-05-29
+C0660,Northstar Synthetic 660,Asia Pacific,Growth,161000,2023-11-26
+C0661,Northstar Synthetic 661,North America,Enterprise,167000,2023-08-08
+C0662,Northstar Synthetic 662,Europe,Mid-Market,118000,2022-12-17
+C0663,Northstar Synthetic 663,Asia Pacific,Growth,66000,2024-09-17
+C0664,Northstar Synthetic 664,North America,Enterprise,158000,2023-08-04
+C0665,Northstar Synthetic 665,Europe,Mid-Market,26000,2024-02-15
+C0666,Northstar Synthetic 666,Asia Pacific,Growth,44000,2023-08-21
+C0667,Northstar Synthetic 667,North America,Enterprise,80000,2023-08-11
+C0668,Northstar Synthetic 668,Europe,Mid-Market,222000,2023-12-28
+C0669,Northstar Synthetic 669,Asia Pacific,Growth,168000,2024-06-08
+C0670,Northstar Synthetic 670,North America,Enterprise,25000,2023-05-14
+C0671,Northstar Synthetic 671,Europe,Mid-Market,150000,2023-08-01
+C0672,Northstar Synthetic 672,Asia Pacific,Growth,55000,2024-10-21
+C0673,Northstar Synthetic 673,North America,Enterprise,139000,2023-06-29
+C0674,Northstar Synthetic 674,Europe,Mid-Market,58000,2022-11-22
+C0675,Northstar Synthetic 675,Asia Pacific,Growth,57000,2022-12-18
+C0676,Northstar Synthetic 676,North America,Enterprise,73000,2024-11-29
+C0677,Northstar Synthetic 677,Europe,Mid-Market,182000,2023-03-30
+C0678,Northstar Synthetic 678,Asia Pacific,Growth,233000,2023-05-28
+C0679,Northstar Synthetic 679,North America,Enterprise,35000,2023-03-10
+C0680,Northstar Synthetic 680,Europe,Mid-Market,225000,2024-11-26
+C0681,Northstar Synthetic 681,Asia Pacific,Growth,34000,2023-08-27
+C0682,Northstar Synthetic 682,North America,Enterprise,143000,2023-08-09
+C0683,Northstar Synthetic 683,Europe,Mid-Market,126000,2023-08-05
+C0684,Northstar Synthetic 684,Asia Pacific,Growth,29000,2023-11-30
+C0685,Northstar Synthetic 685,North America,Enterprise,38000,2023-11-15
+C0686,Northstar Synthetic 686,Europe,Mid-Market,192000,2024-06-20
+C0687,Northstar Synthetic 687,Asia Pacific,Growth,126000,2024-10-27
+C0688,Northstar Synthetic 688,North America,Enterprise,165000,2024-05-28
+C0689,Northstar Synthetic 689,Europe,Mid-Market,213000,2022-11-29
+C0690,Northstar Synthetic 690,Asia Pacific,Growth,168000,2023-09-16
+C0691,Northstar Synthetic 691,North America,Enterprise,33000,2023-07-12
+C0692,Northstar Synthetic 692,Europe,Mid-Market,79000,2024-12-28
+C0693,Northstar Synthetic 693,Asia Pacific,Growth,104000,2024-05-20
+C0694,Northstar Synthetic 694,North America,Enterprise,118000,2023-12-04
+C0695,Northstar Synthetic 695,Europe,Mid-Market,81000,2025-01-28
+C0696,Northstar Synthetic 696,Asia Pacific,Growth,77000,2023-01-13
+C0697,Northstar Synthetic 697,North America,Enterprise,36000,2023-03-12
+C0698,Northstar Synthetic 698,Europe,Mid-Market,59000,2024-01-20
+C0699,Northstar Synthetic 699,Asia Pacific,Growth,74000,2023-05-10
+C0700,Northstar Synthetic 700,North America,Enterprise,97000,2023-05-26
+C0701,Northstar Synthetic 701,Europe,Mid-Market,192000,2025-01-27
+C0702,Northstar Synthetic 702,Asia Pacific,Growth,29000,2023-01-30
+C0703,Northstar Synthetic 703,North America,Enterprise,219000,2023-10-12
+C0704,Northstar Synthetic 704,Europe,Mid-Market,227000,2024-08-18
+C0705,Northstar Synthetic 705,Asia Pacific,Growth,39000,2024-02-09
+C0706,Northstar Synthetic 706,North America,Enterprise,164000,2025-02-13
+C0707,Northstar Synthetic 707,Europe,Mid-Market,61000,2024-10-05
+C0708,Northstar Synthetic 708,Asia Pacific,Growth,133000,2024-06-13
+C0709,Northstar Synthetic 709,North America,Enterprise,169000,2023-06-29
+C0710,Northstar Synthetic 710,Europe,Mid-Market,36000,2022-12-05
+C0711,Northstar Synthetic 711,Asia Pacific,Growth,80000,2023-12-31
+C0712,Northstar Synthetic 712,North America,Enterprise,29000,2024-07-09
+C0713,Northstar Synthetic 713,Europe,Mid-Market,76000,2024-03-01
+C0714,Northstar Synthetic 714,Asia Pacific,Growth,51000,2023-01-26
+C0715,Northstar Synthetic 715,North America,Enterprise,107000,2024-09-10
+C0716,Northstar Synthetic 716,Europe,Mid-Market,123000,2023-05-19
+C0717,Northstar Synthetic 717,Asia Pacific,Growth,177000,2023-10-31
+C0718,Northstar Synthetic 718,North America,Enterprise,225000,2023-11-12
+C0719,Northstar Synthetic 719,Europe,Mid-Market,199000,2023-04-26
+C0720,Northstar Synthetic 720,Asia Pacific,Growth,68000,2022-11-24
+C0721,Northstar Synthetic 721,North America,Enterprise,133000,2023-09-29
+C0722,Northstar Synthetic 722,Europe,Mid-Market,125000,2024-05-17
+C0723,Northstar Synthetic 723,Asia Pacific,Growth,216000,2023-01-12
+C0724,Northstar Synthetic 724,North America,Enterprise,121000,2023-05-26
+C0725,Northstar Synthetic 725,Europe,Mid-Market,30000,2023-11-02
+C0726,Northstar Synthetic 726,Asia Pacific,Growth,26000,2024-02-23
+C0727,Northstar Synthetic 727,North America,Enterprise,138000,2023-07-25
+C0728,Northstar Synthetic 728,Europe,Mid-Market,159000,2023-06-01
+C0729,Northstar Synthetic 729,Asia Pacific,Growth,51000,2023-09-14
+C0730,Northstar Synthetic 730,North America,Enterprise,110000,2023-03-24
+C0731,Northstar Synthetic 731,Europe,Mid-Market,130000,2022-12-08
+C0732,Northstar Synthetic 732,Asia Pacific,Growth,227000,2024-12-18
+C0733,Northstar Synthetic 733,North America,Enterprise,220000,2025-04-05
+C0734,Northstar Synthetic 734,Europe,Mid-Market,84000,2022-12-18
+C0735,Northstar Synthetic 735,Asia Pacific,Growth,197000,2022-12-10
+C0736,Northstar Synthetic 736,North America,Enterprise,120000,2024-09-25
+C0737,Northstar Synthetic 737,Europe,Mid-Market,229000,2024-06-03
+C0738,Northstar Synthetic 738,Asia Pacific,Growth,38000,2024-05-22
+C0739,Northstar Synthetic 739,North America,Enterprise,166000,2022-11-19
+C0740,Northstar Synthetic 740,Europe,Mid-Market,209000,2023-10-16
+C0741,Northstar Synthetic 741,Asia Pacific,Growth,118000,2023-10-09
+C0742,Northstar Synthetic 742,North America,Enterprise,48000,2023-01-28
+C0743,Northstar Synthetic 743,Europe,Mid-Market,86000,2024-09-17
+C0744,Northstar Synthetic 744,Asia Pacific,Growth,151000,2024-11-21
+C0745,Northstar Synthetic 745,North America,Enterprise,214000,2022-11-19
+C0746,Northstar Synthetic 746,Europe,Mid-Market,121000,2023-06-27
+C0747,Northstar Synthetic 747,Asia Pacific,Growth,44000,2024-07-01
+C0748,Northstar Synthetic 748,North America,Enterprise,140000,2024-06-29
+C0749,Northstar Synthetic 749,Europe,Mid-Market,210000,2023-06-21
+C0750,Northstar Synthetic 750,Asia Pacific,Growth,142000,2024-01-10
+C0751,Northstar Synthetic 751,North America,Enterprise,209000,2024-02-10
+C0752,Northstar Synthetic 752,Europe,Mid-Market,162000,2023-10-08
+C0753,Northstar Synthetic 753,Asia Pacific,Growth,139000,2023-09-02
+C0754,Northstar Synthetic 754,North America,Enterprise,186000,2023-10-14
+C0755,Northstar Synthetic 755,Europe,Mid-Market,162000,2024-03-23
+C0756,Northstar Synthetic 756,Asia Pacific,Growth,33000,2023-02-24
+C0757,Northstar Synthetic 757,North America,Enterprise,80000,2022-12-22
+C0758,Northstar Synthetic 758,Europe,Mid-Market,209000,2025-02-17
+C0759,Northstar Synthetic 759,Asia Pacific,Growth,63000,2024-10-28
+C0760,Northstar Synthetic 760,North America,Enterprise,159000,2022-12-26
+C0761,Northstar Synthetic 761,Europe,Mid-Market,199000,2025-01-13
+C0762,Northstar Synthetic 762,Asia Pacific,Growth,70000,2023-02-28
+C0763,Northstar Synthetic 763,North America,Enterprise,62000,2023-10-29
+C0764,Northstar Synthetic 764,Europe,Mid-Market,104000,2024-05-17
+C0765,Northstar Synthetic 765,Asia Pacific,Growth,131000,2024-08-17
+C0766,Northstar Synthetic 766,North America,Enterprise,43000,2023-03-03
+C0767,Northstar Synthetic 767,Europe,Mid-Market,39000,2023-04-05
+C0768,Northstar Synthetic 768,Asia Pacific,Growth,89000,2024-08-23
+C0769,Northstar Synthetic 769,North America,Enterprise,46000,2022-11-26
+C0770,Northstar Synthetic 770,Europe,Mid-Market,149000,2023-01-13
+C0771,Northstar Synthetic 771,Asia Pacific,Growth,47000,2023-04-11
+C0772,Northstar Synthetic 772,North America,Enterprise,166000,2023-04-09
+C0773,Northstar Synthetic 773,Europe,Mid-Market,37000,2024-03-23
+C0774,Northstar Synthetic 774,Asia Pacific,Growth,117000,2023-06-10
+C0775,Northstar Synthetic 775,North America,Enterprise,133000,2023-10-23
+C0776,Northstar Synthetic 776,Europe,Mid-Market,43000,2023-09-08
+C0777,Northstar Synthetic 777,Asia Pacific,Growth,132000,2023-05-10
+C0778,Northstar Synthetic 778,North America,Enterprise,135000,2025-03-26
+C0779,Northstar Synthetic 779,Europe,Mid-Market,41000,2023-10-24
+C0780,Northstar Synthetic 780,Asia Pacific,Growth,40000,2023-01-22
+C0781,Northstar Synthetic 781,North America,Enterprise,174000,2023-09-03
+C0782,Northstar Synthetic 782,Europe,Mid-Market,57000,2023-08-05
+C0783,Northstar Synthetic 783,Asia Pacific,Growth,123000,2023-10-16
+C0784,Northstar Synthetic 784,North America,Enterprise,112000,2023-01-25
+C0785,Northstar Synthetic 785,Europe,Mid-Market,97000,2023-08-18
+C0786,Northstar Synthetic 786,Asia Pacific,Growth,227000,2023-12-04
+C0787,Northstar Synthetic 787,North America,Enterprise,171000,2024-02-20
+C0788,Northstar Synthetic 788,Europe,Mid-Market,160000,2024-10-04
+C0789,Northstar Synthetic 789,Asia Pacific,Growth,85000,2024-08-07
+C0790,Northstar Synthetic 790,North America,Enterprise,191000,2023-05-22
+C0791,Northstar Synthetic 791,Europe,Mid-Market,216000,2023-06-23
+C0792,Northstar Synthetic 792,Asia Pacific,Growth,87000,2024-09-28
+C0793,Northstar Synthetic 793,North America,Enterprise,39000,2024-05-30
+C0794,Northstar Synthetic 794,Europe,Mid-Market,201000,2024-05-15
+C0795,Northstar Synthetic 795,Asia Pacific,Growth,137000,2024-05-20
+C0796,Northstar Synthetic 796,North America,Enterprise,136000,2023-05-02
+C0797,Northstar Synthetic 797,Europe,Mid-Market,147000,2023-03-24
+C0798,Northstar Synthetic 798,Asia Pacific,Growth,40000,2025-01-13
+C0799,Northstar Synthetic 799,North America,Enterprise,54000,2024-07-15
+C0800,Northstar Synthetic 800,Europe,Mid-Market,93000,2024-06-09
+C0801,Northstar Synthetic 801,Asia Pacific,Growth,107000,2024-11-24
+C0802,Northstar Synthetic 802,North America,Enterprise,116000,2023-11-11
+C0803,Northstar Synthetic 803,Europe,Mid-Market,93000,2023-10-29
+C0804,Northstar Synthetic 804,Asia Pacific,Growth,227000,2024-12-13
+C0805,Northstar Synthetic 805,North America,Enterprise,141000,2023-03-11
+C0806,Northstar Synthetic 806,Europe,Mid-Market,174000,2024-10-26
+C0807,Northstar Synthetic 807,Asia Pacific,Growth,74000,2022-11-16
+C0808,Northstar Synthetic 808,North America,Enterprise,232000,2022-12-05
+C0809,Northstar Synthetic 809,Europe,Mid-Market,100000,2024-01-04
+C0810,Northstar Synthetic 810,Asia Pacific,Growth,89000,2023-03-01
+C0811,Northstar Synthetic 811,North America,Enterprise,102000,2024-07-18
+C0812,Northstar Synthetic 812,Europe,Mid-Market,227000,2023-08-13
+C0813,Northstar Synthetic 813,Asia Pacific,Growth,27000,2024-06-27
+C0814,Northstar Synthetic 814,North America,Enterprise,191000,2024-02-03
+C0815,Northstar Synthetic 815,Europe,Mid-Market,47000,2023-09-18
+C0816,Northstar Synthetic 816,Asia Pacific,Growth,46000,2023-12-01
+C0817,Northstar Synthetic 817,North America,Enterprise,147000,2024-04-17
+C0818,Northstar Synthetic 818,Europe,Mid-Market,102000,2023-09-22
+C0819,Northstar Synthetic 819,Asia Pacific,Growth,83000,2024-04-27
+C0820,Northstar Synthetic 820,North America,Enterprise,90000,2023-12-05
+C0821,Northstar Synthetic 821,Europe,Mid-Market,58000,2023-01-27
+C0822,Northstar Synthetic 822,Asia Pacific,Growth,206000,2023-09-15
+C0823,Northstar Synthetic 823,North America,Enterprise,217000,2022-11-27
+C0824,Northstar Synthetic 824,Europe,Mid-Market,202000,2023-10-17
+C0825,Northstar Synthetic 825,Asia Pacific,Growth,123000,2023-06-18
+C0826,Northstar Synthetic 826,North America,Enterprise,142000,2025-01-29
+C0827,Northstar Synthetic 827,Europe,Mid-Market,160000,2023-01-31
+C0828,Northstar Synthetic 828,Asia Pacific,Growth,63000,2025-04-05
+C0829,Northstar Synthetic 829,North America,Enterprise,61000,2023-12-09
+C0830,Northstar Synthetic 830,Europe,Mid-Market,200000,2024-06-27
+C0831,Northstar Synthetic 831,Asia Pacific,Growth,193000,2023-04-19
+C0832,Northstar Synthetic 832,North America,Enterprise,221000,2023-10-18
+C0833,Northstar Synthetic 833,Europe,Mid-Market,198000,2022-12-13
+C0834,Northstar Synthetic 834,Asia Pacific,Growth,227000,2023-04-14
+C0835,Northstar Synthetic 835,North America,Enterprise,200000,2023-05-26
+C0836,Northstar Synthetic 836,Europe,Mid-Market,99000,2024-06-30
+C0837,Northstar Synthetic 837,Asia Pacific,Growth,144000,2024-08-05
+C0838,Northstar Synthetic 838,North America,Enterprise,34000,2023-08-16
+C0839,Northstar Synthetic 839,Europe,Mid-Market,54000,2023-01-22
+C0840,Northstar Synthetic 840,Asia Pacific,Growth,221000,2023-03-17
+C0841,Northstar Synthetic 841,North America,Enterprise,129000,2024-04-22
+C0842,Northstar Synthetic 842,Europe,Mid-Market,90000,2025-01-12
+C0843,Northstar Synthetic 843,Asia Pacific,Growth,83000,2023-10-14
+C0844,Northstar Synthetic 844,North America,Enterprise,172000,2024-05-25
+C0845,Northstar Synthetic 845,Europe,Mid-Market,70000,2022-12-10
+C0846,Northstar Synthetic 846,Asia Pacific,Growth,153000,2024-08-06
+C0847,Northstar Synthetic 847,North America,Enterprise,165000,2022-12-18
+C0848,Northstar Synthetic 848,Europe,Mid-Market,134000,2025-02-06
+C0849,Northstar Synthetic 849,Asia Pacific,Growth,113000,2024-09-10
+C0850,Northstar Synthetic 850,North America,Enterprise,203000,2023-09-14
+C0851,Northstar Synthetic 851,Europe,Mid-Market,123000,2024-09-27
+C0852,Northstar Synthetic 852,Asia Pacific,Growth,173000,2024-07-21
+C0853,Northstar Synthetic 853,North America,Enterprise,114000,2025-03-27
+C0854,Northstar Synthetic 854,Europe,Mid-Market,59000,2024-09-07
+C0855,Northstar Synthetic 855,Asia Pacific,Growth,121000,2024-05-30
+C0856,Northstar Synthetic 856,North America,Enterprise,188000,2024-09-26
+C0857,Northstar Synthetic 857,Europe,Mid-Market,94000,2024-01-01
+C0858,Northstar Synthetic 858,Asia Pacific,Growth,195000,2024-11-11
+C0859,Northstar Synthetic 859,North America,Enterprise,174000,2024-07-10
+C0860,Northstar Synthetic 860,Europe,Mid-Market,29000,2023-11-08
+C0861,Northstar Synthetic 861,Asia Pacific,Growth,116000,2023-03-15
+C0862,Northstar Synthetic 862,North America,Enterprise,208000,2023-12-16
+C0863,Northstar Synthetic 863,Europe,Mid-Market,202000,2025-02-26
+C0864,Northstar Synthetic 864,Asia Pacific,Growth,113000,2024-09-26
+C0865,Northstar Synthetic 865,North America,Enterprise,25000,2023-09-10
+C0866,Northstar Synthetic 866,Europe,Mid-Market,154000,2023-07-31
+C0867,Northstar Synthetic 867,Asia Pacific,Growth,234000,2023-01-17
+C0868,Northstar Synthetic 868,North America,Enterprise,210000,2024-06-07
+C0869,Northstar Synthetic 869,Europe,Mid-Market,153000,2024-12-13
+C0870,Northstar Synthetic 870,Asia Pacific,Growth,104000,2024-09-26
+C0871,Northstar Synthetic 871,North America,Enterprise,144000,2024-01-23
+C0872,Northstar Synthetic 872,Europe,Mid-Market,88000,2024-08-15
+C0873,Northstar Synthetic 873,Asia Pacific,Growth,34000,2023-12-19
+C0874,Northstar Synthetic 874,North America,Enterprise,102000,2024-05-18
+C0875,Northstar Synthetic 875,Europe,Mid-Market,108000,2023-09-07
+C0876,Northstar Synthetic 876,Asia Pacific,Growth,142000,2024-10-28
+C0877,Northstar Synthetic 877,North America,Enterprise,96000,2025-03-09
+C0878,Northstar Synthetic 878,Europe,Mid-Market,225000,2024-12-28
+C0879,Northstar Synthetic 879,Asia Pacific,Growth,176000,2024-02-09
+C0880,Northstar Synthetic 880,North America,Enterprise,151000,2023-01-04
+C0881,Northstar Synthetic 881,Europe,Mid-Market,139000,2025-01-12
+C0882,Northstar Synthetic 882,Asia Pacific,Growth,113000,2025-03-14
+C0883,Northstar Synthetic 883,North America,Enterprise,35000,2023-10-28
+C0884,Northstar Synthetic 884,Europe,Mid-Market,96000,2023-10-05
+C0885,Northstar Synthetic 885,Asia Pacific,Growth,54000,2024-04-13
+C0886,Northstar Synthetic 886,North America,Enterprise,196000,2024-03-25
+C0887,Northstar Synthetic 887,Europe,Mid-Market,138000,2025-04-07
+C0888,Northstar Synthetic 888,Asia Pacific,Growth,157000,2024-04-27
+C0889,Northstar Synthetic 889,North America,Enterprise,146000,2022-12-10
+C0890,Northstar Synthetic 890,Europe,Mid-Market,203000,2023-02-19
+C0891,Northstar Synthetic 891,Asia Pacific,Growth,110000,2023-05-21
+C0892,Northstar Synthetic 892,North America,Enterprise,183000,2023-04-26
+C0893,Northstar Synthetic 893,Europe,Mid-Market,168000,2025-03-08
+C0894,Northstar Synthetic 894,Asia Pacific,Growth,80000,2023-09-08
+C0895,Northstar Synthetic 895,North America,Enterprise,176000,2024-07-15
+C0896,Northstar Synthetic 896,Europe,Mid-Market,123000,2024-06-27
+C0897,Northstar Synthetic 897,Asia Pacific,Growth,119000,2023-11-29
+C0898,Northstar Synthetic 898,North America,Enterprise,175000,2025-04-08
+C0899,Northstar Synthetic 899,Europe,Mid-Market,54000,2023-05-27
+C0900,Northstar Synthetic 900,Asia Pacific,Growth,45000,2023-11-20
+C0901,Northstar Synthetic 901,North America,Enterprise,110000,2024-04-08
+C0902,Northstar Synthetic 902,Europe,Mid-Market,112000,2023-05-14
+C0903,Northstar Synthetic 903,Asia Pacific,Growth,24000,2022-12-19
+C0904,Northstar Synthetic 904,North America,Enterprise,130000,2023-06-09
+C0905,Northstar Synthetic 905,Europe,Mid-Market,155000,2022-12-18
+C0906,Northstar Synthetic 906,Asia Pacific,Growth,33000,2023-02-11
+C0907,Northstar Synthetic 907,North America,Enterprise,77000,2023-06-23
+C0908,Northstar Synthetic 908,Europe,Mid-Market,188000,2023-07-09
+C0909,Northstar Synthetic 909,Asia Pacific,Growth,167000,2025-04-01
+C0910,Northstar Synthetic 910,North America,Enterprise,43000,2023-10-28
+C0911,Northstar Synthetic 911,Europe,Mid-Market,195000,2025-02-01
+C0912,Northstar Synthetic 912,Asia Pacific,Growth,24000,2025-04-01
+C0913,Northstar Synthetic 913,North America,Enterprise,189000,2022-12-02
+C0914,Northstar Synthetic 914,Europe,Mid-Market,153000,2023-09-23
+C0915,Northstar Synthetic 915,Asia Pacific,Growth,63000,2024-02-02
+C0916,Northstar Synthetic 916,North America,Enterprise,118000,2024-08-23
+C0917,Northstar Synthetic 917,Europe,Mid-Market,163000,2024-02-02
+C0918,Northstar Synthetic 918,Asia Pacific,Growth,91000,2024-07-22
+C0919,Northstar Synthetic 919,North America,Enterprise,112000,2023-11-15
+C0920,Northstar Synthetic 920,Europe,Mid-Market,138000,2024-02-25
+C0921,Northstar Synthetic 921,Asia Pacific,Growth,166000,2022-11-18
+C0922,Northstar Synthetic 922,North America,Enterprise,160000,2023-12-22
+C0923,Northstar Synthetic 923,Europe,Mid-Market,120000,2024-01-28
+C0924,Northstar Synthetic 924,Asia Pacific,Growth,223000,2023-04-02
+C0925,Northstar Synthetic 925,North America,Enterprise,40000,2023-10-08
+C0926,Northstar Synthetic 926,Europe,Mid-Market,31000,2023-05-16
+C0927,Northstar Synthetic 927,Asia Pacific,Growth,136000,2024-09-08
+C0928,Northstar Synthetic 928,North America,Enterprise,165000,2024-08-31
+C0929,Northstar Synthetic 929,Europe,Mid-Market,69000,2023-11-09
+C0930,Northstar Synthetic 930,Asia Pacific,Growth,115000,2023-12-21
+C0931,Northstar Synthetic 931,North America,Enterprise,211000,2023-07-23
+C0932,Northstar Synthetic 932,Europe,Mid-Market,28000,2024-06-19
+C0933,Northstar Synthetic 933,Asia Pacific,Growth,69000,2025-01-31
+C0934,Northstar Synthetic 934,North America,Enterprise,174000,2023-10-03
+C0935,Northstar Synthetic 935,Europe,Mid-Market,62000,2025-02-19
+C0936,Northstar Synthetic 936,Asia Pacific,Growth,154000,2024-07-25
+C0937,Northstar Synthetic 937,North America,Enterprise,125000,2024-11-02
+C0938,Northstar Synthetic 938,Europe,Mid-Market,130000,2024-05-03
+C0939,Northstar Synthetic 939,Asia Pacific,Growth,85000,2024-03-28
+C0940,Northstar Synthetic 940,North America,Enterprise,86000,2024-06-18
+C0941,Northstar Synthetic 941,Europe,Mid-Market,60000,2023-12-06
+C0942,Northstar Synthetic 942,Asia Pacific,Growth,214000,2023-04-18
+C0943,Northstar Synthetic 943,North America,Enterprise,145000,2024-08-22
+C0944,Northstar Synthetic 944,Europe,Mid-Market,129000,2023-08-05
+C0945,Northstar Synthetic 945,Asia Pacific,Growth,37000,2024-10-02
+C0946,Northstar Synthetic 946,North America,Enterprise,123000,2023-05-23
+C0947,Northstar Synthetic 947,Europe,Mid-Market,73000,2024-03-10
+C0948,Northstar Synthetic 948,Asia Pacific,Growth,36000,2024-09-23
+C0949,Northstar Synthetic 949,North America,Enterprise,196000,2023-01-06
+C0950,Northstar Synthetic 950,Europe,Mid-Market,104000,2023-02-23
+C0951,Northstar Synthetic 951,Asia Pacific,Growth,225000,2023-02-05
+C0952,Northstar Synthetic 952,North America,Enterprise,29000,2024-12-02
+C0953,Northstar Synthetic 953,Europe,Mid-Market,232000,2022-11-16
+C0954,Northstar Synthetic 954,Asia Pacific,Growth,146000,2025-01-24
+C0955,Northstar Synthetic 955,North America,Enterprise,212000,2022-11-14
+C0956,Northstar Synthetic 956,Europe,Mid-Market,208000,2023-02-07
+C0957,Northstar Synthetic 957,Asia Pacific,Growth,227000,2024-09-22
+C0958,Northstar Synthetic 958,North America,Enterprise,65000,2023-04-27
+C0959,Northstar Synthetic 959,Europe,Mid-Market,38000,2024-12-10
+C0960,Northstar Synthetic 960,Asia Pacific,Growth,84000,2023-06-18
+C0961,Northstar Synthetic 961,North America,Enterprise,227000,2025-03-15
+C0962,Northstar Synthetic 962,Europe,Mid-Market,27000,2023-01-14
+C0963,Northstar Synthetic 963,Asia Pacific,Growth,109000,2023-12-28
+C0964,Northstar Synthetic 964,North America,Enterprise,25000,2024-08-13
+C0965,Northstar Synthetic 965,Europe,Mid-Market,64000,2024-07-31
+C0966,Northstar Synthetic 966,Asia Pacific,Growth,193000,2024-10-30
+C0967,Northstar Synthetic 967,North America,Enterprise,196000,2023-04-20
+C0968,Northstar Synthetic 968,Europe,Mid-Market,188000,2023-12-18
+C0969,Northstar Synthetic 969,Asia Pacific,Growth,181000,2023-12-22
+C0970,Northstar Synthetic 970,North America,Enterprise,224000,2022-12-03
+C0971,Northstar Synthetic 971,Europe,Mid-Market,206000,2023-04-06
+C0972,Northstar Synthetic 972,Asia Pacific,Growth,140000,2024-02-06
+C0973,Northstar Synthetic 973,North America,Enterprise,208000,2025-04-13
+C0974,Northstar Synthetic 974,Europe,Mid-Market,153000,2023-01-15
+C0975,Northstar Synthetic 975,Asia Pacific,Growth,60000,2024-04-27
+C0976,Northstar Synthetic 976,North America,Enterprise,35000,2023-02-26
+C0977,Northstar Synthetic 977,Europe,Mid-Market,166000,2024-09-21
+C0978,Northstar Synthetic 978,Asia Pacific,Growth,229000,2024-12-28
+C0979,Northstar Synthetic 979,North America,Enterprise,152000,2023-09-27
+C0980,Northstar Synthetic 980,Europe,Mid-Market,105000,2024-05-04
+C0981,Northstar Synthetic 981,Asia Pacific,Growth,156000,2024-01-22
+C0982,Northstar Synthetic 982,North America,Enterprise,159000,2025-04-07
+C0983,Northstar Synthetic 983,Europe,Mid-Market,183000,2022-11-11
+C0984,Northstar Synthetic 984,Asia Pacific,Growth,116000,2023-01-27
+C0985,Northstar Synthetic 985,North America,Enterprise,209000,2024-02-21
+C0986,Northstar Synthetic 986,Europe,Mid-Market,101000,2024-09-02
+C0987,Northstar Synthetic 987,Asia Pacific,Growth,65000,2024-03-17
+C0988,Northstar Synthetic 988,North America,Enterprise,189000,2023-03-11
+C0989,Northstar Synthetic 989,Europe,Mid-Market,123000,2024-08-24
+C0990,Northstar Synthetic 990,Asia Pacific,Growth,50000,2024-02-10
+C0991,Northstar Synthetic 991,North America,Enterprise,159000,2025-01-31
+C0992,Northstar Synthetic 992,Europe,Mid-Market,107000,2023-11-27
+C0993,Northstar Synthetic 993,Asia Pacific,Growth,137000,2024-07-29
+C0994,Northstar Synthetic 994,North America,Enterprise,69000,2024-08-31
+C0995,Northstar Synthetic 995,Europe,Mid-Market,94000,2023-11-08
+C0996,Northstar Synthetic 996,Asia Pacific,Growth,161000,2023-11-29
+C0997,Northstar Synthetic 997,North America,Enterprise,211000,2023-04-01
+C0998,Northstar Synthetic 998,Europe,Mid-Market,42000,2025-02-14
+C0999,Northstar Synthetic 999,Asia Pacific,Growth,137000,2023-03-15
+C1000,Northstar Synthetic 1000,North America,Enterprise,35000,2023-08-12
+C1001,Northstar Synthetic 1001,Europe,Mid-Market,161000,2024-06-11
+C1002,Northstar Synthetic 1002,Asia Pacific,Growth,88000,2025-03-18
+C1003,Northstar Synthetic 1003,North America,Enterprise,87000,2024-07-11
+C1004,Northstar Synthetic 1004,Europe,Mid-Market,46000,2023-05-02
+C1005,Northstar Synthetic 1005,Asia Pacific,Growth,208000,2024-12-03
+C1006,Northstar Synthetic 1006,North America,Enterprise,44000,2023-08-28
+C1007,Northstar Synthetic 1007,Europe,Mid-Market,90000,2025-03-13
+C1008,Northstar Synthetic 1008,Asia Pacific,Growth,99000,2024-09-24
+C1009,Northstar Synthetic 1009,North America,Enterprise,210000,2024-03-13
+C1010,Northstar Synthetic 1010,Europe,Mid-Market,234000,2023-02-21
+C1011,Northstar Synthetic 1011,Asia Pacific,Growth,25000,2024-12-09
+C1012,Northstar Synthetic 1012,North America,Enterprise,86000,2024-02-10
+C1013,Northstar Synthetic 1013,Europe,Mid-Market,127000,2023-11-05
+C1014,Northstar Synthetic 1014,Asia Pacific,Growth,66000,2024-07-11
+C1015,Northstar Synthetic 1015,North America,Enterprise,140000,2025-01-21
+C1016,Northstar Synthetic 1016,Europe,Mid-Market,108000,2024-04-12
+C1017,Northstar Synthetic 1017,Asia Pacific,Growth,134000,2024-02-19
+C1018,Northstar Synthetic 1018,North America,Enterprise,220000,2025-03-14
+C1019,Northstar Synthetic 1019,Europe,Mid-Market,149000,2024-08-06
+C1020,Northstar Synthetic 1020,Asia Pacific,Growth,78000,2024-05-15
+C1021,Northstar Synthetic 1021,North America,Enterprise,218000,2023-12-14
+C1022,Northstar Synthetic 1022,Europe,Mid-Market,121000,2023-04-25
+C1023,Northstar Synthetic 1023,Asia Pacific,Growth,183000,2023-04-11
+C1024,Northstar Synthetic 1024,North America,Enterprise,232000,2023-11-06
+C1025,Northstar Synthetic 1025,Europe,Mid-Market,212000,2025-03-30
+C1026,Northstar Synthetic 1026,Asia Pacific,Growth,228000,2023-10-01
+C1027,Northstar Synthetic 1027,North America,Enterprise,142000,2024-05-31
+C1028,Northstar Synthetic 1028,Europe,Mid-Market,30000,2024-07-07
+C1029,Northstar Synthetic 1029,Asia Pacific,Growth,57000,2024-03-17
+C1030,Northstar Synthetic 1030,North America,Enterprise,178000,2025-01-01
+C1031,Northstar Synthetic 1031,Europe,Mid-Market,52000,2022-11-21
+C1032,Northstar Synthetic 1032,Asia Pacific,Growth,63000,2023-08-04
+C1033,Northstar Synthetic 1033,North America,Enterprise,37000,2023-08-07
+C1034,Northstar Synthetic 1034,Europe,Mid-Market,31000,2024-07-20
+C1035,Northstar Synthetic 1035,Asia Pacific,Growth,133000,2025-04-03
+C1036,Northstar Synthetic 1036,North America,Enterprise,169000,2023-05-02
+C1037,Northstar Synthetic 1037,Europe,Mid-Market,160000,2024-03-27
+C1038,Northstar Synthetic 1038,Asia Pacific,Growth,58000,2023-01-19
+C1039,Northstar Synthetic 1039,North America,Enterprise,66000,2022-12-13
+C1040,Northstar Synthetic 1040,Europe,Mid-Market,201000,2024-07-13
+C1041,Northstar Synthetic 1041,Asia Pacific,Growth,203000,2022-12-29
+C1042,Northstar Synthetic 1042,North America,Enterprise,61000,2023-10-08
+C1043,Northstar Synthetic 1043,Europe,Mid-Market,106000,2022-12-26
+C1044,Northstar Synthetic 1044,Asia Pacific,Growth,89000,2024-10-14
+C1045,Northstar Synthetic 1045,North America,Enterprise,168000,2024-11-07
+C1046,Northstar Synthetic 1046,Europe,Mid-Market,119000,2023-04-02
+C1047,Northstar Synthetic 1047,Asia Pacific,Growth,137000,2024-01-31
+C1048,Northstar Synthetic 1048,North America,Enterprise,86000,2023-08-12
+C1049,Northstar Synthetic 1049,Europe,Mid-Market,221000,2022-11-14
+C1050,Northstar Synthetic 1050,Asia Pacific,Growth,206000,2024-01-07
+C1051,Northstar Synthetic 1051,North America,Enterprise,129000,2024-06-12
+C1052,Northstar Synthetic 1052,Europe,Mid-Market,81000,2023-12-06
+C1053,Northstar Synthetic 1053,Asia Pacific,Growth,109000,2025-01-01
+C1054,Northstar Synthetic 1054,North America,Enterprise,104000,2024-02-05
+C1055,Northstar Synthetic 1055,Europe,Mid-Market,108000,2023-01-01
+C1056,Northstar Synthetic 1056,Asia Pacific,Growth,140000,2022-11-23
+C1057,Northstar Synthetic 1057,North America,Enterprise,154000,2024-06-12
+C1058,Northstar Synthetic 1058,Europe,Mid-Market,91000,2024-03-30
+C1059,Northstar Synthetic 1059,Asia Pacific,Growth,88000,2024-02-29
+C1060,Northstar Synthetic 1060,North America,Enterprise,88000,2023-06-10
+C1061,Northstar Synthetic 1061,Europe,Mid-Market,137000,2023-04-06
+C1062,Northstar Synthetic 1062,Asia Pacific,Growth,109000,2024-08-19
+C1063,Northstar Synthetic 1063,North America,Enterprise,35000,2023-04-20
+C1064,Northstar Synthetic 1064,Europe,Mid-Market,102000,2024-01-03
+C1065,Northstar Synthetic 1065,Asia Pacific,Growth,131000,2024-04-04
+C1066,Northstar Synthetic 1066,North America,Enterprise,207000,2024-02-02
+C1067,Northstar Synthetic 1067,Europe,Mid-Market,54000,2024-07-05
+C1068,Northstar Synthetic 1068,Asia Pacific,Growth,154000,2022-12-14
+C1069,Northstar Synthetic 1069,North America,Enterprise,194000,2024-04-15
+C1070,Northstar Synthetic 1070,Europe,Mid-Market,202000,2023-05-24
+C1071,Northstar Synthetic 1071,Asia Pacific,Growth,236000,2024-03-21
+C1072,Northstar Synthetic 1072,North America,Enterprise,130000,2024-10-16
+C1073,Northstar Synthetic 1073,Europe,Mid-Market,70000,2023-05-16
+C1074,Northstar Synthetic 1074,Asia Pacific,Growth,73000,2024-06-11
+C1075,Northstar Synthetic 1075,North America,Enterprise,195000,2025-02-23
+C1076,Northstar Synthetic 1076,Europe,Mid-Market,181000,2025-04-20
+C1077,Northstar Synthetic 1077,Asia Pacific,Growth,95000,2025-04-05
+C1078,Northstar Synthetic 1078,North America,Enterprise,136000,2023-08-21
+C1079,Northstar Synthetic 1079,Europe,Mid-Market,139000,2023-02-11
+C1080,Northstar Synthetic 1080,Asia Pacific,Growth,126000,2025-04-01
+C1081,Northstar Synthetic 1081,North America,Enterprise,235000,2023-05-10
+C1082,Northstar Synthetic 1082,Europe,Mid-Market,92000,2024-03-06
+C1083,Northstar Synthetic 1083,Asia Pacific,Growth,47000,2023-01-18
+C1084,Northstar Synthetic 1084,North America,Enterprise,72000,2023-03-23
+C1085,Northstar Synthetic 1085,Europe,Mid-Market,188000,2023-09-04
+C1086,Northstar Synthetic 1086,Asia Pacific,Growth,228000,2024-05-19
+C1087,Northstar Synthetic 1087,North America,Enterprise,136000,2024-11-17
+C1088,Northstar Synthetic 1088,Europe,Mid-Market,181000,2024-02-09
+C1089,Northstar Synthetic 1089,Asia Pacific,Growth,58000,2025-02-03
+C1090,Northstar Synthetic 1090,North America,Enterprise,235000,2024-03-20
+C1091,Northstar Synthetic 1091,Europe,Mid-Market,53000,2022-12-24
+C1092,Northstar Synthetic 1092,Asia Pacific,Growth,200000,2022-12-01
+C1093,Northstar Synthetic 1093,North America,Enterprise,146000,2023-12-21
+C1094,Northstar Synthetic 1094,Europe,Mid-Market,162000,2023-02-17
+C1095,Northstar Synthetic 1095,Asia Pacific,Growth,237000,2024-04-14
+C1096,Northstar Synthetic 1096,North America,Enterprise,80000,2024-10-27
+C1097,Northstar Synthetic 1097,Europe,Mid-Market,186000,2023-07-03
+C1098,Northstar Synthetic 1098,Asia Pacific,Growth,108000,2023-10-02
+C1099,Northstar Synthetic 1099,North America,Enterprise,83000,2024-03-16
+C1100,Northstar Synthetic 1100,Europe,Mid-Market,75000,2025-02-02
+C1101,Northstar Synthetic 1101,Asia Pacific,Growth,40000,2023-11-11
+C1102,Northstar Synthetic 1102,North America,Enterprise,37000,2022-12-31
+C1103,Northstar Synthetic 1103,Europe,Mid-Market,173000,2023-12-10
+C1104,Northstar Synthetic 1104,Asia Pacific,Growth,237000,2023-03-16
+C1105,Northstar Synthetic 1105,North America,Enterprise,85000,2024-01-22
+C1106,Northstar Synthetic 1106,Europe,Mid-Market,231000,2024-05-05
+C1107,Northstar Synthetic 1107,Asia Pacific,Growth,182000,2024-10-03
+C1108,Northstar Synthetic 1108,North America,Enterprise,169000,2024-08-06
+C1109,Northstar Synthetic 1109,Europe,Mid-Market,63000,2023-07-20
+C1110,Northstar Synthetic 1110,Asia Pacific,Growth,231000,2023-02-10
+C1111,Northstar Synthetic 1111,North America,Enterprise,89000,2024-12-04
+C1112,Northstar Synthetic 1112,Europe,Mid-Market,181000,2023-04-29
+C1113,Northstar Synthetic 1113,Asia Pacific,Growth,183000,2025-04-14
+C1114,Northstar Synthetic 1114,North America,Enterprise,203000,2023-03-29
+C1115,Northstar Synthetic 1115,Europe,Mid-Market,79000,2023-07-04
+C1116,Northstar Synthetic 1116,Asia Pacific,Growth,209000,2023-08-21
+C1117,Northstar Synthetic 1117,North America,Enterprise,24000,2024-07-17
+C1118,Northstar Synthetic 1118,Europe,Mid-Market,157000,2023-05-01
+C1119,Northstar Synthetic 1119,Asia Pacific,Growth,45000,2022-12-18
+C1120,Northstar Synthetic 1120,North America,Enterprise,50000,2025-04-17
+C1121,Northstar Synthetic 1121,Europe,Mid-Market,39000,2024-06-13
+C1122,Northstar Synthetic 1122,Asia Pacific,Growth,224000,2023-04-29
+C1123,Northstar Synthetic 1123,North America,Enterprise,157000,2025-04-18
+C1124,Northstar Synthetic 1124,Europe,Mid-Market,223000,2023-02-26
+C1125,Northstar Synthetic 1125,Asia Pacific,Growth,206000,2023-08-23
+C1126,Northstar Synthetic 1126,North America,Enterprise,238000,2024-01-31
+C1127,Northstar Synthetic 1127,Europe,Mid-Market,175000,2025-02-11
+C1128,Northstar Synthetic 1128,Asia Pacific,Growth,133000,2025-02-05
+C1129,Northstar Synthetic 1129,North America,Enterprise,111000,2025-01-26
+C1130,Northstar Synthetic 1130,Europe,Mid-Market,189000,2024-03-13
+C1131,Northstar Synthetic 1131,Asia Pacific,Growth,200000,2023-05-14
+C1132,Northstar Synthetic 1132,North America,Enterprise,39000,2023-06-24
+C1133,Northstar Synthetic 1133,Europe,Mid-Market,109000,2024-08-12
+C1134,Northstar Synthetic 1134,Asia Pacific,Growth,66000,2024-09-29
+C1135,Northstar Synthetic 1135,North America,Enterprise,222000,2023-12-06
+C1136,Northstar Synthetic 1136,Europe,Mid-Market,194000,2025-03-20
+C1137,Northstar Synthetic 1137,Asia Pacific,Growth,111000,2025-01-06
+C1138,Northstar Synthetic 1138,North America,Enterprise,39000,2024-07-06
+C1139,Northstar Synthetic 1139,Europe,Mid-Market,213000,2024-02-02
+C1140,Northstar Synthetic 1140,Asia Pacific,Growth,121000,2023-06-29
+C1141,Northstar Synthetic 1141,North America,Enterprise,124000,2023-12-20
+C1142,Northstar Synthetic 1142,Europe,Mid-Market,236000,2023-10-14
+C1143,Northstar Synthetic 1143,Asia Pacific,Growth,218000,2023-07-03
+C1144,Northstar Synthetic 1144,North America,Enterprise,129000,2024-12-13
+C1145,Northstar Synthetic 1145,Europe,Mid-Market,231000,2023-11-19
+C1146,Northstar Synthetic 1146,Asia Pacific,Growth,160000,2023-04-26
+C1147,Northstar Synthetic 1147,North America,Enterprise,43000,2023-12-17
+C1148,Northstar Synthetic 1148,Europe,Mid-Market,72000,2023-11-10
+C1149,Northstar Synthetic 1149,Asia Pacific,Growth,219000,2023-08-18
+C1150,Northstar Synthetic 1150,North America,Enterprise,192000,2024-07-07
+C1151,Northstar Synthetic 1151,Europe,Mid-Market,156000,2024-10-27
+C1152,Northstar Synthetic 1152,Asia Pacific,Growth,126000,2023-05-14
+C1153,Northstar Synthetic 1153,North America,Enterprise,135000,2024-07-19
+C1154,Northstar Synthetic 1154,Europe,Mid-Market,125000,2024-12-23
+C1155,Northstar Synthetic 1155,Asia Pacific,Growth,93000,2023-02-13
+C1156,Northstar Synthetic 1156,North America,Enterprise,97000,2023-01-07
+C1157,Northstar Synthetic 1157,Europe,Mid-Market,108000,2024-07-01
+C1158,Northstar Synthetic 1158,Asia Pacific,Growth,154000,2024-09-01
+C1159,Northstar Synthetic 1159,North America,Enterprise,85000,2025-04-19
+C1160,Northstar Synthetic 1160,Europe,Mid-Market,153000,2022-12-18
+C1161,Northstar Synthetic 1161,Asia Pacific,Growth,26000,2023-11-27
+C1162,Northstar Synthetic 1162,North America,Enterprise,29000,2023-11-24
+C1163,Northstar Synthetic 1163,Europe,Mid-Market,65000,2024-05-18
+C1164,Northstar Synthetic 1164,Asia Pacific,Growth,71000,2023-11-05
+C1165,Northstar Synthetic 1165,North America,Enterprise,181000,2025-02-07
+C1166,Northstar Synthetic 1166,Europe,Mid-Market,236000,2025-01-21
+C1167,Northstar Synthetic 1167,Asia Pacific,Growth,194000,2024-01-14
+C1168,Northstar Synthetic 1168,North America,Enterprise,127000,2024-01-04
+C1169,Northstar Synthetic 1169,Europe,Mid-Market,216000,2023-10-08
+C1170,Northstar Synthetic 1170,Asia Pacific,Growth,178000,2024-08-30
+C1171,Northstar Synthetic 1171,North America,Enterprise,53000,2024-05-01
+C1172,Northstar Synthetic 1172,Europe,Mid-Market,81000,2025-02-21
+C1173,Northstar Synthetic 1173,Asia Pacific,Growth,212000,2024-01-09
+C1174,Northstar Synthetic 1174,North America,Enterprise,75000,2024-07-19
+C1175,Northstar Synthetic 1175,Europe,Mid-Market,212000,2023-09-29
+C1176,Northstar Synthetic 1176,Asia Pacific,Growth,217000,2023-03-28
+C1177,Northstar Synthetic 1177,North America,Enterprise,39000,2024-08-15
+C1178,Northstar Synthetic 1178,Europe,Mid-Market,27000,2024-02-17
+C1179,Northstar Synthetic 1179,Asia Pacific,Growth,148000,2023-12-30
+C1180,Northstar Synthetic 1180,North America,Enterprise,171000,2023-09-05
+C1181,Northstar Synthetic 1181,Europe,Mid-Market,52000,2023-04-03
+C1182,Northstar Synthetic 1182,Asia Pacific,Growth,216000,2023-04-27
+C1183,Northstar Synthetic 1183,North America,Enterprise,70000,2022-11-23
+C1184,Northstar Synthetic 1184,Europe,Mid-Market,147000,2023-04-25
+C1185,Northstar Synthetic 1185,Asia Pacific,Growth,87000,2024-05-21
+C1186,Northstar Synthetic 1186,North America,Enterprise,130000,2024-01-19
+C1187,Northstar Synthetic 1187,Europe,Mid-Market,228000,2025-03-14
+C1188,Northstar Synthetic 1188,Asia Pacific,Growth,224000,2024-06-08
+C1189,Northstar Synthetic 1189,North America,Enterprise,170000,2023-06-12
+C1190,Northstar Synthetic 1190,Europe,Mid-Market,238000,2024-01-15
+C1191,Northstar Synthetic 1191,Asia Pacific,Growth,214000,2024-01-16
+C1192,Northstar Synthetic 1192,North America,Enterprise,154000,2024-11-12
+C1193,Northstar Synthetic 1193,Europe,Mid-Market,26000,2023-09-14
+C1194,Northstar Synthetic 1194,Asia Pacific,Growth,205000,2023-07-24
+C1195,Northstar Synthetic 1195,North America,Enterprise,122000,2024-04-04
+C1196,Northstar Synthetic 1196,Europe,Mid-Market,192000,2024-12-13
+C1197,Northstar Synthetic 1197,Asia Pacific,Growth,90000,2024-12-24
+C1198,Northstar Synthetic 1198,North America,Enterprise,103000,2023-10-16
+C1199,Northstar Synthetic 1199,Europe,Mid-Market,191000,2024-10-17
+C1200,Northstar Synthetic 1200,Asia Pacific,Growth,55000,2023-11-30
+C1201,Northstar Synthetic 1201,North America,Enterprise,26000,2023-06-11
+C1202,Northstar Synthetic 1202,Europe,Mid-Market,149000,2023-09-12
+C1203,Northstar Synthetic 1203,Asia Pacific,Growth,194000,2023-07-29
+C1204,Northstar Synthetic 1204,North America,Enterprise,201000,2024-04-21
+C1205,Northstar Synthetic 1205,Europe,Mid-Market,50000,2023-11-03
+C1206,Northstar Synthetic 1206,Asia Pacific,Growth,186000,2023-06-22
+C1207,Northstar Synthetic 1207,North America,Enterprise,154000,2022-11-11
+C1208,Northstar Synthetic 1208,Europe,Mid-Market,109000,2024-11-28
+C1209,Northstar Synthetic 1209,Asia Pacific,Growth,176000,2024-07-11
+C1210,Northstar Synthetic 1210,North America,Enterprise,113000,2023-11-21
+C1211,Northstar Synthetic 1211,Europe,Mid-Market,220000,2023-11-19
+C1212,Northstar Synthetic 1212,Asia Pacific,Growth,30000,2024-10-24
+C1213,Northstar Synthetic 1213,North America,Enterprise,29000,2023-12-14
+C1214,Northstar Synthetic 1214,Europe,Mid-Market,108000,2024-03-16
+C1215,Northstar Synthetic 1215,Asia Pacific,Growth,195000,2023-03-31
+C1216,Northstar Synthetic 1216,North America,Enterprise,168000,2024-03-11
+C1217,Northstar Synthetic 1217,Europe,Mid-Market,35000,2024-04-13
+C1218,Northstar Synthetic 1218,Asia Pacific,Growth,96000,2022-12-06
+C1219,Northstar Synthetic 1219,North America,Enterprise,187000,2023-04-26
+C1220,Northstar Synthetic 1220,Europe,Mid-Market,148000,2025-04-10
+C1221,Northstar Synthetic 1221,Asia Pacific,Growth,209000,2023-03-15
+C1222,Northstar Synthetic 1222,North America,Enterprise,222000,2023-07-21
+C1223,Northstar Synthetic 1223,Europe,Mid-Market,34000,2024-06-28
+C1224,Northstar Synthetic 1224,Asia Pacific,Growth,220000,2023-01-08
+C1225,Northstar Synthetic 1225,North America,Enterprise,230000,2023-11-25
+C1226,Northstar Synthetic 1226,Europe,Mid-Market,155000,2024-09-08
+C1227,Northstar Synthetic 1227,Asia Pacific,Growth,79000,2023-03-16
+C1228,Northstar Synthetic 1228,North America,Enterprise,138000,2025-03-23
+C1229,Northstar Synthetic 1229,Europe,Mid-Market,105000,2024-11-03
+C1230,Northstar Synthetic 1230,Asia Pacific,Growth,43000,2024-10-28
+C1231,Northstar Synthetic 1231,North America,Enterprise,159000,2024-09-24
+C1232,Northstar Synthetic 1232,Europe,Mid-Market,202000,2025-02-12
+C1233,Northstar Synthetic 1233,Asia Pacific,Growth,120000,2025-04-22
+C1234,Northstar Synthetic 1234,North America,Enterprise,45000,2024-07-19
+C1235,Northstar Synthetic 1235,Europe,Mid-Market,154000,2024-11-09
+C1236,Northstar Synthetic 1236,Asia Pacific,Growth,69000,2023-04-07
+C1237,Northstar Synthetic 1237,North America,Enterprise,219000,2023-12-04
+C1238,Northstar Synthetic 1238,Europe,Mid-Market,218000,2024-03-02
+C1239,Northstar Synthetic 1239,Asia Pacific,Growth,94000,2024-10-20
+C1240,Northstar Synthetic 1240,North America,Enterprise,138000,2025-01-12
+C1241,Northstar Synthetic 1241,Europe,Mid-Market,84000,2024-01-21
+C1242,Northstar Synthetic 1242,Asia Pacific,Growth,84000,2025-02-01
+C1243,Northstar Synthetic 1243,North America,Enterprise,170000,2023-10-30
+C1244,Northstar Synthetic 1244,Europe,Mid-Market,164000,2023-04-18
+C1245,Northstar Synthetic 1245,Asia Pacific,Growth,236000,2025-03-15
+C1246,Northstar Synthetic 1246,North America,Enterprise,116000,2023-04-16
+C1247,Northstar Synthetic 1247,Europe,Mid-Market,63000,2024-05-08
+C1248,Northstar Synthetic 1248,Asia Pacific,Growth,104000,2024-05-16
+C1249,Northstar Synthetic 1249,North America,Enterprise,175000,2023-06-29
+C1250,Northstar Synthetic 1250,Europe,Mid-Market,219000,2023-08-21
+C1251,Northstar Synthetic 1251,Asia Pacific,Growth,177000,2024-04-15
+C1252,Northstar Synthetic 1252,North America,Enterprise,148000,2024-01-12
+C1253,Northstar Synthetic 1253,Europe,Mid-Market,154000,2023-09-25
+C1254,Northstar Synthetic 1254,Asia Pacific,Growth,118000,2025-04-20
+C1255,Northstar Synthetic 1255,North America,Enterprise,103000,2025-02-08
+C1256,Northstar Synthetic 1256,Europe,Mid-Market,175000,2023-07-01
+C1257,Northstar Synthetic 1257,Asia Pacific,Growth,26000,2024-09-13
+C1258,Northstar Synthetic 1258,North America,Enterprise,86000,2023-02-20
+C1259,Northstar Synthetic 1259,Europe,Mid-Market,80000,2024-02-18
+C1260,Northstar Synthetic 1260,Asia Pacific,Growth,178000,2024-04-20
+C1261,Northstar Synthetic 1261,North America,Enterprise,182000,2023-07-11
+C1262,Northstar Synthetic 1262,Europe,Mid-Market,59000,2024-09-07
+C1263,Northstar Synthetic 1263,Asia Pacific,Growth,175000,2023-07-06
+C1264,Northstar Synthetic 1264,North America,Enterprise,77000,2023-01-13
+C1265,Northstar Synthetic 1265,Europe,Mid-Market,62000,2025-03-07
+C1266,Northstar Synthetic 1266,Asia Pacific,Growth,71000,2022-12-24
+C1267,Northstar Synthetic 1267,North America,Enterprise,232000,2024-11-17
+C1268,Northstar Synthetic 1268,Europe,Mid-Market,233000,2023-06-05
+C1269,Northstar Synthetic 1269,Asia Pacific,Growth,116000,2024-02-13
+C1270,Northstar Synthetic 1270,North America,Enterprise,212000,2024-06-23
+C1271,Northstar Synthetic 1271,Europe,Mid-Market,123000,2024-06-27
+C1272,Northstar Synthetic 1272,Asia Pacific,Growth,80000,2024-05-19
+C1273,Northstar Synthetic 1273,North America,Enterprise,217000,2024-03-24
+C1274,Northstar Synthetic 1274,Europe,Mid-Market,40000,2023-04-24
+C1275,Northstar Synthetic 1275,Asia Pacific,Growth,115000,2024-10-27
+C1276,Northstar Synthetic 1276,North America,Enterprise,125000,2024-06-02
+C1277,Northstar Synthetic 1277,Europe,Mid-Market,139000,2024-12-01
+C1278,Northstar Synthetic 1278,Asia Pacific,Growth,155000,2024-03-14
+C1279,Northstar Synthetic 1279,North America,Enterprise,233000,2025-03-09
+C1280,Northstar Synthetic 1280,Europe,Mid-Market,31000,2023-11-16
+C1281,Northstar Synthetic 1281,Asia Pacific,Growth,186000,2024-11-03
+C1282,Northstar Synthetic 1282,North America,Enterprise,209000,2023-08-04
+C1283,Northstar Synthetic 1283,Europe,Mid-Market,81000,2024-05-27
+C1284,Northstar Synthetic 1284,Asia Pacific,Growth,69000,2023-07-27
+C1285,Northstar Synthetic 1285,North America,Enterprise,80000,2024-10-15
+C1286,Northstar Synthetic 1286,Europe,Mid-Market,237000,2023-07-16
+C1287,Northstar Synthetic 1287,Asia Pacific,Growth,127000,2024-03-08
+C1288,Northstar Synthetic 1288,North America,Enterprise,207000,2024-04-19
+C1289,Northstar Synthetic 1289,Europe,Mid-Market,90000,2025-01-20
+C1290,Northstar Synthetic 1290,Asia Pacific,Growth,157000,2024-01-19
+C1291,Northstar Synthetic 1291,North America,Enterprise,186000,2024-06-19
+C1292,Northstar Synthetic 1292,Europe,Mid-Market,37000,2023-07-05
+C1293,Northstar Synthetic 1293,Asia Pacific,Growth,171000,2024-03-27
+C1294,Northstar Synthetic 1294,North America,Enterprise,187000,2024-06-19
+C1295,Northstar Synthetic 1295,Europe,Mid-Market,76000,2024-11-22
+C1296,Northstar Synthetic 1296,Asia Pacific,Growth,154000,2023-11-10
+C1297,Northstar Synthetic 1297,North America,Enterprise,93000,2022-12-13
+C1298,Northstar Synthetic 1298,Europe,Mid-Market,61000,2025-03-28
+C1299,Northstar Synthetic 1299,Asia Pacific,Growth,41000,2024-04-11
+C1300,Northstar Synthetic 1300,North America,Enterprise,57000,2024-06-22
+C1301,Northstar Synthetic 1301,Europe,Mid-Market,233000,2024-07-18
+C1302,Northstar Synthetic 1302,Asia Pacific,Growth,125000,2022-11-20
+C1303,Northstar Synthetic 1303,North America,Enterprise,221000,2024-05-01
+C1304,Northstar Synthetic 1304,Europe,Mid-Market,129000,2024-09-13
+C1305,Northstar Synthetic 1305,Asia Pacific,Growth,114000,2023-12-01
+C1306,Northstar Synthetic 1306,North America,Enterprise,59000,2023-04-10
+C1307,Northstar Synthetic 1307,Europe,Mid-Market,140000,2023-02-01
+C1308,Northstar Synthetic 1308,Asia Pacific,Growth,98000,2024-03-12
+C1309,Northstar Synthetic 1309,North America,Enterprise,98000,2023-12-26
+C1310,Northstar Synthetic 1310,Europe,Mid-Market,37000,2025-02-25
+C1311,Northstar Synthetic 1311,Asia Pacific,Growth,26000,2022-12-14
+C1312,Northstar Synthetic 1312,North America,Enterprise,123000,2023-04-29
+C1313,Northstar Synthetic 1313,Europe,Mid-Market,49000,2023-10-19
+C1314,Northstar Synthetic 1314,Asia Pacific,Growth,106000,2023-07-28
+C1315,Northstar Synthetic 1315,North America,Enterprise,240000,2022-12-01
+C1316,Northstar Synthetic 1316,Europe,Mid-Market,46000,2023-03-23
+C1317,Northstar Synthetic 1317,Asia Pacific,Growth,144000,2024-09-21
+C1318,Northstar Synthetic 1318,North America,Enterprise,191000,2022-12-26
+C1319,Northstar Synthetic 1319,Europe,Mid-Market,37000,2024-11-29
+C1320,Northstar Synthetic 1320,Asia Pacific,Growth,129000,2023-06-19
+C1321,Northstar Synthetic 1321,North America,Enterprise,205000,2025-04-15
+C1322,Northstar Synthetic 1322,Europe,Mid-Market,104000,2025-03-26
+C1323,Northstar Synthetic 1323,Asia Pacific,Growth,169000,2024-09-06
+C1324,Northstar Synthetic 1324,North America,Enterprise,53000,2024-05-06
+C1325,Northstar Synthetic 1325,Europe,Mid-Market,127000,2025-03-20
+C1326,Northstar Synthetic 1326,Asia Pacific,Growth,33000,2022-11-11
+C1327,Northstar Synthetic 1327,North America,Enterprise,179000,2023-10-16
+C1328,Northstar Synthetic 1328,Europe,Mid-Market,27000,2023-11-30
+C1329,Northstar Synthetic 1329,Asia Pacific,Growth,152000,2024-05-07
+C1330,Northstar Synthetic 1330,North America,Enterprise,90000,2024-08-19
+C1331,Northstar Synthetic 1331,Europe,Mid-Market,138000,2024-06-27
+C1332,Northstar Synthetic 1332,Asia Pacific,Growth,179000,2023-07-31
+C1333,Northstar Synthetic 1333,North America,Enterprise,95000,2023-08-04
+C1334,Northstar Synthetic 1334,Europe,Mid-Market,32000,2023-07-31
+C1335,Northstar Synthetic 1335,Asia Pacific,Growth,30000,2023-10-20
+C1336,Northstar Synthetic 1336,North America,Enterprise,232000,2024-11-30
+C1337,Northstar Synthetic 1337,Europe,Mid-Market,44000,2024-10-01
+C1338,Northstar Synthetic 1338,Asia Pacific,Growth,171000,2024-11-07
+C1339,Northstar Synthetic 1339,North America,Enterprise,80000,2023-09-06
+C1340,Northstar Synthetic 1340,Europe,Mid-Market,60000,2024-12-30
+C1341,Northstar Synthetic 1341,Asia Pacific,Growth,192000,2025-03-18
+C1342,Northstar Synthetic 1342,North America,Enterprise,91000,2024-10-17
+C1343,Northstar Synthetic 1343,Europe,Mid-Market,116000,2024-12-15
+C1344,Northstar Synthetic 1344,Asia Pacific,Growth,214000,2023-08-02
+C1345,Northstar Synthetic 1345,North America,Enterprise,238000,2023-03-24
+C1346,Northstar Synthetic 1346,Europe,Mid-Market,133000,2023-05-05
+C1347,Northstar Synthetic 1347,Asia Pacific,Growth,37000,2023-12-25
+C1348,Northstar Synthetic 1348,North America,Enterprise,95000,2023-06-24
+C1349,Northstar Synthetic 1349,Europe,Mid-Market,237000,2025-01-28
+C1350,Northstar Synthetic 1350,Asia Pacific,Growth,72000,2023-11-07
+C1351,Northstar Synthetic 1351,North America,Enterprise,62000,2023-08-03
+C1352,Northstar Synthetic 1352,Europe,Mid-Market,26000,2023-12-02
+C1353,Northstar Synthetic 1353,Asia Pacific,Growth,72000,2023-05-12
+C1354,Northstar Synthetic 1354,North America,Enterprise,182000,2024-02-11
+C1355,Northstar Synthetic 1355,Europe,Mid-Market,192000,2023-03-12
+C1356,Northstar Synthetic 1356,Asia Pacific,Growth,185000,2024-07-10
+C1357,Northstar Synthetic 1357,North America,Enterprise,203000,2025-02-22
+C1358,Northstar Synthetic 1358,Europe,Mid-Market,144000,2023-11-06
+C1359,Northstar Synthetic 1359,Asia Pacific,Growth,82000,2023-09-15
+C1360,Northstar Synthetic 1360,North America,Enterprise,107000,2023-09-05
+C1361,Northstar Synthetic 1361,Europe,Mid-Market,218000,2022-11-13
+C1362,Northstar Synthetic 1362,Asia Pacific,Growth,202000,2023-11-02
+C1363,Northstar Synthetic 1363,North America,Enterprise,189000,2024-09-24
+C1364,Northstar Synthetic 1364,Europe,Mid-Market,198000,2022-12-05
+C1365,Northstar Synthetic 1365,Asia Pacific,Growth,129000,2024-01-13
+C1366,Northstar Synthetic 1366,North America,Enterprise,93000,2023-05-31
+C1367,Northstar Synthetic 1367,Europe,Mid-Market,126000,2023-05-03
+C1368,Northstar Synthetic 1368,Asia Pacific,Growth,136000,2024-08-29
+C1369,Northstar Synthetic 1369,North America,Enterprise,87000,2024-04-03
+C1370,Northstar Synthetic 1370,Europe,Mid-Market,99000,2024-04-29
+C1371,Northstar Synthetic 1371,Asia Pacific,Growth,116000,2023-01-16
+C1372,Northstar Synthetic 1372,North America,Enterprise,95000,2023-08-09
+C1373,Northstar Synthetic 1373,Europe,Mid-Market,126000,2023-01-09
+C1374,Northstar Synthetic 1374,Asia Pacific,Growth,199000,2023-07-14
+C1375,Northstar Synthetic 1375,North America,Enterprise,196000,2024-03-08
+C1376,Northstar Synthetic 1376,Europe,Mid-Market,54000,2023-11-05
+C1377,Northstar Synthetic 1377,Asia Pacific,Growth,216000,2025-04-09
+C1378,Northstar Synthetic 1378,North America,Enterprise,188000,2023-04-16
+C1379,Northstar Synthetic 1379,Europe,Mid-Market,55000,2025-02-19
+C1380,Northstar Synthetic 1380,Asia Pacific,Growth,65000,2023-03-18
+C1381,Northstar Synthetic 1381,North America,Enterprise,35000,2023-09-05
+C1382,Northstar Synthetic 1382,Europe,Mid-Market,61000,2025-01-01
+C1383,Northstar Synthetic 1383,Asia Pacific,Growth,232000,2025-04-19
+C1384,Northstar Synthetic 1384,North America,Enterprise,60000,2023-09-22
+C1385,Northstar Synthetic 1385,Europe,Mid-Market,194000,2024-08-22
+C1386,Northstar Synthetic 1386,Asia Pacific,Growth,140000,2023-11-16
+C1387,Northstar Synthetic 1387,North America,Enterprise,233000,2024-08-16
+C1388,Northstar Synthetic 1388,Europe,Mid-Market,38000,2024-06-23
+C1389,Northstar Synthetic 1389,Asia Pacific,Growth,37000,2024-08-23
+C1390,Northstar Synthetic 1390,North America,Enterprise,94000,2023-07-24
+C1391,Northstar Synthetic 1391,Europe,Mid-Market,237000,2024-11-12
+C1392,Northstar Synthetic 1392,Asia Pacific,Growth,170000,2023-01-18
+C1393,Northstar Synthetic 1393,North America,Enterprise,69000,2024-05-18
+C1394,Northstar Synthetic 1394,Europe,Mid-Market,88000,2024-12-06
+C1395,Northstar Synthetic 1395,Asia Pacific,Growth,149000,2025-01-01
+C1396,Northstar Synthetic 1396,North America,Enterprise,156000,2023-11-06
+C1397,Northstar Synthetic 1397,Europe,Mid-Market,166000,2024-02-01
+C1398,Northstar Synthetic 1398,Asia Pacific,Growth,210000,2024-01-01
+C1399,Northstar Synthetic 1399,North America,Enterprise,90000,2024-07-22
+C1400,Northstar Synthetic 1400,Europe,Mid-Market,172000,2024-12-15
+C1401,Northstar Synthetic 1401,Asia Pacific,Growth,66000,2023-09-14
+C1402,Northstar Synthetic 1402,North America,Enterprise,51000,2024-09-28
+C1403,Northstar Synthetic 1403,Europe,Mid-Market,181000,2023-02-14
+C1404,Northstar Synthetic 1404,Asia Pacific,Growth,228000,2023-04-20
+C1405,Northstar Synthetic 1405,North America,Enterprise,73000,2023-10-17
+C1406,Northstar Synthetic 1406,Europe,Mid-Market,100000,2023-07-25
+C1407,Northstar Synthetic 1407,Asia Pacific,Growth,30000,2025-03-17
+C1408,Northstar Synthetic 1408,North America,Enterprise,51000,2024-10-01
+C1409,Northstar Synthetic 1409,Europe,Mid-Market,175000,2023-01-18
+C1410,Northstar Synthetic 1410,Asia Pacific,Growth,159000,2023-03-24
+C1411,Northstar Synthetic 1411,North America,Enterprise,200000,2023-05-27
+C1412,Northstar Synthetic 1412,Europe,Mid-Market,33000,2024-03-05
+C1413,Northstar Synthetic 1413,Asia Pacific,Growth,112000,2025-04-17
+C1414,Northstar Synthetic 1414,North America,Enterprise,208000,2025-02-19
+C1415,Northstar Synthetic 1415,Europe,Mid-Market,191000,2024-05-28
+C1416,Northstar Synthetic 1416,Asia Pacific,Growth,172000,2024-01-16
+C1417,Northstar Synthetic 1417,North America,Enterprise,203000,2023-06-23
+C1418,Northstar Synthetic 1418,Europe,Mid-Market,198000,2025-03-25
+C1419,Northstar Synthetic 1419,Asia Pacific,Growth,106000,2025-04-17
+C1420,Northstar Synthetic 1420,North America,Enterprise,41000,2024-04-16
+C1421,Northstar Synthetic 1421,Europe,Mid-Market,124000,2022-11-23
+C1422,Northstar Synthetic 1422,Asia Pacific,Growth,182000,2025-04-18
+C1423,Northstar Synthetic 1423,North America,Enterprise,205000,2023-01-14
+C1424,Northstar Synthetic 1424,Europe,Mid-Market,179000,2023-06-23
+C1425,Northstar Synthetic 1425,Asia Pacific,Growth,86000,2023-07-03
+C1426,Northstar Synthetic 1426,North America,Enterprise,108000,2023-08-25
+C1427,Northstar Synthetic 1427,Europe,Mid-Market,141000,2024-03-26
+C1428,Northstar Synthetic 1428,Asia Pacific,Growth,138000,2023-06-02
+C1429,Northstar Synthetic 1429,North America,Enterprise,74000,2025-01-27
+C1430,Northstar Synthetic 1430,Europe,Mid-Market,55000,2024-02-15
+C1431,Northstar Synthetic 1431,Asia Pacific,Growth,58000,2025-01-16
+C1432,Northstar Synthetic 1432,North America,Enterprise,208000,2024-08-01
+C1433,Northstar Synthetic 1433,Europe,Mid-Market,108000,2023-10-17
+C1434,Northstar Synthetic 1434,Asia Pacific,Growth,64000,2024-05-11
+C1435,Northstar Synthetic 1435,North America,Enterprise,103000,2023-07-21
+C1436,Northstar Synthetic 1436,Europe,Mid-Market,113000,2024-12-30
+C1437,Northstar Synthetic 1437,Asia Pacific,Growth,224000,2023-10-06
+C1438,Northstar Synthetic 1438,North America,Enterprise,195000,2023-08-22
+C1439,Northstar Synthetic 1439,Europe,Mid-Market,192000,2024-08-02
+C1440,Northstar Synthetic 1440,Asia Pacific,Growth,193000,2022-12-20
+C1441,Northstar Synthetic 1441,North America,Enterprise,82000,2023-02-01
+C1442,Northstar Synthetic 1442,Europe,Mid-Market,182000,2024-07-31
+C1443,Northstar Synthetic 1443,Asia Pacific,Growth,190000,2024-07-22
+C1444,Northstar Synthetic 1444,North America,Enterprise,30000,2024-03-31
+C1445,Northstar Synthetic 1445,Europe,Mid-Market,178000,2023-04-01
+C1446,Northstar Synthetic 1446,Asia Pacific,Growth,79000,2024-06-07
+C1447,Northstar Synthetic 1447,North America,Enterprise,90000,2024-05-01
+C1448,Northstar Synthetic 1448,Europe,Mid-Market,111000,2024-03-21
+C1449,Northstar Synthetic 1449,Asia Pacific,Growth,92000,2024-09-28
+C1450,Northstar Synthetic 1450,North America,Enterprise,185000,2023-10-09
+C1451,Northstar Synthetic 1451,Europe,Mid-Market,54000,2024-04-27
+C1452,Northstar Synthetic 1452,Asia Pacific,Growth,44000,2023-12-05
+C1453,Northstar Synthetic 1453,North America,Enterprise,111000,2022-12-02
+C1454,Northstar Synthetic 1454,Europe,Mid-Market,179000,2024-09-22
+C1455,Northstar Synthetic 1455,Asia Pacific,Growth,89000,2022-12-24
+C1456,Northstar Synthetic 1456,North America,Enterprise,171000,2025-02-26
+C1457,Northstar Synthetic 1457,Europe,Mid-Market,32000,2023-04-05
+C1458,Northstar Synthetic 1458,Asia Pacific,Growth,234000,2024-11-17
+C1459,Northstar Synthetic 1459,North America,Enterprise,73000,2023-12-30
+C1460,Northstar Synthetic 1460,Europe,Mid-Market,45000,2024-04-02
+C1461,Northstar Synthetic 1461,Asia Pacific,Growth,191000,2024-12-21
+C1462,Northstar Synthetic 1462,North America,Enterprise,138000,2023-04-06
+C1463,Northstar Synthetic 1463,Europe,Mid-Market,137000,2024-10-07
+C1464,Northstar Synthetic 1464,Asia Pacific,Growth,103000,2023-01-18
+C1465,Northstar Synthetic 1465,North America,Enterprise,218000,2025-03-20
+C1466,Northstar Synthetic 1466,Europe,Mid-Market,184000,2024-03-07
+C1467,Northstar Synthetic 1467,Asia Pacific,Growth,239000,2025-03-20
+C1468,Northstar Synthetic 1468,North America,Enterprise,28000,2023-02-27
+C1469,Northstar Synthetic 1469,Europe,Mid-Market,45000,2023-01-01
+C1470,Northstar Synthetic 1470,Asia Pacific,Growth,30000,2025-01-01
+C1471,Northstar Synthetic 1471,North America,Enterprise,78000,2022-12-25
+C1472,Northstar Synthetic 1472,Europe,Mid-Market,34000,2024-10-11
+C1473,Northstar Synthetic 1473,Asia Pacific,Growth,138000,2023-06-03
+C1474,Northstar Synthetic 1474,North America,Enterprise,162000,2023-04-23
+C1475,Northstar Synthetic 1475,Europe,Mid-Market,187000,2022-12-06
+C1476,Northstar Synthetic 1476,Asia Pacific,Growth,116000,2023-04-01
+C1477,Northstar Synthetic 1477,North America,Enterprise,176000,2023-12-02
+C1478,Northstar Synthetic 1478,Europe,Mid-Market,135000,2024-06-01
+C1479,Northstar Synthetic 1479,Asia Pacific,Growth,36000,2023-12-09
+C1480,Northstar Synthetic 1480,North America,Enterprise,180000,2025-01-07
+C1481,Northstar Synthetic 1481,Europe,Mid-Market,46000,2023-12-25
+C1482,Northstar Synthetic 1482,Asia Pacific,Growth,161000,2024-06-13
+C1483,Northstar Synthetic 1483,North America,Enterprise,225000,2023-09-28
+C1484,Northstar Synthetic 1484,Europe,Mid-Market,200000,2024-01-25
+C1485,Northstar Synthetic 1485,Asia Pacific,Growth,91000,2024-06-10
+C1486,Northstar Synthetic 1486,North America,Enterprise,221000,2025-02-20
+C1487,Northstar Synthetic 1487,Europe,Mid-Market,108000,2024-07-21
+C1488,Northstar Synthetic 1488,Asia Pacific,Growth,233000,2024-05-17
+C1489,Northstar Synthetic 1489,North America,Enterprise,29000,2023-10-10
+C1490,Northstar Synthetic 1490,Europe,Mid-Market,127000,2024-07-18
+C1491,Northstar Synthetic 1491,Asia Pacific,Growth,224000,2024-11-17
+C1492,Northstar Synthetic 1492,North America,Enterprise,227000,2024-06-27
+C1493,Northstar Synthetic 1493,Europe,Mid-Market,211000,2022-11-12
+C1494,Northstar Synthetic 1494,Asia Pacific,Growth,238000,2025-02-22
+C1495,Northstar Synthetic 1495,North America,Enterprise,162000,2024-08-10
+C1496,Northstar Synthetic 1496,Europe,Mid-Market,206000,2024-04-09
+C1497,Northstar Synthetic 1497,Asia Pacific,Growth,50000,2023-10-04
+C1498,Northstar Synthetic 1498,North America,Enterprise,157000,2025-02-17
+C1499,Northstar Synthetic 1499,Europe,Mid-Market,122000,2023-11-19
+C1500,Northstar Synthetic 1500,Asia Pacific,Growth,109000,2023-01-16
+C1501,Northstar Synthetic 1501,North America,Enterprise,217000,2024-07-16
+C1502,Northstar Synthetic 1502,Europe,Mid-Market,42000,2022-12-05
+C1503,Northstar Synthetic 1503,Asia Pacific,Growth,169000,2024-11-05
+C1504,Northstar Synthetic 1504,North America,Enterprise,135000,2024-09-16
+C1505,Northstar Synthetic 1505,Europe,Mid-Market,221000,2024-10-18
+C1506,Northstar Synthetic 1506,Asia Pacific,Growth,186000,2024-03-29
+C1507,Northstar Synthetic 1507,North America,Enterprise,156000,2025-01-21
+C1508,Northstar Synthetic 1508,Europe,Mid-Market,198000,2024-02-10
+C1509,Northstar Synthetic 1509,Asia Pacific,Growth,208000,2023-02-18
+C1510,Northstar Synthetic 1510,North America,Enterprise,155000,2022-12-03
+C1511,Northstar Synthetic 1511,Europe,Mid-Market,24000,2024-03-06
+C1512,Northstar Synthetic 1512,Asia Pacific,Growth,175000,2022-12-27
+C1513,Northstar Synthetic 1513,North America,Enterprise,129000,2023-03-23
+C1514,Northstar Synthetic 1514,Europe,Mid-Market,37000,2025-01-10
+C1515,Northstar Synthetic 1515,Asia Pacific,Growth,88000,2024-07-29
+C1516,Northstar Synthetic 1516,North America,Enterprise,121000,2024-10-23
+C1517,Northstar Synthetic 1517,Europe,Mid-Market,36000,2024-03-14
+C1518,Northstar Synthetic 1518,Asia Pacific,Growth,47000,2024-03-23
+C1519,Northstar Synthetic 1519,North America,Enterprise,42000,2023-07-22
+C1520,Northstar Synthetic 1520,Europe,Mid-Market,89000,2025-04-10
+C1521,Northstar Synthetic 1521,Asia Pacific,Growth,63000,2023-02-17
+C1522,Northstar Synthetic 1522,North America,Enterprise,29000,2024-05-04
+C1523,Northstar Synthetic 1523,Europe,Mid-Market,202000,2024-07-30
+C1524,Northstar Synthetic 1524,Asia Pacific,Growth,187000,2023-08-07
+C1525,Northstar Synthetic 1525,North America,Enterprise,184000,2024-09-11
+C1526,Northstar Synthetic 1526,Europe,Mid-Market,211000,2024-12-06
+C1527,Northstar Synthetic 1527,Asia Pacific,Growth,174000,2023-01-12
+C1528,Northstar Synthetic 1528,North America,Enterprise,191000,2023-12-08
+C1529,Northstar Synthetic 1529,Europe,Mid-Market,43000,2023-09-20
+C1530,Northstar Synthetic 1530,Asia Pacific,Growth,178000,2024-06-01
+C1531,Northstar Synthetic 1531,North America,Enterprise,166000,2025-02-28
+C1532,Northstar Synthetic 1532,Europe,Mid-Market,178000,2023-08-26
+C1533,Northstar Synthetic 1533,Asia Pacific,Growth,226000,2025-01-06
+C1534,Northstar Synthetic 1534,North America,Enterprise,157000,2024-03-03
+C1535,Northstar Synthetic 1535,Europe,Mid-Market,213000,2025-03-12
+C1536,Northstar Synthetic 1536,Asia Pacific,Growth,73000,2025-03-28
+C1537,Northstar Synthetic 1537,North America,Enterprise,240000,2025-04-26
+C1538,Northstar Synthetic 1538,Europe,Mid-Market,117000,2024-05-19
+C1539,Northstar Synthetic 1539,Asia Pacific,Growth,184000,2023-08-11
+C1540,Northstar Synthetic 1540,North America,Enterprise,127000,2024-07-16
+C1541,Northstar Synthetic 1541,Europe,Mid-Market,118000,2024-09-24
+C1542,Northstar Synthetic 1542,Asia Pacific,Growth,96000,2024-11-04
+C1543,Northstar Synthetic 1543,North America,Enterprise,236000,2024-10-28
+C1544,Northstar Synthetic 1544,Europe,Mid-Market,179000,2023-11-12
+C1545,Northstar Synthetic 1545,Asia Pacific,Growth,81000,2024-09-23
+C1546,Northstar Synthetic 1546,North America,Enterprise,49000,2023-02-05
+C1547,Northstar Synthetic 1547,Europe,Mid-Market,85000,2023-11-10
+C1548,Northstar Synthetic 1548,Asia Pacific,Growth,29000,2023-07-04
+C1549,Northstar Synthetic 1549,North America,Enterprise,86000,2023-05-02
+C1550,Northstar Synthetic 1550,Europe,Mid-Market,52000,2024-12-29
+C1551,Northstar Synthetic 1551,Asia Pacific,Growth,237000,2024-06-09
+C1552,Northstar Synthetic 1552,North America,Enterprise,150000,2024-10-10
+C1553,Northstar Synthetic 1553,Europe,Mid-Market,204000,2024-07-22
+C1554,Northstar Synthetic 1554,Asia Pacific,Growth,71000,2022-12-09
+C1555,Northstar Synthetic 1555,North America,Enterprise,194000,2023-09-02
+C1556,Northstar Synthetic 1556,Europe,Mid-Market,153000,2025-01-25
+C1557,Northstar Synthetic 1557,Asia Pacific,Growth,85000,2024-04-07
+C1558,Northstar Synthetic 1558,North America,Enterprise,83000,2024-03-06
+C1559,Northstar Synthetic 1559,Europe,Mid-Market,231000,2023-06-30
+C1560,Northstar Synthetic 1560,Asia Pacific,Growth,207000,2023-02-04
+C1561,Northstar Synthetic 1561,North America,Enterprise,149000,2024-09-05
+C1562,Northstar Synthetic 1562,Europe,Mid-Market,138000,2023-11-17
+C1563,Northstar Synthetic 1563,Asia Pacific,Growth,236000,2024-10-07
+C1564,Northstar Synthetic 1564,North America,Enterprise,149000,2023-05-13
+C1565,Northstar Synthetic 1565,Europe,Mid-Market,83000,2023-09-28
+C1566,Northstar Synthetic 1566,Asia Pacific,Growth,154000,2022-12-26
+C1567,Northstar Synthetic 1567,North America,Enterprise,102000,2024-03-09
+C1568,Northstar Synthetic 1568,Europe,Mid-Market,155000,2024-03-02
+C1569,Northstar Synthetic 1569,Asia Pacific,Growth,203000,2023-04-12
+C1570,Northstar Synthetic 1570,North America,Enterprise,30000,2023-08-22
+C1571,Northstar Synthetic 1571,Europe,Mid-Market,159000,2024-03-25
+C1572,Northstar Synthetic 1572,Asia Pacific,Growth,102000,2024-08-21
+C1573,Northstar Synthetic 1573,North America,Enterprise,207000,2024-06-24
+C1574,Northstar Synthetic 1574,Europe,Mid-Market,94000,2023-10-07
+C1575,Northstar Synthetic 1575,Asia Pacific,Growth,105000,2025-02-04
+C1576,Northstar Synthetic 1576,North America,Enterprise,192000,2024-03-01
+C1577,Northstar Synthetic 1577,Europe,Mid-Market,99000,2024-06-17
+C1578,Northstar Synthetic 1578,Asia Pacific,Growth,136000,2023-06-20
+C1579,Northstar Synthetic 1579,North America,Enterprise,113000,2025-02-18
+C1580,Northstar Synthetic 1580,Europe,Mid-Market,118000,2025-01-31
+C1581,Northstar Synthetic 1581,Asia Pacific,Growth,44000,2024-06-01
+C1582,Northstar Synthetic 1582,North America,Enterprise,33000,2024-12-30
+C1583,Northstar Synthetic 1583,Europe,Mid-Market,59000,2025-04-24
+C1584,Northstar Synthetic 1584,Asia Pacific,Growth,223000,2023-07-09
+C1585,Northstar Synthetic 1585,North America,Enterprise,149000,2023-02-04
+C1586,Northstar Synthetic 1586,Europe,Mid-Market,236000,2023-12-20
+C1587,Northstar Synthetic 1587,Asia Pacific,Growth,94000,2023-06-21
+C1588,Northstar Synthetic 1588,North America,Enterprise,121000,2024-04-24
+C1589,Northstar Synthetic 1589,Europe,Mid-Market,62000,2023-06-29
+C1590,Northstar Synthetic 1590,Asia Pacific,Growth,133000,2025-04-02
+C1591,Northstar Synthetic 1591,North America,Enterprise,216000,2024-05-27
+C1592,Northstar Synthetic 1592,Europe,Mid-Market,88000,2023-07-31
+C1593,Northstar Synthetic 1593,Asia Pacific,Growth,102000,2024-04-01
+C1594,Northstar Synthetic 1594,North America,Enterprise,96000,2024-12-17
+C1595,Northstar Synthetic 1595,Europe,Mid-Market,128000,2023-08-18
+C1596,Northstar Synthetic 1596,Asia Pacific,Growth,100000,2023-11-29
+C1597,Northstar Synthetic 1597,North America,Enterprise,223000,2025-03-24
+C1598,Northstar Synthetic 1598,Europe,Mid-Market,57000,2023-10-23
+C1599,Northstar Synthetic 1599,Asia Pacific,Growth,49000,2023-07-19
+C1600,Northstar Synthetic 1600,North America,Enterprise,70000,2025-02-18
+C1601,Northstar Synthetic 1601,Europe,Mid-Market,82000,2024-01-18
+C1602,Northstar Synthetic 1602,Asia Pacific,Growth,172000,2024-12-04
+C1603,Northstar Synthetic 1603,North America,Enterprise,105000,2023-07-11
+C1604,Northstar Synthetic 1604,Europe,Mid-Market,136000,2024-09-09
+C1605,Northstar Synthetic 1605,Asia Pacific,Growth,108000,2023-11-25
+C1606,Northstar Synthetic 1606,North America,Enterprise,131000,2023-09-26
+C1607,Northstar Synthetic 1607,Europe,Mid-Market,233000,2024-10-29
+C1608,Northstar Synthetic 1608,Asia Pacific,Growth,129000,2022-11-19
+C1609,Northstar Synthetic 1609,North America,Enterprise,67000,2024-09-15
+C1610,Northstar Synthetic 1610,Europe,Mid-Market,201000,2025-03-22
+C1611,Northstar Synthetic 1611,Asia Pacific,Growth,129000,2024-08-11
+C1612,Northstar Synthetic 1612,North America,Enterprise,55000,2024-06-19
+C1613,Northstar Synthetic 1613,Europe,Mid-Market,93000,2023-01-09
+C1614,Northstar Synthetic 1614,Asia Pacific,Growth,111000,2024-05-31
+C1615,Northstar Synthetic 1615,North America,Enterprise,187000,2023-05-08
+C1616,Northstar Synthetic 1616,Europe,Mid-Market,130000,2024-06-03
+C1617,Northstar Synthetic 1617,Asia Pacific,Growth,72000,2023-07-12
+C1618,Northstar Synthetic 1618,North America,Enterprise,79000,2024-06-29
+C1619,Northstar Synthetic 1619,Europe,Mid-Market,86000,2024-03-12
+C1620,Northstar Synthetic 1620,Asia Pacific,Growth,169000,2023-11-27
+C1621,Northstar Synthetic 1621,North America,Enterprise,166000,2023-04-13
+C1622,Northstar Synthetic 1622,Europe,Mid-Market,38000,2023-12-11
+C1623,Northstar Synthetic 1623,Asia Pacific,Growth,227000,2023-12-17
+C1624,Northstar Synthetic 1624,North America,Enterprise,218000,2023-06-27
+C1625,Northstar Synthetic 1625,Europe,Mid-Market,186000,2024-11-02
+C1626,Northstar Synthetic 1626,Asia Pacific,Growth,236000,2023-08-02
+C1627,Northstar Synthetic 1627,North America,Enterprise,208000,2024-12-02
+C1628,Northstar Synthetic 1628,Europe,Mid-Market,70000,2024-12-06
+C1629,Northstar Synthetic 1629,Asia Pacific,Growth,225000,2024-01-18
+C1630,Northstar Synthetic 1630,North America,Enterprise,174000,2023-02-24
+C1631,Northstar Synthetic 1631,Europe,Mid-Market,87000,2025-04-27
+C1632,Northstar Synthetic 1632,Asia Pacific,Growth,205000,2023-06-12
+C1633,Northstar Synthetic 1633,North America,Enterprise,218000,2023-01-11
+C1634,Northstar Synthetic 1634,Europe,Mid-Market,218000,2023-02-03
+C1635,Northstar Synthetic 1635,Asia Pacific,Growth,117000,2024-12-20
+C1636,Northstar Synthetic 1636,North America,Enterprise,177000,2024-03-10
+C1637,Northstar Synthetic 1637,Europe,Mid-Market,228000,2023-03-16
+C1638,Northstar Synthetic 1638,Asia Pacific,Growth,187000,2024-02-26
+C1639,Northstar Synthetic 1639,North America,Enterprise,126000,2024-10-10
+C1640,Northstar Synthetic 1640,Europe,Mid-Market,48000,2025-04-06
+C1641,Northstar Synthetic 1641,Asia Pacific,Growth,91000,2024-06-23
+C1642,Northstar Synthetic 1642,North America,Enterprise,34000,2022-12-30
+C1643,Northstar Synthetic 1643,Europe,Mid-Market,232000,2024-08-31
+C1644,Northstar Synthetic 1644,Asia Pacific,Growth,170000,2023-08-10
+C1645,Northstar Synthetic 1645,North America,Enterprise,106000,2025-04-24
+C1646,Northstar Synthetic 1646,Europe,Mid-Market,199000,2024-07-21
+C1647,Northstar Synthetic 1647,Asia Pacific,Growth,151000,2023-05-10
+C1648,Northstar Synthetic 1648,North America,Enterprise,76000,2025-04-11
+C1649,Northstar Synthetic 1649,Europe,Mid-Market,29000,2024-06-25
+C1650,Northstar Synthetic 1650,Asia Pacific,Growth,195000,2024-09-27
+C1651,Northstar Synthetic 1651,North America,Enterprise,174000,2023-03-05
+C1652,Northstar Synthetic 1652,Europe,Mid-Market,106000,2023-03-06
+C1653,Northstar Synthetic 1653,Asia Pacific,Growth,115000,2025-01-02
+C1654,Northstar Synthetic 1654,North America,Enterprise,71000,2024-07-11
+C1655,Northstar Synthetic 1655,Europe,Mid-Market,85000,2024-09-14
+C1656,Northstar Synthetic 1656,Asia Pacific,Growth,95000,2023-10-04
+C1657,Northstar Synthetic 1657,North America,Enterprise,74000,2023-03-24
+C1658,Northstar Synthetic 1658,Europe,Mid-Market,114000,2023-10-14
+C1659,Northstar Synthetic 1659,Asia Pacific,Growth,166000,2023-02-01
+C1660,Northstar Synthetic 1660,North America,Enterprise,106000,2024-04-22
+C1661,Northstar Synthetic 1661,Europe,Mid-Market,227000,2025-04-15
+C1662,Northstar Synthetic 1662,Asia Pacific,Growth,180000,2023-10-01
+C1663,Northstar Synthetic 1663,North America,Enterprise,123000,2023-03-14
+C1664,Northstar Synthetic 1664,Europe,Mid-Market,88000,2025-02-06
+C1665,Northstar Synthetic 1665,Asia Pacific,Growth,114000,2023-09-22
+C1666,Northstar Synthetic 1666,North America,Enterprise,207000,2023-04-05
+C1667,Northstar Synthetic 1667,Europe,Mid-Market,69000,2023-05-03
+C1668,Northstar Synthetic 1668,Asia Pacific,Growth,98000,2024-08-25
+C1669,Northstar Synthetic 1669,North America,Enterprise,167000,2023-10-05
+C1670,Northstar Synthetic 1670,Europe,Mid-Market,193000,2024-09-16
+C1671,Northstar Synthetic 1671,Asia Pacific,Growth,167000,2023-08-04
+C1672,Northstar Synthetic 1672,North America,Enterprise,95000,2025-02-07
+C1673,Northstar Synthetic 1673,Europe,Mid-Market,232000,2024-08-23
+C1674,Northstar Synthetic 1674,Asia Pacific,Growth,120000,2025-03-24
+C1675,Northstar Synthetic 1675,North America,Enterprise,122000,2023-11-15
+C1676,Northstar Synthetic 1676,Europe,Mid-Market,180000,2022-12-15
+C1677,Northstar Synthetic 1677,Asia Pacific,Growth,76000,2024-07-23
+C1678,Northstar Synthetic 1678,North America,Enterprise,131000,2025-04-02
+C1679,Northstar Synthetic 1679,Europe,Mid-Market,83000,2024-09-28
+C1680,Northstar Synthetic 1680,Asia Pacific,Growth,213000,2024-01-30
+C1681,Northstar Synthetic 1681,North America,Enterprise,94000,2023-07-18
+C1682,Northstar Synthetic 1682,Europe,Mid-Market,56000,2023-10-10
+C1683,Northstar Synthetic 1683,Asia Pacific,Growth,125000,2023-11-24
+C1684,Northstar Synthetic 1684,North America,Enterprise,28000,2025-02-11
+C1685,Northstar Synthetic 1685,Europe,Mid-Market,166000,2023-10-02
+C1686,Northstar Synthetic 1686,Asia Pacific,Growth,106000,2025-01-08
+C1687,Northstar Synthetic 1687,North America,Enterprise,181000,2022-12-14
+C1688,Northstar Synthetic 1688,Europe,Mid-Market,95000,2023-07-23
+C1689,Northstar Synthetic 1689,Asia Pacific,Growth,112000,2025-04-13
+C1690,Northstar Synthetic 1690,North America,Enterprise,112000,2023-06-24
+C1691,Northstar Synthetic 1691,Europe,Mid-Market,191000,2024-12-09
+C1692,Northstar Synthetic 1692,Asia Pacific,Growth,94000,2022-12-29
+C1693,Northstar Synthetic 1693,North America,Enterprise,206000,2024-09-03
+C1694,Northstar Synthetic 1694,Europe,Mid-Market,192000,2023-04-10
+C1695,Northstar Synthetic 1695,Asia Pacific,Growth,70000,2024-05-06
+C1696,Northstar Synthetic 1696,North America,Enterprise,175000,2022-11-18
+C1697,Northstar Synthetic 1697,Europe,Mid-Market,143000,2024-01-29
+C1698,Northstar Synthetic 1698,Asia Pacific,Growth,200000,2024-09-19
+C1699,Northstar Synthetic 1699,North America,Enterprise,112000,2023-08-08
+C1700,Northstar Synthetic 1700,Europe,Mid-Market,100000,2023-04-30
+C1701,Northstar Synthetic 1701,Asia Pacific,Growth,31000,2023-08-16
+C1702,Northstar Synthetic 1702,North America,Enterprise,173000,2024-02-26
+C1703,Northstar Synthetic 1703,Europe,Mid-Market,49000,2024-07-21
+C1704,Northstar Synthetic 1704,Asia Pacific,Growth,149000,2023-04-04
+C1705,Northstar Synthetic 1705,North America,Enterprise,50000,2023-08-23
+C1706,Northstar Synthetic 1706,Europe,Mid-Market,136000,2024-03-03
+C1707,Northstar Synthetic 1707,Asia Pacific,Growth,42000,2023-06-27
+C1708,Northstar Synthetic 1708,North America,Enterprise,231000,2023-05-14
+C1709,Northstar Synthetic 1709,Europe,Mid-Market,224000,2023-01-14
+C1710,Northstar Synthetic 1710,Asia Pacific,Growth,139000,2023-11-28
+C1711,Northstar Synthetic 1711,North America,Enterprise,74000,2024-09-25
+C1712,Northstar Synthetic 1712,Europe,Mid-Market,191000,2025-04-17
+C1713,Northstar Synthetic 1713,Asia Pacific,Growth,172000,2023-07-22
+C1714,Northstar Synthetic 1714,North America,Enterprise,177000,2025-01-29
+C1715,Northstar Synthetic 1715,Europe,Mid-Market,174000,2024-10-16
+C1716,Northstar Synthetic 1716,Asia Pacific,Growth,49000,2024-12-10
+C1717,Northstar Synthetic 1717,North America,Enterprise,164000,2024-12-18
+C1718,Northstar Synthetic 1718,Europe,Mid-Market,145000,2024-03-20
+C1719,Northstar Synthetic 1719,Asia Pacific,Growth,102000,2023-01-01
+C1720,Northstar Synthetic 1720,North America,Enterprise,138000,2023-03-04
+C1721,Northstar Synthetic 1721,Europe,Mid-Market,107000,2023-08-17
+C1722,Northstar Synthetic 1722,Asia Pacific,Growth,88000,2024-02-26
+C1723,Northstar Synthetic 1723,North America,Enterprise,107000,2023-04-09
+C1724,Northstar Synthetic 1724,Europe,Mid-Market,161000,2023-07-15
+C1725,Northstar Synthetic 1725,Asia Pacific,Growth,110000,2023-05-21
+C1726,Northstar Synthetic 1726,North America,Enterprise,141000,2023-03-06
+C1727,Northstar Synthetic 1727,Europe,Mid-Market,111000,2022-12-27
+C1728,Northstar Synthetic 1728,Asia Pacific,Growth,64000,2024-10-20
+C1729,Northstar Synthetic 1729,North America,Enterprise,58000,2023-11-28
+C1730,Northstar Synthetic 1730,Europe,Mid-Market,160000,2023-05-21
+C1731,Northstar Synthetic 1731,Asia Pacific,Growth,196000,2023-05-04
+C1732,Northstar Synthetic 1732,North America,Enterprise,171000,2023-06-09
+C1733,Northstar Synthetic 1733,Europe,Mid-Market,52000,2022-12-24
+C1734,Northstar Synthetic 1734,Asia Pacific,Growth,99000,2022-12-02
+C1735,Northstar Synthetic 1735,North America,Enterprise,136000,2023-07-30
+C1736,Northstar Synthetic 1736,Europe,Mid-Market,121000,2024-04-04
+C1737,Northstar Synthetic 1737,Asia Pacific,Growth,102000,2025-01-09
+C1738,Northstar Synthetic 1738,North America,Enterprise,226000,2024-06-30
+C1739,Northstar Synthetic 1739,Europe,Mid-Market,181000,2024-10-10
+C1740,Northstar Synthetic 1740,Asia Pacific,Growth,102000,2023-04-23
+C1741,Northstar Synthetic 1741,North America,Enterprise,166000,2023-02-03
+C1742,Northstar Synthetic 1742,Europe,Mid-Market,178000,2024-12-26
+C1743,Northstar Synthetic 1743,Asia Pacific,Growth,59000,2023-05-20
+C1744,Northstar Synthetic 1744,North America,Enterprise,204000,2023-12-09
+C1745,Northstar Synthetic 1745,Europe,Mid-Market,232000,2024-06-19
+C1746,Northstar Synthetic 1746,Asia Pacific,Growth,86000,2023-12-12
+C1747,Northstar Synthetic 1747,North America,Enterprise,174000,2023-10-14
+C1748,Northstar Synthetic 1748,Europe,Mid-Market,238000,2024-01-21
+C1749,Northstar Synthetic 1749,Asia Pacific,Growth,33000,2024-03-25
+C1750,Northstar Synthetic 1750,North America,Enterprise,32000,2024-09-26
+C1751,Northstar Synthetic 1751,Europe,Mid-Market,103000,2024-06-30
+C1752,Northstar Synthetic 1752,Asia Pacific,Growth,204000,2023-05-02
+C1753,Northstar Synthetic 1753,North America,Enterprise,238000,2023-11-21
+C1754,Northstar Synthetic 1754,Europe,Mid-Market,179000,2023-03-03
+C1755,Northstar Synthetic 1755,Asia Pacific,Growth,82000,2025-03-22
+C1756,Northstar Synthetic 1756,North America,Enterprise,109000,2025-02-17
+C1757,Northstar Synthetic 1757,Europe,Mid-Market,166000,2024-11-29
+C1758,Northstar Synthetic 1758,Asia Pacific,Growth,114000,2024-01-19
+C1759,Northstar Synthetic 1759,North America,Enterprise,162000,2023-06-25
+C1760,Northstar Synthetic 1760,Europe,Mid-Market,96000,2024-02-04
+C1761,Northstar Synthetic 1761,Asia Pacific,Growth,154000,2024-07-15
+C1762,Northstar Synthetic 1762,North America,Enterprise,150000,2024-09-02
+C1763,Northstar Synthetic 1763,Europe,Mid-Market,106000,2023-11-24
+C1764,Northstar Synthetic 1764,Asia Pacific,Growth,140000,2023-03-20
+C1765,Northstar Synthetic 1765,North America,Enterprise,142000,2024-06-25
+C1766,Northstar Synthetic 1766,Europe,Mid-Market,65000,2024-06-17
+C1767,Northstar Synthetic 1767,Asia Pacific,Growth,44000,2024-10-06
+C1768,Northstar Synthetic 1768,North America,Enterprise,143000,2024-10-21
+C1769,Northstar Synthetic 1769,Europe,Mid-Market,126000,2022-12-10
+C1770,Northstar Synthetic 1770,Asia Pacific,Growth,217000,2024-01-26
+C1771,Northstar Synthetic 1771,North America,Enterprise,161000,2025-03-11
+C1772,Northstar Synthetic 1772,Europe,Mid-Market,182000,2023-09-03
+C1773,Northstar Synthetic 1773,Asia Pacific,Growth,70000,2025-04-14
+C1774,Northstar Synthetic 1774,North America,Enterprise,149000,2024-02-08
+C1775,Northstar Synthetic 1775,Europe,Mid-Market,42000,2025-03-31
+C1776,Northstar Synthetic 1776,Asia Pacific,Growth,76000,2024-08-30
+C1777,Northstar Synthetic 1777,North America,Enterprise,229000,2024-01-30
+C1778,Northstar Synthetic 1778,Europe,Mid-Market,102000,2022-11-18
+C1779,Northstar Synthetic 1779,Asia Pacific,Growth,238000,2023-02-18
+C1780,Northstar Synthetic 1780,North America,Enterprise,82000,2025-02-07
+C1781,Northstar Synthetic 1781,Europe,Mid-Market,107000,2024-12-19
+C1782,Northstar Synthetic 1782,Asia Pacific,Growth,50000,2023-05-30
+C1783,Northstar Synthetic 1783,North America,Enterprise,173000,2023-01-12
+C1784,Northstar Synthetic 1784,Europe,Mid-Market,80000,2024-02-04
+C1785,Northstar Synthetic 1785,Asia Pacific,Growth,74000,2024-11-14
+C1786,Northstar Synthetic 1786,North America,Enterprise,166000,2024-11-15
+C1787,Northstar Synthetic 1787,Europe,Mid-Market,55000,2023-02-05
+C1788,Northstar Synthetic 1788,Asia Pacific,Growth,159000,2024-01-25
+C1789,Northstar Synthetic 1789,North America,Enterprise,146000,2024-05-31
+C1790,Northstar Synthetic 1790,Europe,Mid-Market,134000,2025-02-26
+C1791,Northstar Synthetic 1791,Asia Pacific,Growth,151000,2023-07-17
+C1792,Northstar Synthetic 1792,North America,Enterprise,61000,2024-03-18
+C1793,Northstar Synthetic 1793,Europe,Mid-Market,195000,2023-05-10
+C1794,Northstar Synthetic 1794,Asia Pacific,Growth,202000,2023-08-11
+C1795,Northstar Synthetic 1795,North America,Enterprise,225000,2024-02-21
+C1796,Northstar Synthetic 1796,Europe,Mid-Market,208000,2023-12-05
+C1797,Northstar Synthetic 1797,Asia Pacific,Growth,89000,2023-03-23
+C1798,Northstar Synthetic 1798,North America,Enterprise,129000,2025-03-22
+C1799,Northstar Synthetic 1799,Europe,Mid-Market,87000,2023-05-12
+C1800,Northstar Synthetic 1800,Asia Pacific,Growth,110000,2023-12-07
+C1801,Northstar Synthetic 1801,North America,Enterprise,142000,2023-05-09
+C1802,Northstar Synthetic 1802,Europe,Mid-Market,137000,2023-06-21
+C1803,Northstar Synthetic 1803,Asia Pacific,Growth,106000,2023-12-08
+C1804,Northstar Synthetic 1804,North America,Enterprise,208000,2024-09-03
+C1805,Northstar Synthetic 1805,Europe,Mid-Market,141000,2024-05-29
+C1806,Northstar Synthetic 1806,Asia Pacific,Growth,91000,2024-12-04
+C1807,Northstar Synthetic 1807,North America,Enterprise,52000,2024-04-04
+C1808,Northstar Synthetic 1808,Europe,Mid-Market,205000,2024-09-22
+C1809,Northstar Synthetic 1809,Asia Pacific,Growth,211000,2024-01-28
+C1810,Northstar Synthetic 1810,North America,Enterprise,69000,2025-03-29
+C1811,Northstar Synthetic 1811,Europe,Mid-Market,113000,2024-05-08
+C1812,Northstar Synthetic 1812,Asia Pacific,Growth,216000,2024-10-09
+C1813,Northstar Synthetic 1813,North America,Enterprise,77000,2025-03-07
+C1814,Northstar Synthetic 1814,Europe,Mid-Market,229000,2024-03-19
+C1815,Northstar Synthetic 1815,Asia Pacific,Growth,140000,2024-03-29
+C1816,Northstar Synthetic 1816,North America,Enterprise,140000,2023-06-05
+C1817,Northstar Synthetic 1817,Europe,Mid-Market,88000,2024-10-10
+C1818,Northstar Synthetic 1818,Asia Pacific,Growth,181000,2023-12-27
+C1819,Northstar Synthetic 1819,North America,Enterprise,80000,2024-04-02
+C1820,Northstar Synthetic 1820,Europe,Mid-Market,89000,2023-05-07
+C1821,Northstar Synthetic 1821,Asia Pacific,Growth,142000,2023-01-25
+C1822,Northstar Synthetic 1822,North America,Enterprise,71000,2025-03-02
+C1823,Northstar Synthetic 1823,Europe,Mid-Market,26000,2023-03-01
+C1824,Northstar Synthetic 1824,Asia Pacific,Growth,176000,2025-02-14
+C1825,Northstar Synthetic 1825,North America,Enterprise,129000,2023-07-30
+C1826,Northstar Synthetic 1826,Europe,Mid-Market,136000,2023-01-28
+C1827,Northstar Synthetic 1827,Asia Pacific,Growth,170000,2024-04-28
+C1828,Northstar Synthetic 1828,North America,Enterprise,45000,2023-12-07
+C1829,Northstar Synthetic 1829,Europe,Mid-Market,185000,2023-09-27
+C1830,Northstar Synthetic 1830,Asia Pacific,Growth,123000,2024-10-30
+C1831,Northstar Synthetic 1831,North America,Enterprise,37000,2025-02-10
+C1832,Northstar Synthetic 1832,Europe,Mid-Market,112000,2025-02-02
+C1833,Northstar Synthetic 1833,Asia Pacific,Growth,169000,2024-04-23
+C1834,Northstar Synthetic 1834,North America,Enterprise,173000,2023-01-21
+C1835,Northstar Synthetic 1835,Europe,Mid-Market,44000,2024-12-30
+C1836,Northstar Synthetic 1836,Asia Pacific,Growth,55000,2025-02-01
+C1837,Northstar Synthetic 1837,North America,Enterprise,179000,2024-02-17
+C1838,Northstar Synthetic 1838,Europe,Mid-Market,188000,2025-03-28
+C1839,Northstar Synthetic 1839,Asia Pacific,Growth,189000,2024-12-06
+C1840,Northstar Synthetic 1840,North America,Enterprise,129000,2024-07-26
+C1841,Northstar Synthetic 1841,Europe,Mid-Market,164000,2023-09-28
+C1842,Northstar Synthetic 1842,Asia Pacific,Growth,51000,2023-07-13
+C1843,Northstar Synthetic 1843,North America,Enterprise,163000,2023-01-05
+C1844,Northstar Synthetic 1844,Europe,Mid-Market,30000,2023-08-14
+C1845,Northstar Synthetic 1845,Asia Pacific,Growth,62000,2023-09-17
+C1846,Northstar Synthetic 1846,North America,Enterprise,41000,2024-11-02
+C1847,Northstar Synthetic 1847,Europe,Mid-Market,48000,2023-08-08
+C1848,Northstar Synthetic 1848,Asia Pacific,Growth,189000,2023-06-09
+C1849,Northstar Synthetic 1849,North America,Enterprise,139000,2024-02-24
+C1850,Northstar Synthetic 1850,Europe,Mid-Market,237000,2024-03-29
+C1851,Northstar Synthetic 1851,Asia Pacific,Growth,124000,2023-06-18
+C1852,Northstar Synthetic 1852,North America,Enterprise,183000,2025-01-03
+C1853,Northstar Synthetic 1853,Europe,Mid-Market,73000,2024-12-18
+C1854,Northstar Synthetic 1854,Asia Pacific,Growth,52000,2024-08-23
+C1855,Northstar Synthetic 1855,North America,Enterprise,28000,2023-01-16
+C1856,Northstar Synthetic 1856,Europe,Mid-Market,114000,2024-11-16
+C1857,Northstar Synthetic 1857,Asia Pacific,Growth,208000,2023-06-22
+C1858,Northstar Synthetic 1858,North America,Enterprise,194000,2023-09-27
+C1859,Northstar Synthetic 1859,Europe,Mid-Market,31000,2024-10-11
+C1860,Northstar Synthetic 1860,Asia Pacific,Growth,240000,2024-12-30
+C1861,Northstar Synthetic 1861,North America,Enterprise,95000,2022-12-30
+C1862,Northstar Synthetic 1862,Europe,Mid-Market,36000,2023-04-04
+C1863,Northstar Synthetic 1863,Asia Pacific,Growth,210000,2023-12-04
+C1864,Northstar Synthetic 1864,North America,Enterprise,231000,2023-05-13
+C1865,Northstar Synthetic 1865,Europe,Mid-Market,212000,2025-02-08
+C1866,Northstar Synthetic 1866,Asia Pacific,Growth,66000,2023-01-13
+C1867,Northstar Synthetic 1867,North America,Enterprise,132000,2022-12-06
+C1868,Northstar Synthetic 1868,Europe,Mid-Market,229000,2024-09-21
+C1869,Northstar Synthetic 1869,Asia Pacific,Growth,50000,2025-01-23
+C1870,Northstar Synthetic 1870,North America,Enterprise,98000,2023-07-28
+C1871,Northstar Synthetic 1871,Europe,Mid-Market,36000,2023-10-23
+C1872,Northstar Synthetic 1872,Asia Pacific,Growth,36000,2025-01-02
+C1873,Northstar Synthetic 1873,North America,Enterprise,45000,2024-08-03
+C1874,Northstar Synthetic 1874,Europe,Mid-Market,94000,2024-01-19
+C1875,Northstar Synthetic 1875,Asia Pacific,Growth,66000,2024-10-12
+C1876,Northstar Synthetic 1876,North America,Enterprise,204000,2023-03-02
+C1877,Northstar Synthetic 1877,Europe,Mid-Market,211000,2025-04-11
+C1878,Northstar Synthetic 1878,Asia Pacific,Growth,186000,2025-01-03
+C1879,Northstar Synthetic 1879,North America,Enterprise,97000,2023-02-23
+C1880,Northstar Synthetic 1880,Europe,Mid-Market,78000,2023-10-26
+C1881,Northstar Synthetic 1881,Asia Pacific,Growth,45000,2024-10-25
+C1882,Northstar Synthetic 1882,North America,Enterprise,203000,2023-06-29
+C1883,Northstar Synthetic 1883,Europe,Mid-Market,87000,2024-09-30
+C1884,Northstar Synthetic 1884,Asia Pacific,Growth,36000,2023-04-14
+C1885,Northstar Synthetic 1885,North America,Enterprise,180000,2024-02-18
+C1886,Northstar Synthetic 1886,Europe,Mid-Market,149000,2023-12-06
+C1887,Northstar Synthetic 1887,Asia Pacific,Growth,79000,2023-07-12
+C1888,Northstar Synthetic 1888,North America,Enterprise,223000,2024-01-10
+C1889,Northstar Synthetic 1889,Europe,Mid-Market,72000,2023-12-22
+C1890,Northstar Synthetic 1890,Asia Pacific,Growth,211000,2024-10-01
+C1891,Northstar Synthetic 1891,North America,Enterprise,84000,2025-04-11
+C1892,Northstar Synthetic 1892,Europe,Mid-Market,219000,2023-08-05
+C1893,Northstar Synthetic 1893,Asia Pacific,Growth,212000,2024-06-10
+C1894,Northstar Synthetic 1894,North America,Enterprise,93000,2025-04-19
+C1895,Northstar Synthetic 1895,Europe,Mid-Market,43000,2024-12-26
+C1896,Northstar Synthetic 1896,Asia Pacific,Growth,205000,2025-04-11
+C1897,Northstar Synthetic 1897,North America,Enterprise,38000,2023-01-24
+C1898,Northstar Synthetic 1898,Europe,Mid-Market,152000,2023-06-05
+C1899,Northstar Synthetic 1899,Asia Pacific,Growth,34000,2023-04-10
+C1900,Northstar Synthetic 1900,North America,Enterprise,177000,2024-10-13
+C1901,Northstar Synthetic 1901,Europe,Mid-Market,116000,2023-04-05
+C1902,Northstar Synthetic 1902,Asia Pacific,Growth,89000,2023-04-07
+C1903,Northstar Synthetic 1903,North America,Enterprise,229000,2022-11-18
+C1904,Northstar Synthetic 1904,Europe,Mid-Market,78000,2023-09-07
+C1905,Northstar Synthetic 1905,Asia Pacific,Growth,146000,2022-12-24
+C1906,Northstar Synthetic 1906,North America,Enterprise,203000,2023-12-21
+C1907,Northstar Synthetic 1907,Europe,Mid-Market,119000,2024-06-17
+C1908,Northstar Synthetic 1908,Asia Pacific,Growth,65000,2025-01-11
+C1909,Northstar Synthetic 1909,North America,Enterprise,88000,2023-11-17
+C1910,Northstar Synthetic 1910,Europe,Mid-Market,195000,2023-08-11
+C1911,Northstar Synthetic 1911,Asia Pacific,Growth,108000,2024-02-13
+C1912,Northstar Synthetic 1912,North America,Enterprise,136000,2023-04-25
+C1913,Northstar Synthetic 1913,Europe,Mid-Market,176000,2024-11-28
+C1914,Northstar Synthetic 1914,Asia Pacific,Growth,47000,2023-05-17
+C1915,Northstar Synthetic 1915,North America,Enterprise,236000,2023-10-30
+C1916,Northstar Synthetic 1916,Europe,Mid-Market,97000,2023-06-02
+C1917,Northstar Synthetic 1917,Asia Pacific,Growth,123000,2023-08-29
+C1918,Northstar Synthetic 1918,North America,Enterprise,146000,2023-12-23
+C1919,Northstar Synthetic 1919,Europe,Mid-Market,124000,2024-05-29
+C1920,Northstar Synthetic 1920,Asia Pacific,Growth,195000,2023-03-12
+C1921,Northstar Synthetic 1921,North America,Enterprise,91000,2025-03-03
+C1922,Northstar Synthetic 1922,Europe,Mid-Market,162000,2025-02-17
+C1923,Northstar Synthetic 1923,Asia Pacific,Growth,225000,2025-01-22
+C1924,Northstar Synthetic 1924,North America,Enterprise,144000,2022-11-13
+C1925,Northstar Synthetic 1925,Europe,Mid-Market,101000,2022-12-04
+C1926,Northstar Synthetic 1926,Asia Pacific,Growth,122000,2024-07-03
+C1927,Northstar Synthetic 1927,North America,Enterprise,37000,2024-08-24
+C1928,Northstar Synthetic 1928,Europe,Mid-Market,75000,2025-03-29
+C1929,Northstar Synthetic 1929,Asia Pacific,Growth,27000,2023-03-02
+C1930,Northstar Synthetic 1930,North America,Enterprise,184000,2024-01-09
+C1931,Northstar Synthetic 1931,Europe,Mid-Market,215000,2023-08-13
+C1932,Northstar Synthetic 1932,Asia Pacific,Growth,161000,2024-07-10
+C1933,Northstar Synthetic 1933,North America,Enterprise,52000,2024-11-06
+C1934,Northstar Synthetic 1934,Europe,Mid-Market,220000,2024-11-25
+C1935,Northstar Synthetic 1935,Asia Pacific,Growth,81000,2023-04-11
+C1936,Northstar Synthetic 1936,North America,Enterprise,133000,2024-11-14
+C1937,Northstar Synthetic 1937,Europe,Mid-Market,139000,2023-06-13
+C1938,Northstar Synthetic 1938,Asia Pacific,Growth,107000,2023-12-31
+C1939,Northstar Synthetic 1939,North America,Enterprise,90000,2024-06-22
+C1940,Northstar Synthetic 1940,Europe,Mid-Market,102000,2023-09-21
+C1941,Northstar Synthetic 1941,Asia Pacific,Growth,224000,2023-04-24
+C1942,Northstar Synthetic 1942,North America,Enterprise,217000,2023-11-16
+C1943,Northstar Synthetic 1943,Europe,Mid-Market,36000,2023-07-01
+C1944,Northstar Synthetic 1944,Asia Pacific,Growth,225000,2024-08-25
+C1945,Northstar Synthetic 1945,North America,Enterprise,160000,2024-06-21
+C1946,Northstar Synthetic 1946,Europe,Mid-Market,188000,2024-12-23
+C1947,Northstar Synthetic 1947,Asia Pacific,Growth,62000,2023-08-17
+C1948,Northstar Synthetic 1948,North America,Enterprise,187000,2023-08-06
+C1949,Northstar Synthetic 1949,Europe,Mid-Market,148000,2023-04-02
+C1950,Northstar Synthetic 1950,Asia Pacific,Growth,24000,2025-03-05
+C1951,Northstar Synthetic 1951,North America,Enterprise,182000,2023-06-17
+C1952,Northstar Synthetic 1952,Europe,Mid-Market,66000,2024-08-20
+C1953,Northstar Synthetic 1953,Asia Pacific,Growth,71000,2025-01-18
+C1954,Northstar Synthetic 1954,North America,Enterprise,57000,2024-04-06
+C1955,Northstar Synthetic 1955,Europe,Mid-Market,211000,2024-09-06
+C1956,Northstar Synthetic 1956,Asia Pacific,Growth,222000,2022-11-30
+C1957,Northstar Synthetic 1957,North America,Enterprise,101000,2024-11-17
+C1958,Northstar Synthetic 1958,Europe,Mid-Market,65000,2024-08-22
+C1959,Northstar Synthetic 1959,Asia Pacific,Growth,142000,2023-11-24
+C1960,Northstar Synthetic 1960,North America,Enterprise,235000,2023-05-04
+C1961,Northstar Synthetic 1961,Europe,Mid-Market,35000,2025-01-26
+C1962,Northstar Synthetic 1962,Asia Pacific,Growth,208000,2024-04-05
+C1963,Northstar Synthetic 1963,North America,Enterprise,85000,2024-09-11
+C1964,Northstar Synthetic 1964,Europe,Mid-Market,29000,2024-11-24
+C1965,Northstar Synthetic 1965,Asia Pacific,Growth,213000,2023-03-07
+C1966,Northstar Synthetic 1966,North America,Enterprise,83000,2025-01-27
+C1967,Northstar Synthetic 1967,Europe,Mid-Market,232000,2024-11-02
+C1968,Northstar Synthetic 1968,Asia Pacific,Growth,169000,2024-04-04
+C1969,Northstar Synthetic 1969,North America,Enterprise,53000,2025-04-17
+C1970,Northstar Synthetic 1970,Europe,Mid-Market,120000,2024-03-01
+C1971,Northstar Synthetic 1971,Asia Pacific,Growth,32000,2025-02-14
+C1972,Northstar Synthetic 1972,North America,Enterprise,76000,2025-01-21
+C1973,Northstar Synthetic 1973,Europe,Mid-Market,70000,2024-09-14
+C1974,Northstar Synthetic 1974,Asia Pacific,Growth,220000,2023-02-21
+C1975,Northstar Synthetic 1975,North America,Enterprise,40000,2024-06-30
+C1976,Northstar Synthetic 1976,Europe,Mid-Market,34000,2023-11-07
+C1977,Northstar Synthetic 1977,Asia Pacific,Growth,126000,2022-12-14
+C1978,Northstar Synthetic 1978,North America,Enterprise,35000,2024-02-14
+C1979,Northstar Synthetic 1979,Europe,Mid-Market,107000,2024-11-27
+C1980,Northstar Synthetic 1980,Asia Pacific,Growth,206000,2024-08-31
+C1981,Northstar Synthetic 1981,North America,Enterprise,133000,2024-08-23
+C1982,Northstar Synthetic 1982,Europe,Mid-Market,88000,2024-05-18
+C1983,Northstar Synthetic 1983,Asia Pacific,Growth,163000,2023-07-19
+C1984,Northstar Synthetic 1984,North America,Enterprise,158000,2024-12-27
+C1985,Northstar Synthetic 1985,Europe,Mid-Market,144000,2024-02-05
+C1986,Northstar Synthetic 1986,Asia Pacific,Growth,153000,2023-10-09
+C1987,Northstar Synthetic 1987,North America,Enterprise,152000,2024-11-04
+C1988,Northstar Synthetic 1988,Europe,Mid-Market,73000,2024-05-17
+C1989,Northstar Synthetic 1989,Asia Pacific,Growth,237000,2024-01-06
+C1990,Northstar Synthetic 1990,North America,Enterprise,116000,2024-02-25
+C1991,Northstar Synthetic 1991,Europe,Mid-Market,54000,2023-11-01
+C1992,Northstar Synthetic 1992,Asia Pacific,Growth,75000,2024-03-14
+C1993,Northstar Synthetic 1993,North America,Enterprise,162000,2023-04-16
+C1994,Northstar Synthetic 1994,Europe,Mid-Market,149000,2025-04-14
+C1995,Northstar Synthetic 1995,Asia Pacific,Growth,202000,2023-10-08
+C1996,Northstar Synthetic 1996,North America,Enterprise,219000,2024-05-31
+C1997,Northstar Synthetic 1997,Europe,Mid-Market,54000,2023-02-02
+C1998,Northstar Synthetic 1998,Asia Pacific,Growth,124000,2023-06-23
+C1999,Northstar Synthetic 1999,North America,Enterprise,76000,2023-10-07
+C2000,Northstar Synthetic 2000,Europe,Mid-Market,235000,2024-08-24

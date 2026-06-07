@@ -8,9 +8,11 @@ class UnsupportedScenario(ValueError):
 
 
 class CoordinatorAgent:
-    """Limit execution to the three reviewed synthetic scenarios."""
+    """Limit execution to the reviewed synthetic scenarios."""
 
-    supported_concepts = frozenset({"active_customer", "net_revenue", "churned_customer"})
+    supported_concepts = frozenset(
+        {"active_customer", "net_revenue", "churned_customer", "qualified_lead"}
+    )
 
     def require_supported(self, concept: ConceptResolution) -> None:
         if concept.concept_id not in self.supported_concepts:

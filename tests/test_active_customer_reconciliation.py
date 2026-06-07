@@ -33,9 +33,9 @@ def test_active_customer_conflict_detected(active_case: ReconciliationCase) -> N
     assert active_case.state == ReconciliationState.COMPLETE
     assert active_case.verdict == "conflict"
     assert [result.entity_count for result in active_case.execution_results] == [
-        96,
-        90,
-        80,
+        1600,
+        1500,
+        1334,
     ]
     assert active_case.verifier_report
     assert active_case.verifier_report.passed is True
@@ -47,7 +47,7 @@ def test_active_customer_impact_ranked_first(active_case: ReconciliationCase) ->
     assert impact
     assert impact.rank == 1
     assert impact.severity == "high"
-    assert impact.customer_count_delta == 16
+    assert impact.customer_count_delta == 266
     assert impact.arr_delta > 0
     assert impact.reports_affected == 3
 

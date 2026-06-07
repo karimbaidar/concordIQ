@@ -23,6 +23,20 @@ from concord.fabric_seed import (
     export_fabric_seed,
 )
 
+# Fabric REST surfaces below are VERIFIED against current Microsoft Learn
+# (Ontology REST API, updated 2026-05/06), not assumed:
+#   - POST /workspaces/{id}/ontologies                      (Create Ontology, 202 LRO)
+#   - POST /workspaces/{id}/ontologies/{id}/updateDefinition?updateMetadata=...
+#   - GET  /workspaces/{id}/items?type=Ontology|Lakehouse   (list items, ItemType enum)
+#   - POST /workspaces/{id}/lakehouses                       (Create Lakehouse)
+#   - POST /workspaces/{id}/assignToCapacity                 (assign capacity)
+#   - MCP: /v1/mcp/dataPlane/workspaces/{ws}/items/{ont}/ontologyEndpoint
+# Prerequisites the operator must satisfy (see docs/iq-integration.md): the
+# "Enable Ontology item (preview)" tenant setting, a contributor role with the
+# Item.ReadWrite.All delegated scope, and a supported capacity (F2 is the minimum
+# SKU for the Ontology preview). The one best-effort surface is the `.platform`
+# definition part payload (its exact schema is not published); if updateDefinition
+# is rejected, the bootstrap preserves resources and prints the manual UI fallback.
 FABRIC_API_ROOT = "https://api.fabric.microsoft.com/v1"
 
 

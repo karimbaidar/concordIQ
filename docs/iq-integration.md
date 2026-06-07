@@ -26,6 +26,39 @@ The Fabric adapter initializes the ontology MCP endpoint, lists tools, selects
 Fabric tool schemas can evolve, so a tenant smoke test is required before this
 adapter can be described as verified.
 
+## Verified Fabric API surfaces (confirmed 2026-06)
+
+The bootstrap and adapter REST/MCP surfaces were checked against current
+Microsoft Learn (Ontology REST API pages updated 2026-05/06). They are verified,
+not assumed:
+
+| Surface | Endpoint | Status |
+| --- | --- | --- |
+| Create workspace | `POST /v1/workspaces` | Verified (GA) |
+| Assign capacity | `POST /v1/workspaces/{id}/assignToCapacity` | Verified (GA) |
+| Create lakehouse | `POST /v1/workspaces/{id}/lakehouses` | Verified (GA) |
+| List items by type | `GET /v1/workspaces/{id}/items?type=Ontology` | Verified (`Ontology` is in the `ItemType` enum) |
+| Create ontology | `POST /v1/workspaces/{id}/ontologies` (201 / 202 LRO) | Verified (preview) |
+| Update definition | `POST /v1/workspaces/{id}/ontologies/{id}/updateDefinition?updateMetadata=true` | Verified (preview) |
+| Definition payload | `{definition:{parts:[{path,payload,payloadType:"InlineBase64"}]}}` over `definition.json`, `EntityTypes/{id}/definition.json`, `.platform` | Verified shape |
+| Ontology MCP endpoint | `/v1/mcp/dataPlane/workspaces/{ws}/items/{ont}/ontologyEndpoint` | Verified shape |
+
+The only surface still treated as best-effort is the base64 `.platform`
+definition part (its exact schema is not published). If `updateDefinition` is
+rejected, the bootstrap preserves the created resources and prints the manual
+Fabric UI import steps; nothing is lost.
+
+## Prerequisites before cloud bootstrap
+
+1. Enable the **"Enable Ontology item (preview)"** tenant setting in the Fabric
+   admin portal. Creating an ontology fails without it.
+2. The caller needs a **contributor** workspace role and the
+   **`Item.ReadWrite.All`** delegated scope (user or service principal).
+   `az account get-access-token --resource https://api.fabric.microsoft.com`
+   supplies a suitable token for an authorized user.
+3. The workspace must be on a **supported capacity. F2 is the minimum SKU** for
+   the Ontology preview, so a planned F2 capacity is sufficient.
+
 Official references:
 
 - [Microsoft Agent Framework workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/)
@@ -34,6 +67,10 @@ Official references:
 - [Foundry IQ and agentic retrieval](https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-overview)
 - [Fabric IQ overview](https://learn.microsoft.com/en-us/fabric/iq/overview)
 - [Fabric ontology MCP server](https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-use-ontology-mcp-server)
+- [Create Ontology (REST)](https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items/create-ontology)
+- [Update Ontology Definition (REST)](https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items/update-ontology-definition)
+- [Ontology preview tenant settings](https://learn.microsoft.com/en-us/fabric/iq/ontology/overview-tenant-settings)
+- [Ontology billing and capacity usage](https://learn.microsoft.com/en-us/fabric/iq/ontology/resources-capacity-usage)
 
 ## Configuration
 

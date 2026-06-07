@@ -5,3 +5,5 @@ RPT003,Customer Success,Adoption Health,Active Customer,high
 RPT004,Finance,Net Revenue,Net Revenue,high
 RPT005,Sales,Booked Revenue,Net Revenue,medium
 RPT006,Customer Success,Retention Review,Churned Customer,high
+RPT007,Sales,Pipeline Qualified Leads,Qualified Lead,medium
+RPT008,Marketing,Demand Funnel,Qualified Lead,medium

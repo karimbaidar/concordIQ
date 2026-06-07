@@ -2,7 +2,7 @@ UV ?= uv
 PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
-.PHONY: setup postgres seed test lint dev frontend demo agent-smoke capture \
+.PHONY: setup postgres seed test lint dev frontend demo scan agent-smoke capture \
 	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
 
 setup:
@@ -39,6 +39,9 @@ dev: postgres seed
 
 demo: postgres seed
 	$(PYTHON) -m concord.demo
+
+scan: seed
+	$(PYTHON) -m concord.scan
 
 agent-smoke: postgres seed
 	PYTHONWARNINGS="ignore::FutureWarning" \

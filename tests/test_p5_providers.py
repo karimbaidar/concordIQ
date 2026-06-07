@@ -99,6 +99,14 @@ def test_provider_contract_local_and_replay_match(
             p2_local_provider.get_authority_rules(local_concept.concept_id)
         )
 
+        question = f"Why do our {scenario.term} numbers disagree?"
+        local_query = p2_local_provider.nl_query(question)
+        replay_query = replay.nl_query(question)
+        assert local_query.matched and replay_query.matched
+        assert replay_query.concept_id == local_query.concept_id
+        assert replay_query.citations == local_query.citations
+        assert replay_query.answer == local_query.answer
+
 
 def test_replay_refuses_unverified_artifact(
     tmp_path: Path,
@@ -233,6 +241,83 @@ def test_fabric_mcp_discovers_tool_and_parses_typed_snapshot(
     assert transport.requests[1]["headers"]["Mcp-Session-Id"] == "session-123"
     assert transport.requests[1]["body"]["method"] == "notifications/initialized"
     assert transport.requests[3]["body"]["params"]["name"] == "search_ontology"
+
+
+def test_fabric_capture_stays_within_six_call_budget(
+    tmp_path: Path,
+    p2_local_provider: LocalProvider,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Lock the F2 budget: a full Fabric capture is exactly six MCP calls.
+
+    One handshake (initialize + initialized + tools/list) plus one tool call per
+    scenario = 6. MAX_CLOUD_CALLS=6 must be sufficient and not exceeded.
+    """
+    snapshots = _snapshots(p2_local_provider)
+    transport = QueueTransport(
+        [
+            HttpResult(
+                payload={"jsonrpc": "2.0", "id": 1, "result": {"protocolVersion": "2025-06-18"}},
+                headers={"mcp-session-id": "session-123"},
+            ),
+            HttpResult(payload={}, headers={}),
+            HttpResult(
+                payload={
+                    "jsonrpc": "2.0",
+                    "id": 3,
+                    "result": {
+                        "tools": [
+                            {
+                                "name": "search_ontology",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {"query": {"type": "string"}},
+                                },
+                            }
+                        ]
+                    },
+                },
+                headers={},
+            ),
+            *(
+                HttpResult(
+                    payload={
+                        "jsonrpc": "2.0",
+                        "id": index + 4,
+                        "result": {
+                            "content": [{"type": "text", "text": snapshot.model_dump_json()}]
+                        },
+                    },
+                    headers={},
+                )
+                for index, snapshot in enumerate(snapshots)
+            ),
+        ]
+    )
+    settings = Settings(
+        provider="fabric_iq",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint=(
+            "https://api.fabric.microsoft.com/v1/mcp/dataPlane/"
+            "workspaces/workspace/items/ontology/ontologyEndpoint"
+        ),
+        fabric_iq_access_token="secret",
+        capture_raw_dir=tmp_path / "raw",
+        capture_sanitized_path=tmp_path / "sanitized" / "latest.json",
+    )
+    provider = FabricIQProvider(settings, transport=transport)
+    monkeypatch.setattr("concord.capture.create_provider", lambda _: provider)
+
+    sanitized_path = capture(settings)
+
+    assert provider.cloud_call_count == 6
+    replay = ReplayProvider(sanitized_path)
+    assert {scenario.scenario_id for scenario in replay.artifact.scenarios} == {
+        "active-customer",
+        "net-revenue",
+        "churned-customer",
+    }
 
 
 def test_capture_writes_raw_ignored_shape_and_sanitized_replay(

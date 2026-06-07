@@ -47,6 +47,45 @@ It then validates typed synthetic snapshots and writes a sanitized candidate to
 `artifacts/replay/sanitized/latest.json`. Review that file before staging it.
 `make replay-check` must pass before the artifact is presented as verified.
 
+## Fabric F2 budget runbook (target: well under EUR 100)
+
+The captured IQ run is a few minutes of work; the only thing that spends real
+money is leaving an F-capacity *running*. Treat capacity time as the budget.
+
+1. **Use the minimum SKU.** F2 is the minimum capacity that supports the Ontology
+   preview, so provision **F2** — not a larger SKU. (Confirm the current F2
+   hourly rate on the Fabric pricing page before you start; do not assume it.)
+2. **Pause when idle, always.** Fabric capacities can be paused and resumed, and
+   pausing stops compute billing. Resume only for the minutes you bootstrap and
+   capture, then pause again immediately. This is the single most important
+   control.
+3. **Disable graph auto-refresh.** The ontology's child Graph item can be set to
+   refresh on a schedule and that consumes capacity. Leave it manual/disabled for
+   a one-off capture.
+4. **Keep the workload tiny.** Only the three synthetic scenarios are captured
+   (six budgeted MCP calls). Ontology Modeling bills ~0.0039 CU/hr per definition
+   in 30-minute windows, and NL2Ontology reasoning is token-metered and smoothed
+   over 24 hours — both are negligible at this scale.
+5. **Monitor.** Install the Microsoft Fabric Capacity Metrics app to watch actual
+   CU usage while the capacity is live.
+6. **Delete when done.** After the sanitized artifact passes `make replay-check`,
+   delete the workspace and (if it was created only for this) the capacity. From
+   then on the demo runs entirely on `ReplayProvider` at zero cost.
+
+Minimal-cost path end to end:
+
+```bash
+# 1. (Fabric portal) resume the F2 capacity; ensure "Enable Ontology item (preview)"
+make fabric-bootstrap-dry-run                                  # EUR 0, no cloud
+ALLOW_CLOUD=true make fabric-bootstrap                         # create resources
+PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
+make replay-check                                             # validate + replay
+# 2. (Fabric portal) PAUSE or DELETE the F2 capacity
+```
+
+See [iq-integration.md](iq-integration.md) for the verified API surfaces and the
+tenant/role/capacity prerequisites.
+
 ## Operational hygiene
 
 - Use only the three small synthetic scenarios.

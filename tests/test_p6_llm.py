@@ -99,7 +99,7 @@ def test_core_reconciliation_works_with_llm_disabled(
     )
 
     assert case.verdict == "conflict"
-    assert [result.entity_count for result in case.execution_results] == [96, 90, 80]
+    assert [result.entity_count for result in case.execution_results] == [1600, 1500, 1334]
     assert case.reconciliation_proposal
     assert case.verifier_report and case.verifier_report.passed
     assert [narration.task for narration in case.narrations] == [
@@ -145,7 +145,7 @@ def test_llm_output_cannot_override_evidence(
     )
 
     assert case.verdict == "conflict"
-    assert [result.entity_count for result in case.execution_results] == [96, 90, 80]
+    assert [result.entity_count for result in case.execution_results] == [1600, 1500, 1334]
     assert all("SELECT" in result.executed_sql for result in case.execution_results)
     assert case.authority_assessment
     assert case.authority_assessment.status == "clear"
@@ -165,9 +165,9 @@ def test_llm_output_cannot_override_evidence(
     assert finding
     assert finding.verdict == "conflict"
     assert finding.details["counts"] == {
-        "active_customer_finance": 96,
-        "active_customer_sales": 90,
-        "active_customer_customer_success": 80,
+        "active_customer_finance": 1600,
+        "active_customer_sales": 1500,
+        "active_customer_customer_success": 1334,
     }
     assert len(finding.details["narrations"]) == 3
 

@@ -103,6 +103,28 @@ class SkepticalVerifierAgent:
                     ),
                 }
             )
+        elif concept_id == "qualified_lead":
+            checks.update(
+                {
+                    "two_definitions_executed": len(case.execution_results) == 2,
+                    "conflict_has_divergent_sets": (
+                        case.verdict == "conflict" and len(entity_sets) > 1
+                    ),
+                    "authority_is_configured": (
+                        case.authority_assessment is not None
+                        and case.authority_assessment.status == "clear"
+                        and case.authority_assessment.owner is not None
+                    ),
+                    "proposal_cites_all_evidence": (
+                        case.reconciliation_proposal is not None and proposal_refs == evidence_ids
+                    ),
+                    "proposal_requires_human_approval": (
+                        case.requires_human_approval
+                        and case.reconciliation_proposal is not None
+                        and case.reconciliation_proposal.requires_human_approval
+                    ),
+                }
+            )
         else:
             checks["scenario_is_supported"] = False
         failures = tuple(name for name, passed in checks.items() if not passed)

@@ -21,6 +21,9 @@ from concord.providers.base import (
     OntologySubgraph,
     ProviderMode,
     ProviderNotConfigured,
+    QueryResult,
+    build_query_result,
+    unmatched_query_result,
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -66,6 +69,49 @@ class LocalProvider:
     def _authority_rules(self) -> tuple[dict[str, Any], ...]:
         document = _load_yaml_document(self.authority_rules_path)
         return tuple(document["rules"])
+
+    def list_concepts(self) -> list[ConceptResolution]:
+        """Enumerate every registered concept (used by the portfolio scan)."""
+        definitions = self._definitions()
+        resolutions: list[ConceptResolution] = []
+        for concept in self._ontology()["concepts"]:
+            definition_ids = tuple(
+                definition["definition_id"]
+                for definition in definitions
+                if definition["concept_id"] == concept["concept_id"]
+            )
+            resolutions.append(
+                ConceptResolution(
+                    concept_id=concept["concept_id"],
+                    canonical_name=concept["canonical_name"],
+                    description=concept["description"],
+                    aliases=tuple(concept.get("aliases", ())),
+                    definition_ids=definition_ids,
+                )
+            )
+        return resolutions
+
+    def nl_query(self, question: str) -> QueryResult:
+        """Resolve a business question to its governed concept and definitions."""
+        normalized = _normalized_term(question)
+        best_concept: dict[str, Any] | None = None
+        best_length = 0
+        for concept in self._ontology()["concepts"]:
+            for name in (concept["canonical_name"], *concept.get("aliases", ())):
+                candidate = _normalized_term(name)
+                if candidate and candidate in normalized and len(candidate) > best_length:
+                    best_concept = concept
+                    best_length = len(candidate)
+        if best_concept is None:
+            return unmatched_query_result(question, provider_name=self.name)
+        resolution = self.resolve_concept(best_concept["canonical_name"])
+        bindings = tuple(self.get_binding_semantics(resolution.concept_id))
+        return build_query_result(
+            question,
+            provider_name=self.name,
+            concept=resolution,
+            bindings=bindings,
+        )
 
     def resolve_concept(self, term: str) -> ConceptResolution:
         sought = _normalized_term(term)

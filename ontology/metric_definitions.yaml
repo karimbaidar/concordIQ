@@ -129,6 +129,44 @@
         "exclusions": [],
         "sql_template": "SELECT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN churn_events ce ON ce.customer_id = c.customer_id WHERE TRY_CAST(ce.cs_churn_date AS DATE) IS NOT NULL AND TRY_CAST(ce.cs_churn_date AS DATE) <= DATE '{period_end}' ORDER BY entity_id"
       }
+    },
+    {
+      "definition_id": "qualified_lead_sales",
+      "concept_id": "qualified_lead",
+      "name": "Sales Qualified Lead",
+      "owner": "Sales",
+      "rule_text": "Customer with an open or won opportunity updated during the trailing 180 days.",
+      "semantic_dimensions": ["lead-stage-definition", "activity-window"],
+      "binding": {
+        "binding_id": "qualified_lead_sales_v1",
+        "source_tables": ["customers", "opportunities"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with an open or won opportunity in the trailing 180 days.",
+        "time_window_days": 180,
+        "filters": ["stage in open, won", "updated_at in trailing 180 days"],
+        "exclusions": ["nurturing opportunities", "closed_lost opportunities"],
+        "sql_template": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN opportunities o ON o.customer_id = c.customer_id WHERE o.stage IN ('open', 'won') AND CAST(o.updated_at AS DATE) BETWEEN DATE '{period_end}' - INTERVAL 179 DAY AND DATE '{period_end}' ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "qualified_lead_marketing",
+      "concept_id": "qualified_lead",
+      "name": "Marketing Qualified Lead",
+      "owner": "Marketing",
+      "rule_text": "Customer with an open, won, or nurturing opportunity updated during the trailing 180 days.",
+      "semantic_dimensions": ["lead-stage-definition", "activity-window"],
+      "binding": {
+        "binding_id": "qualified_lead_marketing_v1",
+        "source_tables": ["customers", "opportunities"],
+        "entity_key": "customer_id",
+        "grain": "customer",
+        "population": "Customers with an open, won, or nurturing opportunity in the trailing 180 days.",
+        "time_window_days": 180,
+        "filters": ["stage in open, won, nurturing", "updated_at in trailing 180 days"],
+        "exclusions": ["closed_lost opportunities"],
+        "sql_template": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN opportunities o ON o.customer_id = c.customer_id WHERE o.stage IN ('open', 'won', 'nurturing') AND CAST(o.updated_at AS DATE) BETWEEN DATE '{period_end}' - INTERVAL 179 DAY AND DATE '{period_end}' ORDER BY entity_id"
+      }
     }
   ]
 }

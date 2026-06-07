@@ -13,6 +13,8 @@ from concord.providers.base import (
     EvaluationPeriod,
     OntologySubgraph,
     ProviderMode,
+    QueryResult,
+    build_query_result,
 )
 from concord.providers.cloud import GuardedCloudClient, JsonTransport
 from concord.providers.replay_schema import ReplayScenarioSnapshot
@@ -61,6 +63,20 @@ class CloudSnapshotProvider(ABC):
     @abstractmethod
     def _retrieve_snapshot(self, term: str) -> ReplayScenarioSnapshot:
         """Retrieve and validate one scenario through the configured IQ surface."""
+
+    def list_concepts(self) -> list[ConceptResolution]:
+        """Enumerate concepts already retrieved this session (no extra cloud call)."""
+        return [snapshot.concept for snapshot in self._by_concept.values()]
+
+    def nl_query(self, question: str) -> QueryResult:
+        """Genuinely IQ-served: ask NL2Ontology/retrieve to resolve the question."""
+        snapshot = self._cache(self._retrieve_snapshot(question))
+        return build_query_result(
+            question,
+            provider_name=self.name,
+            concept=snapshot.concept,
+            bindings=snapshot.bindings,
+        )
 
     def resolve_concept(self, term: str) -> ConceptResolution:
         key = self._normalize(term)

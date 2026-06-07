@@ -18,12 +18,19 @@
       "canonical_name": "Churned Customer",
       "description": "A customer treated as lost for retention and financial reporting.",
       "aliases": ["churn", "churned customers", "lost customer"]
+    },
+    {
+      "concept_id": "qualified_lead",
+      "canonical_name": "Qualified Lead",
+      "description": "A prospect considered sales-ready for pipeline and demand reporting.",
+      "aliases": ["qualified leads", "mql", "sql", "marketing qualified lead", "sales qualified lead"]
     }
   ],
   "nodes": [
     {"node_id": "active_customer", "node_type": "business_concept", "label": "Active Customer"},
     {"node_id": "net_revenue", "node_type": "business_concept", "label": "Net Revenue"},
     {"node_id": "churned_customer", "node_type": "business_concept", "label": "Churned Customer"},
+    {"node_id": "qualified_lead", "node_type": "business_concept", "label": "Qualified Lead"},
     {"node_id": "customer", "node_type": "entity_type", "label": "Customer"},
     {"node_id": "contract", "node_type": "entity_type", "label": "Contract"},
     {"node_id": "opportunity", "node_type": "entity_type", "label": "Opportunity"},
@@ -40,6 +47,8 @@
     {"source": "net_revenue", "target": "revenue_event", "relationship_type": "aggregates"},
     {"source": "churned_customer", "target": "contract", "relationship_type": "derived_from"},
     {"source": "churned_customer", "target": "usage_event", "relationship_type": "derived_from"},
-    {"source": "churned_customer", "target": "churn_event", "relationship_type": "materialized_as"}
+    {"source": "churned_customer", "target": "churn_event", "relationship_type": "materialized_as"},
+    {"source": "qualified_lead", "target": "customer", "relationship_type": "selects"},
+    {"source": "qualified_lead", "target": "opportunity", "relationship_type": "derived_from"}
   ]
 }

@@ -8,6 +8,8 @@ from concord.providers.base import (
     EvaluationPeriod,
     GroundingProvider,
     OntologySubgraph,
+    QueryDefinitionSummary,
+    QueryResult,
 )
 from concord.providers.fabric_iq import FabricIQProvider
 from concord.providers.factory import (
@@ -32,6 +34,8 @@ __all__ = [
     "GroundingProvider",
     "LocalProvider",
     "OntologySubgraph",
+    "QueryDefinitionSummary",
+    "QueryResult",
     "ReplayProvider",
     "create_preferred_cloud_provider",
     "create_provider",

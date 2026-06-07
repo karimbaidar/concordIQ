@@ -66,7 +66,7 @@ def test_local_provider_evaluates_active_customer_definitions(
         for binding in local_provider.get_binding_semantics("active_customer")
     ]
 
-    assert [evaluation.entity_count for evaluation in evaluations] == [96, 90, 80]
+    assert [evaluation.entity_count for evaluation in evaluations] == [1600, 1500, 1334]
     assert len({evaluation.entity_ids for evaluation in evaluations}) == 3
     assert all(evaluation.metric_total > 0 for evaluation in evaluations)
     assert all("SELECT" in evaluation.executed_sql for evaluation in evaluations)
@@ -93,8 +93,8 @@ def test_seeded_churn_bindings_return_divergent_customer_sets(
         for binding in local_provider.get_binding_semantics("churned_customer")
     ]
 
-    assert evaluations[0].entity_count == 20
-    assert evaluations[1].entity_count == 40
+    assert evaluations[0].entity_count == 333
+    assert evaluations[1].entity_count == 666
     assert evaluations[0].entity_ids != evaluations[1].entity_ids
 
 

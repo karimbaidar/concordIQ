@@ -48,7 +48,7 @@ def test_net_revenue_decoy_ruled_out(
 
     assert net_revenue_case.state == ReconciliationState.COMPLETE
     assert net_revenue_case.verdict == "consistent"
-    assert [result.entity_count for result in evaluations] == [96, 96]
+    assert [result.entity_count for result in evaluations] == [1600, 1600]
     assert evaluations[0].entity_ids == evaluations[1].entity_ids
     assert evaluations[0].rows == evaluations[1].rows
     assert evaluations[0].metric_total == evaluations[1].metric_total
@@ -89,7 +89,7 @@ def test_churned_customer_requires_human_approval(
 
     assert churned_customer_case.state == ReconciliationState.COMPLETE
     assert churned_customer_case.verdict == "conflict"
-    assert [result.entity_count for result in churned_customer_case.execution_results] == [20, 40]
+    assert [result.entity_count for result in churned_customer_case.execution_results] == [333, 666]
     assert authority
     assert authority.status == "ambiguous"
     assert authority.owner is None
@@ -160,10 +160,13 @@ def test_headless_demo_prints_all_three_verdicts(
         "conflict",
     ]
     assert output == [
-        ("Active Customer: CONFLICT | counts=96/90/80 | proposal drafted; human approval required"),
-        ("Net Revenue: CONSISTENT | counts=96/96 | decoy ruled out; no reconciliation needed"),
         (
-            "Churned Customer: CONFLICT | counts=20/40 | "
+            "Active Customer: CONFLICT | counts=1600/1500/1334 | "
+            "proposal drafted; human approval required"
+        ),
+        ("Net Revenue: CONSISTENT | counts=1600/1600 | decoy ruled out; no reconciliation needed"),
+        (
+            "Churned Customer: CONFLICT | counts=333/666 | "
             "automatic reconciliation refused; human approval required"
         ),
     ]

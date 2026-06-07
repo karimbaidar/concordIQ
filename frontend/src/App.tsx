@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { fetchDemoScenarios, fetchHealth, runDemoScenario } from "./api";
+import { fetchDemoScenarios, fetchHealth, reconcileTerm, runDemoScenario } from "./api";
+import { AskConcord } from "./components/AskConcord";
 import { DashboardDisagreement } from "./components/DashboardDisagreement";
 import { DecoyRuledOut } from "./components/DecoyRuledOut";
+import { PortfolioBoard } from "./components/PortfolioBoard";
 import { DefinitionDiff } from "./components/DefinitionDiff";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ImpactPanel } from "./components/ImpactPanel";
@@ -110,6 +112,39 @@ export default function App() {
     }
   }
 
+  function handleAskAnswer(caseResult: ReconciliationCase) {
+    setResult(caseResult);
+    requestAnimationFrame(() => {
+      document.getElementById("case-result")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  async function handleInvestigate(term: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      const caseResult = await reconcileTerm(term);
+      setResult(caseResult);
+      requestAnimationFrame(() => {
+        document.getElementById("case-result")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "The deterministic reconciliation run failed.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -185,6 +220,11 @@ export default function App() {
           </section>
         )}
 
+        {!result && (
+          <AskConcord onAnswer={handleAskAnswer} busy={busy} setBusy={setBusy} />
+        )}
+        {!result && <PortfolioBoard onInvestigate={handleInvestigate} busy={busy} />}
+
         {result && (
           <div className="result-area" id="case-result">
             <section className={`outcome-banner outcome-${result.verdict}`}>
@@ -227,7 +267,10 @@ export default function App() {
             </div>
 
             {result.reconciliation_proposal && (
-              <SemanticPullRequest proposal={result.reconciliation_proposal} />
+              <SemanticPullRequest
+                proposal={result.reconciliation_proposal}
+                runId={result.run_id}
+              />
             )}
             {result.refusal_reason && result.authority_assessment && (
               <RefusalCard

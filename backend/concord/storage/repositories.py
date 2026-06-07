@@ -1,6 +1,9 @@
 """PostgreSQL repositories for reconciliation runs and evidence."""
 
+import json
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Literal
 from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sqlalchemy import Engine, select
@@ -17,6 +20,30 @@ from concord.storage.models import (
     SemanticProposal,
     utc_now,
 )
+
+
+class ProposalNotFound(LookupError):
+    """Raised when a run has no governed proposal to approve (e.g. a refusal)."""
+
+
+class ProposalAlreadyDecided(RuntimeError):
+    """Raised when a proposal has already been approved or rejected."""
+
+
+class UnauthorizedApprover(PermissionError):
+    """Raised when a non-owner attempts to approve or reject a proposal."""
+
+
+@dataclass(frozen=True, slots=True)
+class ProposalDecisionResult:
+    """The outcome of a Semantic-PR approval-gate decision."""
+
+    run_id: UUID
+    term: str
+    status: Literal["approved", "rejected"]
+    authority_owner: str
+    decided_by: str
+    decided_at: datetime
 
 
 @dataclass(slots=True)
@@ -128,6 +155,91 @@ class ReconciliationRepository:
                 for entry in case.audit_log
             )
         return case.run_id
+
+    def get_proposal_state(self, run_id: UUID) -> dict[str, object] | None:
+        """Return a non-secret view of a run's proposal for the approval gate."""
+        with self._sessions() as session:
+            proposal = session.scalar(
+                select(SemanticProposal).where(SemanticProposal.run_id == run_id)
+            )
+            if proposal is None:
+                return None
+            term = self._term_for_finding(session, proposal.finding_id)
+            owner = self._proposal_owner(proposal.proposal_text)
+            return {
+                "run_id": str(run_id),
+                "term": term,
+                "status": proposal.status,
+                "authority_owner": owner,
+                "requires_human_approval": proposal.requires_human_approval,
+            }
+
+    def decide_proposal(
+        self,
+        run_id: UUID,
+        *,
+        decision: Literal["approved", "rejected"],
+        approver: str,
+    ) -> ProposalDecisionResult:
+        """Apply a Semantic-PR decision; only the configured owner may decide.
+
+        Deterministic governance: the approver must equal the proposal's
+        authority owner, the proposal must still be a draft, and the decision is
+        written to the immutable audit trail. The LLM is never consulted.
+        """
+        with self._sessions.begin() as session:
+            proposal = session.scalar(
+                select(SemanticProposal).where(SemanticProposal.run_id == run_id)
+            )
+            if proposal is None:
+                raise ProposalNotFound(f"Run {run_id} has no governed proposal to {decision[:-1]}.")
+            if proposal.status != "draft":
+                raise ProposalAlreadyDecided(
+                    f"Proposal for run {run_id} is already {proposal.status}."
+                )
+            owner = self._proposal_owner(proposal.proposal_text)
+            if approver != owner:
+                raise UnauthorizedApprover(
+                    f"Only {owner} may decide this proposal; {approver!r} is not the owner."
+                )
+            proposal.status = decision
+            term = self._term_for_finding(session, proposal.finding_id)
+            decided_at = utc_now()
+            session.add(
+                AuditEvent(
+                    run_id=run_id,
+                    event_type="proposal_decision",
+                    actor=approver,
+                    payload={
+                        "decision": decision,
+                        "authority_owner": owner,
+                        "term": term,
+                    },
+                )
+            )
+        return ProposalDecisionResult(
+            run_id=run_id,
+            term=term,
+            status=decision,
+            authority_owner=owner,
+            decided_by=approver,
+            decided_at=decided_at,
+        )
+
+    @staticmethod
+    def _proposal_owner(proposal_text: str) -> str:
+        try:
+            return str(json.loads(proposal_text).get("authority_owner", ""))
+        except json.JSONDecodeError:
+            return ""
+
+    @staticmethod
+    def _term_for_finding(session: Session, finding_id: UUID) -> str:
+        finding = session.get(ConflictFinding, finding_id)
+        if finding is None:
+            return ""
+        term = session.get(BusinessTerm, finding.term_id)
+        return term.canonical_name if term else ""
 
     @staticmethod
     def _get_or_create_term(

@@ -1662,3 +1662,357 @@ summary:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Phase 2: engagement layer (portfolio scan, Concord Score, approval gate) ---- */
+
+.portfolio-board {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.portfolio-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.portfolio-head p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+.score-dial {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  color: #fff;
+  background: radial-gradient(circle at 30% 25%, #3a6bf0, #1b2a55);
+  box-shadow: 0 16px 34px rgba(33, 52, 110, 0.28);
+  flex: none;
+}
+
+.score-dial strong {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.score-dial span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+.score-dial em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.score-dial.grade-A,
+.score-dial.grade-B {
+  background: radial-gradient(circle at 30% 25%, #18b08f, #0b5b53);
+}
+
+.score-dial.grade-D,
+.score-dial.grade-F {
+  background: radial-gradient(circle at 30% 25%, #d2693f, #7c2b2b);
+}
+
+.score-summary {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.score-summary strong {
+  color: var(--ink);
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+.conflict-board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conflict-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #fafbfe;
+}
+
+.conflict-row.verdict-conflict {
+  border-left: 4px solid var(--red);
+}
+
+.conflict-row.verdict-consistent {
+  border-left: 4px solid var(--green);
+  opacity: 0.85;
+}
+
+.conflict-rank {
+  font-weight: 800;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.conflict-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.conflict-main strong {
+  font-size: 15px;
+}
+
+.conflict-counts {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.conflict-impact {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.conflict-impact strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.conflict-impact span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.action-pill {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #eef1f8;
+  color: var(--muted);
+}
+
+.action-pill.action-propose {
+  background: rgba(47, 103, 246, 0.12);
+  color: var(--blue);
+}
+
+.action-pill.action-refuse {
+  background: rgba(196, 71, 71, 0.13);
+  color: var(--red);
+}
+
+.action-pill.action-monitor {
+  background: rgba(21, 134, 99, 0.13);
+  color: var(--green);
+}
+
+.team-leaderboard {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.team-card {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 14px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.team-card strong {
+  font-size: 24px;
+}
+
+.team-card span {
+  font-size: 12px;
+  color: var(--ink);
+  text-align: center;
+}
+
+.team-card em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.primary-button,
+.ghost-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(105deg, #315fdf, #6b55e8);
+  box-shadow: 0 10px 22px rgba(73, 83, 210, 0.22);
+}
+
+.ghost-button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.primary-button:disabled,
+.ghost-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.pr-gate {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pr-gate p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pr-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.gate-result {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.gate-result.gate-approved {
+  color: var(--green);
+}
+
+.gate-result.gate-rejected,
+.gate-result.gate-error {
+  color: var(--red);
+}
+
+.draft-badge.status-approved {
+  background: rgba(21, 134, 99, 0.14);
+  color: var(--green);
+}
+
+.draft-badge.status-rejected {
+  background: rgba(196, 71, 71, 0.14);
+  color: var(--red);
+}
+
+.ask-concord {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ask-concord p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ask-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ask-form input {
+  flex: 1 1 320px;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  font-size: 14px;
+  background: #fafbfe;
+}
+
+.ask-form input:focus {
+  outline: 2px solid rgba(47, 103, 246, 0.35);
+  border-color: var(--blue);
+}
+
+.ask-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ask-suggestions .ghost-button {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.ask-answer {
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: rgba(47, 103, 246, 0.06);
+  border: 1px solid rgba(47, 103, 246, 0.18);
+}
+
+.ask-answer.unmatched {
+  background: #f6f7fa;
+  border-color: var(--line);
+}
+
+.ask-answer p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.ask-grounding {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+}

@@ -90,9 +90,28 @@ The adapter follows Ollama's official
 [structured output](https://docs.ollama.com/capabilities/structured-outputs)
 contracts with streaming disabled and temperature zero.
 
+## Engagement surfaces
+
+Three read-only, deterministic surfaces sit on top of the reconciliation engine
+and never weaken the truth path:
+
+- **`nl_query` / `POST /ask`** resolves a natural-language question to a governed
+  concept and its competing definitions, then runs the full reconciliation. On
+  Fabric/Foundry the resolution is served by NL2Ontology/retrieve; Local and
+  Replay answer the same typed contract deterministically.
+- **`scan_portfolio` / `GET /scan` / `make scan`** sweeps every concept through
+  the deterministic agents (no persistence, no cloud), ranks conflicts by ARR
+  impact, and derives a single 0–100 **Concord Score** plus a per-business-unit
+  leaderboard (`GET /score`).
+- **The Semantic-PR approval gate** (`POST /proposals/{id}/approve|reject`) merges
+  a canonical definition only when the caller equals the proposal's configured
+  authority owner. Decisions are idempotent and appended to the audit trail. The
+  owner check is a configuration lookup, never an LLM judgement.
+
 ## Data flow and trust
 
-1. The user selects one of three synthetic scenarios.
+1. The user asks a natural-language question, runs the autonomous scan, or selects
+   one of the synthetic concepts.
 2. The provider returns only the resolved scenario context.
 3. Trusted definition bindings produce entity sets and metric totals.
 4. Agents compare behavior, rank impact, and consult authority rules.

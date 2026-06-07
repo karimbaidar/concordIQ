@@ -71,43 +71,13 @@ class ReconciliationAgent:
                     )
                 }
             )
-        if concept_id != "active_customer":
-            raise ValueError(f"No governed proposal template is implemented for {concept_id}.")
-        finance = next(binding for binding in bindings if binding.owner == "Finance")
-        customer_success = next(
-            binding for binding in bindings if binding.owner == "Customer Success"
-        )
-        canonical_definition = (
-            "Active Customer means a customer with an active contract and qualifying "
-            "usage in the trailing 30 days. Finance and Sales variants remain named "
-            "domain views and must not publish under the unqualified canonical term."
-        )
+        if concept_id == "active_customer":
+            proposal = self._active_customer_proposal(bindings, impact, authority, evidence)
+        else:
+            proposal = self._generic_proposal(concept_id, bindings, impact, authority, evidence)
         decision = ReconciliationDecision(
             action="propose",
-            proposal=ReconciliationProposal(
-                canonical_definition=canonical_definition,
-                rationale=(
-                    f"The three executed definitions diverge by "
-                    f"{impact.customer_count_delta} customers and "
-                    f"{impact.arr_delta:,.2f} ARR. The proposed canonical definition "
-                    f"uses the contract and usage semantics from "
-                    f"{customer_success.name}; {finance.name} remains a governed "
-                    "financial activity view."
-                ),
-                migration_notes=(
-                    "Rename domain-specific dashboard measures before changing "
-                    "the canonical alias.",
-                    "Publish the canonical definition only after steward approval.",
-                    "Re-run all three SQL bindings and compare the expected dashboard deltas.",
-                ),
-                expected_dashboard_impact=(
-                    f"Up to {impact.customer_count_delta} customers and "
-                    f"{impact.arr_delta:,.2f} ARR differ across current views."
-                ),
-                authority_owner=authority.owner,
-                requires_human_approval=True,
-                evidence_refs=tuple(item.evidence_id for item in evidence),
-            ),
+            proposal=proposal,
             requires_human_approval=True,
         )
         return decision.model_copy(
@@ -121,6 +91,94 @@ class ReconciliationAgent:
                     evidence=evidence,
                 )
             }
+        )
+
+    @staticmethod
+    def _active_customer_proposal(
+        bindings: tuple[DefinitionBinding, ...],
+        impact: ImpactAssessment,
+        authority: AuthorityAssessment,
+        evidence: tuple[EvidenceRecord, ...],
+    ) -> ReconciliationProposal:
+        finance = next(binding for binding in bindings if binding.owner == "Finance")
+        customer_success = next(
+            binding for binding in bindings if binding.owner == "Customer Success"
+        )
+        canonical_definition = (
+            "Active Customer means a customer with an active contract and qualifying "
+            "usage in the trailing 30 days. Finance and Sales variants remain named "
+            "domain views and must not publish under the unqualified canonical term."
+        )
+        return ReconciliationProposal(
+            canonical_definition=canonical_definition,
+            rationale=(
+                f"The three executed definitions diverge by "
+                f"{impact.customer_count_delta} customers and "
+                f"{impact.arr_delta:,.2f} ARR. The proposed canonical definition "
+                f"uses the contract and usage semantics from "
+                f"{customer_success.name}; {finance.name} remains a governed "
+                "financial activity view."
+            ),
+            migration_notes=(
+                "Rename domain-specific dashboard measures before changing the canonical alias.",
+                "Publish the canonical definition only after steward approval.",
+                "Re-run all three SQL bindings and compare the expected dashboard deltas.",
+            ),
+            expected_dashboard_impact=(
+                f"Up to {impact.customer_count_delta} customers and "
+                f"{impact.arr_delta:,.2f} ARR differ across current views."
+            ),
+            authority_owner=authority.owner or "",
+            requires_human_approval=True,
+            evidence_refs=tuple(item.evidence_id for item in evidence),
+        )
+
+    @staticmethod
+    def _generic_proposal(
+        concept_id: str,
+        bindings: tuple[DefinitionBinding, ...],
+        impact: ImpactAssessment,
+        authority: AuthorityAssessment,
+        evidence: tuple[EvidenceRecord, ...],
+    ) -> ReconciliationProposal:
+        """Build an evidence-backed proposal for any clear-authority conflict.
+
+        The most conservative (smallest-population) definition becomes the
+        canonical anchor; every other variant is named as a governed domain view.
+        Selection is deterministic and never decided by the LLM.
+        """
+        counts = {item.binding_id: item.entity_count for item in evidence}
+        anchor = min(
+            bindings,
+            key=lambda binding: (counts.get(binding.binding_id, 0), binding.binding_id),
+        )
+        variants = tuple(binding for binding in bindings if binding.binding_id != anchor.binding_id)
+        concept_label = concept_id.replace("_", " ").title()
+        variant_names = ", ".join(binding.name for binding in variants) or "no other variant"
+        return ReconciliationProposal(
+            canonical_definition=(
+                f"{concept_label} is canonically defined as: {anchor.rule_text} "
+                f"Other variants ({variant_names}) remain named domain views and "
+                "must not publish under the unqualified canonical term."
+            ),
+            rationale=(
+                f"The {len(bindings)} executed definitions diverge by "
+                f"{impact.customer_count_delta} entities and {impact.arr_delta:,.2f} "
+                f"in value. {authority.owner} governs this term and can approve the "
+                f"canonical definition anchored on {anchor.name}."
+            ),
+            migration_notes=(
+                "Rename domain-specific dashboard measures before changing the canonical alias.",
+                f"Publish the canonical definition only after {authority.owner} approval.",
+                "Re-run every SQL binding and compare the expected dashboard deltas.",
+            ),
+            expected_dashboard_impact=(
+                f"Up to {impact.customer_count_delta} entities and "
+                f"{impact.arr_delta:,.2f} in value differ across current views."
+            ),
+            authority_owner=authority.owner or "",
+            requires_human_approval=True,
+            evidence_refs=tuple(item.evidence_id for item in evidence),
         )
 
     def _narrate(

@@ -123,6 +123,80 @@ export interface NarrationResult {
   fallback_reason: string | null;
 }
 
+export type RecommendedAction = "propose" | "refuse" | "monitor";
+
+export interface PortfolioConceptResult {
+  rank: number;
+  concept_id: string;
+  term: string;
+  verdict: "conflict" | "consistent";
+  definition_count: number;
+  counts: number[];
+  owners: string[];
+  customer_count_delta: number;
+  arr_delta: number;
+  severity: Severity;
+  authority_status: "clear" | "shared" | "ambiguous" | "missing";
+  authority_owner: string | null;
+  recommended_action: RecommendedAction;
+}
+
+export interface BusinessUnitScore {
+  business_unit: string;
+  score: number;
+  open_conflicts: number;
+}
+
+export interface ConcordScore {
+  overall: number;
+  grade: "A" | "B" | "C" | "D" | "F";
+  concepts_scanned: number;
+  conflicts: number;
+  consistent: number;
+  refusals: number;
+  by_business_unit: BusinessUnitScore[];
+}
+
+export interface PortfolioScan {
+  generated_at: string;
+  provider: string;
+  period: EvaluationPeriod;
+  score: ConcordScore;
+  concepts: PortfolioConceptResult[];
+}
+
+export interface QueryDefinitionSummary {
+  definition_id: string;
+  name: string;
+  owner: string;
+  rule_text: string;
+}
+
+export interface QueryResult {
+  question: string;
+  matched: boolean;
+  grounding_provider: string;
+  concept_id: string | null;
+  canonical_name: string | null;
+  answer: string;
+  definitions: QueryDefinitionSummary[];
+  citations: string[];
+}
+
+export interface AskResponse {
+  query: QueryResult;
+  case: ReconciliationCase | null;
+}
+
+export interface ProposalDecisionResult {
+  run_id: string;
+  term: string;
+  status: "approved" | "rejected";
+  authority_owner: string;
+  decided_by: string;
+  decided_at: string;
+}
+
 export interface ReconciliationCase {
   run_id: string;
   request: {
