@@ -8,6 +8,8 @@ from concord.providers.base import (
     EvaluationPeriod,
     GroundingProvider,
     OntologySubgraph,
+    ProviderMode,
+    ProviderNotConfigured,
     QueryDefinitionSummary,
     QueryResult,
 )
@@ -16,8 +18,14 @@ from concord.providers.factory import (
     create_preferred_cloud_provider,
     create_provider,
     fabric_iq_is_configured,
+    foundry_hosted_is_configured,
     foundry_iq_is_configured,
     provider_statuses,
+)
+from concord.providers.foundry_hosted import (
+    FoundryHostedProof,
+    FoundryHostedProvider,
+    FoundryHostedResponseError,
 )
 from concord.providers.foundry_iq import FoundryIQProvider
 from concord.providers.local import LocalProvider
@@ -31,15 +39,21 @@ __all__ = [
     "EvaluationPeriod",
     "FabricIQProvider",
     "FoundryIQProvider",
+    "FoundryHostedProvider",
+    "FoundryHostedProof",
+    "FoundryHostedResponseError",
     "GroundingProvider",
     "LocalProvider",
     "OntologySubgraph",
+    "ProviderMode",
+    "ProviderNotConfigured",
     "QueryDefinitionSummary",
     "QueryResult",
     "ReplayProvider",
     "create_preferred_cloud_provider",
     "create_provider",
     "fabric_iq_is_configured",
+    "foundry_hosted_is_configured",
     "foundry_iq_is_configured",
     "provider_statuses",
 ]

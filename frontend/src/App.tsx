@@ -85,6 +85,9 @@ export default function App() {
     () => scenarios.find((scenario) => scenario.scenario_id === selectedId),
     [scenarios, selectedId],
   );
+  const foundryHosted =
+    health?.provider_mode === "foundry_hosted" ||
+    result?.context_packet?.provider_metadata.mode === "foundry_hosted";
 
   async function handleRun() {
     if (!selectedScenario) {
@@ -170,6 +173,9 @@ export default function App() {
       <main id="top">
         <section className="hero" id="workbench">
           <div className="hero-copy">
+            {foundryHosted && (
+              <span className="runtime-label">Runtime: Foundry Agent Service</span>
+            )}
             <span className="eyebrow">
               <i aria-hidden="true" />
               Semantic reconciliation agent
@@ -191,6 +197,7 @@ export default function App() {
             scenarios={scenarios}
             selectedId={selectedId}
             busy={busy}
+            hostedRuntime={foundryHosted}
             onSelect={(scenarioId) => {
               setSelectedId(scenarioId);
               setResult(null);
@@ -291,7 +298,11 @@ export default function App() {
 
       <footer className="site-footer">
         <span>Concord IQ</span>
-        <p>Deterministic reviewer mode · synthetic data · cloud disabled by default</p>
+        <p>
+          {foundryHosted
+            ? "Foundry Agent Service runtime · replay-grounded proof · cloud enabled"
+            : "Deterministic reviewer mode · synthetic data · cloud disabled by default"}
+        </p>
         <span>Microsoft Agents League 2026</span>
       </footer>
     </div>

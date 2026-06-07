@@ -18,7 +18,7 @@ Local mode is deterministic, uses synthetic data, and makes no Microsoft call:
 
 ```bash
 make agent-smoke
-AGENT_WORKFLOW_MODE=strict make agent-smoke
+CONCORD_WORKFLOW_MODE=strict make agent-smoke
 ```
 
 The command prints `workflow=fast` or `workflow=strict`. Strict mode never invokes

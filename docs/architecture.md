@@ -45,7 +45,7 @@ CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
 The workflow runs in two modes. **Fast** mode (default) calls the deterministic
 domain tool once and exposes the resulting trace; each later node validates its
 corresponding typed output before forwarding the casefile. **Strict** mode
-(`AGENT_WORKFLOW_MODE=strict`) makes the Agent Framework own the progression — each
+(`CONCORD_WORKFLOW_MODE=strict`) makes the Agent Framework own the progression — each
 specialist node executes exactly one stage and writes its typed output into the
 casefile, so no single call performs the whole reasoning. Both modes share the same
 deterministic truth path and reach the same verdict.
@@ -157,9 +157,11 @@ have run. This keeps each specialist scoped to the information it needs.
 
 ## Deployment posture
 
-The workflow can be exposed through the optional Foundry Agent Service entrypoint
-in `concord.ms_agent.foundry_hosted_entrypoint`. The host requires explicit cloud
-permission and at least one configured cloud IQ provider before it starts.
+The workflow is deployed through the Foundry Agent Service entrypoint in
+`concord.ms_agent.foundry_hosted_entrypoint`. The deployed reviewer runtime uses
+ReplayProvider with cloud grounding disabled. Separately, the main FastAPI app can
+set `PROVIDER=foundry_hosted` to call that deployed Responses endpoint; this caller
+requires explicit cloud permission, a positive budget, endpoint, and token.
 
 Cloud calls are disabled by default. Opening the UI, listing providers, running
 tests, and using `LocalProvider` or `ReplayProvider` make no Microsoft request.

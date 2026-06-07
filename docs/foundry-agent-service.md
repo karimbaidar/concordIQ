@@ -40,50 +40,133 @@ capture gate. It does not contact Fabric or Foundry.
 
 ## Why the host is stateless
 
-Each Concord IQ request creates an independent reconciliation casefile. The
-host therefore builds a fresh Agent Framework workflow for every Responses
-request. This avoids storing application-specific Python casefile objects in
-preview host checkpoints while preserving the complete typed specialist flow.
-PostgreSQL remains the durable audit and evidence store.
+Each request creates an independent reconciliation casefile, so the host builds a
+fresh Agent Framework workflow per Responses request. The hosted smoke uses an
+ephemeral SQLite database at
+`sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db`; production deployments can
+replace it with a durable SQLAlchemy URL when persistent approval history is
+required.
 
-## Real hosted mode
+## Deploy with azd
 
-Running the module without `--dry-run` or `--smoke` defaults to provider `auto`.
-That path fails closed unless cloud access, a positive request budget, and a
-real IQ provider are configured:
+The verified deployment path uses the Microsoft Foundry extension for Azure
+Developer CLI:
 
-```bash
-PROVIDER=auto \
-ALLOW_CLOUD=true \
-MAX_CLOUD_CALLS=3 \
-uv run --extra dev --extra foundry-hosting \
-  python -m concord.ms_agent.foundry_hosted_entrypoint
+1. Install [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
+   and the Foundry extension:
+
+   ```bash
+   azd extension install azure.ai.agents
+   azd extension list
+   ```
+
+2. Initialize from the official hosted-agent quickstart:
+
+   ```bash
+   azd ai agent init
+   ```
+
+   Select the existing Foundry project `aiskillfest`, or create a new project.
+   Leave Azure Container Registry and Application Insights blank if you want
+   `azd` to create them. If `gpt-4.1-mini` quota is unavailable, select a model
+   deployment with quota in the chosen region.
+
+3. Copy the Concord IQ product files into the generated scaffold. Replace its
+   `main.py` with:
+
+   ```python
+   from concord.ms_agent.foundry_hosted_entrypoint import main
+
+   if __name__ == "__main__":
+       main()
+   ```
+
+   Install the `foundry-hosting` extra and include `backend/concord/`,
+   `pyproject.toml`, `uv.lock`, `ontology/`, `data/synthetic/`, and
+   `artifacts/replay/sanitized/latest.json`. Do not include `.env`, access tokens,
+   `.venv/`, `node_modules/`, `artifacts/replay/raw/`, diagnostics, or planning
+   files.
+
+4. Configure the hosted container:
+
+   ```text
+   PROVIDER=replay
+   CONCORD_WORKFLOW_MODE=strict
+   ALLOW_CLOUD=false
+   MAX_CLOUD_CALLS=0
+   DATABASE_URL=sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db
+   REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/latest.json
+   ```
+
+   Use `CONCORD_WORKFLOW_MODE`, not `AGENT_WORKFLOW_MODE`; Foundry reserves the
+   `AGENT_*` namespace.
+
+5. If ACR Tasks are blocked by policy, set `docker.remoteBuild: false` in
+   `azure.yaml`. The manual ACR fallback is:
+
+   ```bash
+   docker build --platform linux/amd64 -t <acr>.azurecr.io/concord-iq-foundry:smoke .
+   docker push <acr>.azurecr.io/concord-iq-foundry:smoke
+   ```
+
+6. Deploy and verify:
+
+   ```bash
+   azd deploy
+   azd ai agent show
+   azd ai agent invoke "Active Customer"
+   # Some extension versions use the explicit flag:
+   azd ai agent invoke --message "Active Customer"
+   ```
+
+   The verified Concord IQ response reports `provider_mode=replay`,
+   `workflow_mode=strict`, `verdict=conflict`,
+   `verification_status=passed`, and `specialist_steps=10`.
+
+## Connect the main app
+
+The application-side `FoundryHostedProvider` calls the full Foundry Responses
+endpoint and never calls Fabric IQ. Put only local, gitignored values in `.env`:
+
+```text
+PROVIDER=foundry_hosted
+ALLOW_CLOUD=true
+MAX_CLOUD_CALLS=20
+FOUNDRY_HOSTED_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>/agents/<agent>/endpoint/protocols/openai/responses?api-version=v1
+FOUNDRY_HOSTED_AGENT_ID=
+FOUNDRY_ACCESS_TOKEN=<short-lived bearer token>
 ```
 
-`auto` prefers Fabric IQ and uses Foundry IQ only as fallback. Local and replay
-are explicit reviewer modes; neither is represented as Microsoft IQ.
-
-The local server follows the Responses protocol:
+`FOUNDRY_HOSTED_AGENT_ID` is optional for an agent-specific endpoint. Run:
 
 ```bash
-curl -X POST http://localhost:8088/responses \
-  -H "Content-Type: application/json" \
-  -d '{"input":"{\"term\":\"Active Customer\"}"}'
+make dev
 ```
 
-Foundry deployment tooling may inject `FOUNDRY_PROJECT_ENDPOINT`,
-`AZURE_AI_MODEL_DEPLOYMENT_NAME`, and telemetry settings. Concord IQ's
-deterministic workflow does not require a model deployment to make its verdict,
-but tenant deployment and identity setup must follow the current preview
-documentation.
+Open `http://127.0.0.1:5173`, choose a scenario, and confirm the badge reads
+**Foundry Agent Service**, **hosted runtime**, and **Cloud enabled**. `/analyze`,
+`/ask`, and `/demo/run/{scenario_id}` all render the returned remote case through
+the existing workbench.
 
-## Safety and status
+The one-call proof check remains available:
 
-- No secrets or tenant identifiers belong in source control.
-- The dry-run and smoke commands explicitly disable cloud calls.
-- Real hosting does not silently fall back to LocalProvider.
-- This repository validates the hosting protocol locally; it does not claim a
-  successful tenant deployment.
+```bash
+ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 make foundry-hosted-smoke
+```
+
+It validates the proof envelope and writes only a secret-free report under the
+gitignored `artifacts/foundry/` folder.
+
+## Safety
+
+- Hosted mode refuses unless `ALLOW_CLOUD=true` and `MAX_CLOUD_CALLS` is positive.
+- Missing endpoint or token configuration fails before any request.
+- The access token is sent only in the Authorization header; it is never logged,
+  persisted, or included in provider status.
+- A completed response with empty output, wrong provider/workflow fields, or an
+  unpassed verifier is rejected.
+- The deployed replay runtime does not need Fabric credentials and does not make
+  Fabric calls.
 
 Do not assume Foundry, Fabric, or IQ usage is free or unlimited. Verify current
 Microsoft pricing, trial limits, tenant settings, and permissions before enabling
@@ -91,58 +174,9 @@ cloud mode. Keep datasets tiny, use cloud only for smoke tests, pause or delete
 idle resources, and replay sanitized captured responses through ReplayProvider
 for demo rehearsal.
 
-## Hosted deployment runbook (real cloud runtime)
+## Microsoft references
 
-Foundry Agent Service is the intended cloud runtime. The hosted agent runs over
-**ReplayProvider**, so it needs no Fabric credentials or capacity — the committed
-verified Fabric IQ replay artifact carries the grounding. Deployment automation
-depends on tenant-specific preview APIs, so this is a manual runbook; the smoke
-runs against an already-deployed endpoint. Do not fake a deployment.
-
-1. **Prepare locally (no cloud).**
-   ```bash
-   make foundry-hosted-dry-run     # checks the entrypoint + committed replay artifact
-   make foundry-hosted-package      # writes artifacts/foundry/package-report.md
-   ```
-2. **Create or select a Microsoft Foundry project** in the Foundry portal.
-3. **Deploy Concord IQ as a hosted/containerized agent** using the existing
-   entrypoint as the start command:
-   ```bash
-   python -m concord.ms_agent.foundry_hosted_entrypoint
-   ```
-   Install the app with the `foundry-hosting` extra. Ship the application package,
-   `pyproject.toml`/`uv.lock`, `ontology/`, `data/synthetic/`, and the committed
-   `artifacts/replay/sanitized/latest.json`. **Never** ship `.env`, tokens,
-   `.venv/`, `node_modules/`, `artifacts/replay/raw/`, diagnostics, planning files,
-   or screenshots.
-4. **Configure the hosted environment** (inside the deployed app):
-   ```text
-   PROVIDER=replay
-   AGENT_WORKFLOW_MODE=strict
-   ALLOW_CLOUD=false
-   MAX_CLOUD_CALLS=0
-   REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/latest.json
-   ```
-5. **Configure the local smoke caller** (your machine, reaching the deployed agent):
-   ```text
-   ALLOW_CLOUD=true
-   MAX_CLOUD_CALLS=1
-   FOUNDRY_HOSTED_ENDPOINT=https://<your-deployed-agent>
-   FOUNDRY_ACCESS_TOKEN=<short-lived bearer token>
-   ```
-6. **Run the real cloud smoke** (one call):
-   ```bash
-   ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 make foundry-hosted-smoke
-   ```
-   It sends *"Why do our Active Customer dashboards disagree?"*, then asserts the
-   response proves `provider_mode=replay`, `workflow_mode=strict`,
-   `term=Active Customer`, `verdict=conflict`, `verification_status=passed`,
-   `specialist_steps=10`, and writes `artifacts/foundry/hosted-smoke-report.md`
-   (no token). Only after this passes may docs say
-   **"Foundry Agent Service cloud runtime smoke verified."**
-7. **Delete or stop the hosted resources** afterward to avoid charges.
-
-## Current Microsoft references
-
-- [Foundry hosted agents](https://learn.microsoft.com/en-us/agent-framework/hosting/foundry-hosted-agent)
+- [Host Agent Framework agents on Foundry](https://learn.microsoft.com/en-us/agent-framework/hosting/foundry-hosted-agent)
 - [Hosted agents concepts](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/hosted-agents)
+- [Azure Developer CLI installation](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
+- [Foundry azd extension](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/extensions/azure-ai-foundry-extension)

@@ -62,7 +62,7 @@ def test_hosted_dry_run_validates_entrypoint_and_artifact(tmp_path: Path) -> Non
     assert report["workflow_mode"] == "strict"
     env = report["required_env"]
     assert env["PROVIDER"] == "replay"
-    assert env["AGENT_WORKFLOW_MODE"] == "strict"
+    assert env["CONCORD_WORKFLOW_MODE"] == "strict"
     assert "ReplayProvider is used" in report["explanation"]
 
 

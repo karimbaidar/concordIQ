@@ -22,7 +22,7 @@ is shared or ambiguous, it refuses to choose and routes the decision to a human.
 ## Implementation status
 
 Concord IQ is **built with Microsoft Agent Framework** as the orchestration layer
-and is **prepared for Foundry Agent Service hosted deployment**. Specialist agents
+and supports **Foundry Agent Service as a first-class application runtime**. Specialist agents
 coordinate through a typed casefile and call deterministic reconciliation tools.
 The Agent Framework workflow runs in two modes: a **fast** mode (default, stable)
 and a **strict** mode in which each specialist node executes exactly one reasoning
@@ -30,18 +30,19 @@ stage and writes its typed output into the casefile — no single call performs 
 whole reasoning. Fabric IQ is the primary semantic grounding provider, with Foundry
 IQ as fallback and LocalProvider for reproducible public review.
 
-The Foundry Agent Service hosting protocol is **validated locally with a cloud-free
-hosted smoke test** (`make foundry-agent-smoke`) over LocalProvider or a verified
-ReplayProvider artifact — no Fabric credentials required. Guarded Foundry IQ and
+The Foundry Agent Service deployment and remote invocation are verified with
+`provider_mode=replay`, `workflow_mode=strict`, a passed verifier, and all ten
+specialist steps. The main backend can now route `/analyze`, `/ask`, and demo
+requests to that deployment with `PROVIDER=foundry_hosted`. Guarded Foundry IQ and
 Fabric IQ adapters, typed capture/replay, Fabric bootstrap helpers, optional local
 narration, a deterministic verifier that blocks unsupported cases, and a per-run
 agent trace are implemented. The Fabric REST and MCP surfaces are verified against
 current Microsoft Learn (see [IQ integration](docs/iq-integration.md)).
 
-Two external gates remain deliberately open: no Microsoft tenant was available, so
-**no real Fabric IQ capture and no Foundry Agent Service tenant deployment are
-claimed**. ReplayProvider replays a sanitized, verified IQ capture only after
-`make capture` succeeds against a real tenant.
+The committed ReplayProvider artifact records a real Fabric IQ semantic-proof
+capture over synthetic concepts. It does not claim Fabric returned the complete
+scenario JSON: the Fabric ontology supplied the governed concept proof, while the
+deterministic LocalProvider snapshot supplied the SQL/evidence payload.
 
 Beyond one-off detection, Concord IQ **watches, scores, and gates**: an autonomous
 portfolio scan ranks every conflict, a Concord Score grades organizational
@@ -254,12 +255,12 @@ The layering, from deployment down to grounding:
 
 | Layer | Responsibility | Status |
 | --- | --- | --- |
-| **Foundry Agent Service** | Hosts/deploys the Agent Framework workflow | Hosting protocol validated cloud-free; no tenant deployment claimed |
+| **Foundry Agent Service** | Hosts/deploys the Agent Framework workflow | Deployment and remote replay/strict invocation verified |
 | **Microsoft Agent Framework** | Orchestrates the specialist agents and workflow states (fast + strict modes) | Implemented and tested locally |
 | **Concord IQ deterministic tools** | Execute SQL, evidence, authority, verifier, audit — the truth path | Implemented and tested |
-| **Fabric IQ** | Primary semantic ontology grounding (ontology MCP + NL2Ontology) | Adapter + verified surfaces; real capture pending |
+| **Fabric IQ** | Primary semantic ontology grounding (ontology MCP + NL2Ontology) | Real semantic-proof capture verified; sanitized replay committed |
 | **Foundry IQ** | Fallback knowledge grounding (Azure AI Search) | Adapter implemented; tenant smoke pending |
-| **ReplayProvider** | Sanitized Microsoft IQ replay (after `make capture` succeeds) | Implemented; refuses unverified artifacts |
+| **ReplayProvider** | Sanitized Microsoft IQ replay | Verified Fabric semantic-proof artifact committed; refuses unverified artifacts |
 | **LocalProvider** | Deterministic reviewer mode over synthetic data | Implemented |
 
 Microsoft Agent Framework owns application orchestration. Its specialist workflow
@@ -270,7 +271,10 @@ conflict verdict, authority decision, or stored result.
 
 ```mermaid
 flowchart TD
-    UI["Chat and conflict dashboard"] --> MAF["Microsoft Agent Framework workflow"]
+    UI["Chat and conflict dashboard"] --> MAF["In-process Microsoft Agent Framework workflow"]
+    UI --> HOSTED["FoundryHostedProvider"]
+    HOSTED --> SERVICE["Foundry Agent Service"]
+    SERVICE --> MAF
     MAF --> NODES["Ten specialist workflow nodes"]
     NODES --> TOOL["reconcile_business_term tool"]
     TOOL --> ENGINE["Deterministic ReconciliationRunner"]
@@ -339,7 +343,7 @@ START
 
 **Fast vs strict mode.** In **fast** mode (default) the coordinator invokes
 `reconcile_business_term(term, period, provider)` and the framework nodes expose
-the resulting trace. In **strict** mode (`AGENT_WORKFLOW_MODE=strict`, the default
+the resulting trace. In **strict** mode (`CONCORD_WORKFLOW_MODE=strict`, the default
 for the Foundry hosted smoke) the Agent Framework owns the progression: each
 specialist node executes exactly one stage and writes its typed output into the
 shared casefile — no single call performs the whole reasoning. Both modes reach
@@ -361,14 +365,15 @@ so the multi-agent pattern is visible rather than implied.
 
 ## Microsoft IQ architecture
 
-The grounding layer keeps four modes explicit:
+The application keeps semantic grounding and hosted runtime modes explicit:
 
 | Provider | Role | Current status |
 | --- | --- | --- |
 | `LocalProvider` | Deterministic development and reviewer mode over local registry and synthetic data | Resolves concepts, returns bindings/subgraphs/rules, and executes definitions |
 | `ReplayProvider` | Replays a reviewed real-IQ capture through the same typed contract | Implemented; refuses missing or unverified artifacts |
-| `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP + NL2Ontology | Guarded MCP adapter; REST/MCP surfaces verified against Microsoft Learn (2026-06); tenant smoke test pending |
+| `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP + NL2Ontology | Real semantic-proof capture verified; deterministic snapshot provenance disclosed |
 | `FoundryIQProvider` | Fallback cloud grounding through Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
+| `FoundryHostedProvider` | Calls a deployed Concord IQ Agent Framework workflow and returns its verified typed case | First-class `/analyze`, `/ask`, demo, health, and provider-status runtime |
 
 The `nl_query` path is genuinely IQ-served: on Fabric/Foundry it calls the real
 NL2Ontology/retrieve surface, while Local/Replay answer the same typed contract
@@ -387,13 +392,13 @@ response, reviewed sanitized copy, and successful `ReplayProvider` run. See
 
 ## Foundry Agent Service deployment
 
-**Foundry Agent Service is the intended cloud runtime for Concord IQ.** Microsoft
-Agent Framework (strict mode) is the multi-agent orchestration layer; the Foundry
-Agent Service runtime path is implemented and locally smoke-tested. **Real cloud
-smoke is pending** — until it passes, the project does not claim a Foundry tenant
-deployment. LocalProvider and ReplayProvider remain fallback / reviewer modes.
+**Foundry Agent Service is the verified cloud runtime for Concord IQ.** Microsoft
+Agent Framework strict mode is the multi-agent orchestration layer. The deployed
+agent runs over ReplayProvider, so invoking it does not make a Fabric call; the
+separate committed replay artifact carries the verified Fabric semantic proof.
+LocalProvider remains deterministic reviewer/development mode.
 
-The intended runtime — once a hosted agent is deployed — uses **ReplayProvider**,
+The deployed runtime uses **ReplayProvider**,
 so the hosted agent needs **no Fabric credentials or capacity**:
 
 ```bash
@@ -407,6 +412,22 @@ The hosted smoke asserts the deployed agent's response proves
 **provider_mode=replay, workflow_mode=strict, term=Active Customer,
 verdict=conflict, verification_status=passed, specialist_steps=10**. The
 deployment runbook is in [Foundry Agent Service](docs/foundry-agent-service.md).
+
+To route the actual backend and workbench through the hosted runtime, configure a
+local, gitignored `.env`:
+
+```text
+PROVIDER=foundry_hosted
+ALLOW_CLOUD=true
+MAX_CLOUD_CALLS=20
+FOUNDRY_HOSTED_ENDPOINT=https://<foundry-hosted-responses-endpoint>?api-version=v1
+FOUNDRY_HOSTED_AGENT_ID=
+FOUNDRY_ACCESS_TOKEN=<short-lived-token>
+```
+
+Then run `make dev` and open `http://127.0.0.1:5173`. The badge reads **Foundry
+Agent Service / hosted runtime / Cloud enabled**, and the workbench renders the
+remote typed case through the same panels used for local and replay mode.
 
 The in-process protocol smoke (no tenant) is also available:
 
@@ -433,8 +454,9 @@ MAX_CLOUD_CALLS=0
 LLM_PROVIDER=disabled
 ```
 
-`FabricIQProvider` and `FoundryIQProvider` fail closed unless explicit cloud
-permission, a positive call budget, endpoint, and authentication are configured.
+`FabricIQProvider`, `FoundryIQProvider`, and `FoundryHostedProvider` fail closed
+unless explicit cloud permission, a positive call budget, endpoint, and
+authentication are configured.
 Automated tests use injected transports and never call Microsoft services.
 
 **Do not assume Foundry, Fabric, or IQ usage is free or unlimited. Verify current

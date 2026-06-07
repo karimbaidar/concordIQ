@@ -238,6 +238,19 @@ summary:focus-visible {
   z-index: 1;
 }
 
+.runtime-label {
+  display: inline-flex;
+  margin-bottom: 14px;
+  padding: 6px 10px;
+  border: 1px solid rgba(158, 182, 255, 0.35);
+  border-radius: 999px;
+  color: #dce5ff;
+  background: rgba(78, 111, 238, 0.14);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
 .eyebrow,
 .section-kicker {
   color: #6b7b95;

@@ -26,6 +26,7 @@ from urllib.request import Request, urlopen
 from pydantic import BaseModel, ConfigDict
 
 from concord.config import CloudAccessDisabled, Settings
+from concord.providers.foundry_hosted import foundry_responses_url
 
 HOSTED_ENTRYPOINT_MODULE = "concord.ms_agent.foundry_hosted_entrypoint"
 HOSTED_START_COMMAND = "python -m concord.ms_agent.foundry_hosted_entrypoint"
@@ -78,7 +79,8 @@ def required_hosted_env() -> dict[str, str]:
     return {
         # Inside the hosted app (no cloud grounding needed — replay is self-contained):
         "PROVIDER": "replay",
-        "AGENT_WORKFLOW_MODE": "strict",
+        "CONCORD_WORKFLOW_MODE": "strict",
+        "DATABASE_URL": "sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db",
         "REPLAY_ARTIFACT_PATH": "artifacts/replay/sanitized/latest.json",
         "ALLOW_CLOUD": "false",
         "MAX_CLOUD_CALLS": "0",
@@ -281,7 +283,7 @@ def hosted_smoke(
     if not endpoint.startswith("https://"):
         raise HostedSmokeError("FOUNDRY_HOSTED_ENDPOINT must use HTTPS.")
 
-    url = f"{endpoint.rstrip('/')}/responses"
+    url = foundry_responses_url(endpoint)
     headers = {
         "Authorization": f"Bearer {token.get_secret_value()}",
         "Content-Type": "application/json",

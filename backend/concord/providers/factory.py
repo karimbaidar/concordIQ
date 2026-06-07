@@ -5,6 +5,7 @@ from typing import Any
 from concord.config import Settings
 from concord.providers.base import GroundingProvider, ProviderMode, ProviderNotConfigured
 from concord.providers.fabric_iq import FabricIQProvider
+from concord.providers.foundry_hosted import FoundryHostedProvider
 from concord.providers.foundry_iq import FoundryIQProvider
 from concord.providers.local import LocalProvider
 from concord.providers.replay import ReplayProvider
@@ -22,6 +23,11 @@ def foundry_iq_is_configured(settings: Settings) -> bool:
         and settings.foundry_iq_knowledge_base
         and (settings.foundry_iq_access_token or settings.foundry_iq_api_key)
     )
+
+
+def foundry_hosted_is_configured(settings: Settings) -> bool:
+    """Return hosted runtime readiness without making a network request."""
+    return bool(settings.foundry_hosted_endpoint and settings.foundry_access_token)
 
 
 def create_preferred_cloud_provider(settings: Settings) -> GroundingProvider:
@@ -53,6 +59,11 @@ def create_provider(settings: Settings) -> GroundingProvider:
         return FoundryIQProvider(settings)
     if mode is ProviderMode.FABRIC_IQ:
         return FabricIQProvider(settings)
+    if mode is ProviderMode.FOUNDRY_HOSTED:
+        raise ProviderNotConfigured(
+            "foundry_hosted is a complete-case runtime. Use FoundryHostedProvider "
+            "through the Concord IQ API application."
+        )
     raise ProviderNotConfigured(f"Unsupported provider mode: {mode}")
 
 
@@ -100,5 +111,12 @@ def provider_statuses(settings: Settings) -> list[dict[str, Any]]:
             "configured": foundry_iq_is_configured(settings),
             "cloud": True,
             "detail": "Fallback cloud grounding: Azure AI Search knowledge-base adapter.",
+        },
+        {
+            "mode": ProviderMode.FOUNDRY_HOSTED,
+            "name": FoundryHostedProvider.name,
+            "configured": foundry_hosted_is_configured(settings),
+            "cloud": True,
+            "detail": "Hosted Microsoft Agent Framework runtime through Foundry Agent Service.",
         },
     ]

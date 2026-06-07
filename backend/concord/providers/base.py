@@ -14,6 +14,7 @@ class ProviderMode(StrEnum):
     REPLAY = "replay"
     FOUNDRY_IQ = "foundry_iq"
     FABRIC_IQ = "fabric_iq"
+    FOUNDRY_HOSTED = "foundry_hosted"
 
 
 class ProviderNotConfigured(RuntimeError):

@@ -333,4 +333,63 @@ describe("Concord IQ demo", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Human governance approval")).toBeInTheDocument();
   });
+
+  it("labels Foundry Agent Service as the hosted cloud runtime", async () => {
+    const hostedCase = makeCase("active_customer");
+    if (hostedCase.context_packet) {
+      hostedCase.context_packet.provider_metadata = {
+        name: "Foundry Agent Service",
+        mode: "foundry_hosted",
+        uses_cloud: true,
+        data_type: "hosted runtime",
+      };
+    }
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith("/health")) {
+          return mockJson({
+            status: "ok",
+            workflow_mode: "strict",
+            provider: "Foundry Agent Service",
+            provider_mode: "foundry_hosted",
+            runtime: "Foundry Agent Service",
+            cloud_enabled: true,
+            data_type: "hosted runtime",
+            llm_provider: "DisabledLLMProvider",
+            llm_enabled: false,
+            llm_model: null,
+          });
+        }
+        if (url.endsWith("/demo/scenarios")) {
+          return mockJson(scenarios);
+        }
+        return mockJson(hostedCase);
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    expect(
+      await screen.findByText("Runtime: Foundry Agent Service"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("hosted runtime")).toBeInTheDocument();
+    expect(screen.getByText("Cloud enabled")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Calls the deployed Agent Framework runtime; deterministic tools still own the verdict.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Foundry Agent Service runtime · replay-grounded proof · cloud enabled",
+      ),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
+    expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
+    expect(screen.getByText("foundry_hosted")).toBeInTheDocument();
+  });
 });

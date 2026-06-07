@@ -201,15 +201,14 @@ the response shape, and writes a sanitized copy to
 ## Foundry Agent Service
 
 `concord.ms_agent.foundry_hosted_entrypoint` wraps the typed Microsoft Agent
-Framework workflow in the optional Foundry responses host. The hosting protocol is
-validated **cloud-free**: `make foundry-agent-dry-run` constructs the host and
-checks its routes with no socket or cloud call, and `make foundry-agent-smoke`
-exercises the full in-process `/responses` path over LocalProvider (or a verified
-ReplayProvider artifact) with no Fabric credentials. Real `auto` hosting refuses to
-start unless `ALLOW_CLOUD=true`, `MAX_CLOUD_CALLS` is positive, and a real IQ
-provider is configured. See [Foundry Agent Service](foundry-agent-service.md) and
-the [integration README](../backend/concord/ms_agent/README.md). The repository
-validates the protocol locally and does not claim a tenant deployment.
+Framework workflow in the Foundry Responses host. The hosting protocol is covered
+cloud-free by `make foundry-agent-dry-run` and `make foundry-agent-smoke`; the
+deployed replay/strict runtime has also passed remote invocation with all ten
+specialist steps. `PROVIDER=foundry_hosted` routes the main app's `/analyze`,
+`/ask`, and demo requests to that endpoint, validates the proof envelope, and
+renders the returned typed case without contacting Fabric. See
+[Foundry Agent Service](foundry-agent-service.md) and the
+[integration README](../backend/concord/ms_agent/README.md).
 
 ## What counts as real integration
 

@@ -6,6 +6,7 @@ interface TermSearchProps {
   scenarios: DemoScenario[];
   selectedId: string;
   busy: boolean;
+  hostedRuntime?: boolean;
   onSelect: (scenarioId: string) => void;
   onRun: () => void;
 }
@@ -20,6 +21,7 @@ export function TermSearch({
   scenarios,
   selectedId,
   busy,
+  hostedRuntime = false,
   onSelect,
   onRun,
 }: TermSearchProps) {
@@ -81,7 +83,9 @@ export function TermSearch({
         </svg>
       </button>
       <p className="run-note">
-        Executes trusted SQL locally. No LLM or cloud call participates in the verdict.
+        {hostedRuntime
+          ? "Calls the deployed Agent Framework runtime; deterministic tools still own the verdict."
+          : "Executes trusted SQL locally. No LLM or cloud call participates in the verdict."}
       </p>
     </section>
   );

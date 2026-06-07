@@ -50,7 +50,7 @@ export function askConcord(question: string): Promise<AskResponse> {
 }
 
 export function reconcileTerm(term: string): Promise<ReconciliationCase> {
-  return requestJson<ReconciliationCase>("/reconcile", {
+  return requestJson<ReconciliationCase>("/analyze", {
     method: "POST",
     body: JSON.stringify({
       term,

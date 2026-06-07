@@ -46,7 +46,7 @@ not free-text search — then proves the answer on data."*
    in the `ImpactPanel` (ranked high).
 3. Walk the ten-step **agent trace** / `ReasoningTimeline` — each specialist node,
    its evidence IDs, and the green skeptical-verifier status. Mention that in
-   strict mode (`AGENT_WORKFLOW_MODE=strict`) the Agent Framework drives each stage
+   strict mode (`CONCORD_WORKFLOW_MODE=strict`) the Agent Framework drives each stage
    one at a time, and the same trace is served at `GET /runs/{run_id}/agent-trace`.
 4. Expand one evidence item to show the exact SQL.
 

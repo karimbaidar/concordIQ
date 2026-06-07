@@ -1,11 +1,13 @@
 """HTTP routes for deterministic local reconciliation."""
 
+import asyncio
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel
 
 from concord.agents.coordinator import UnsupportedScenario
+from concord.config import CloudAccessDisabled, Settings
 from concord.demo import DEMO_SCENARIOS, get_demo_scenario
 from concord.ms_agent import ConcordAgentWorkflow
 from concord.orchestration.casefile import (
@@ -15,7 +17,14 @@ from concord.orchestration.casefile import (
 )
 from concord.orchestration.portfolio import ConcordScore, PortfolioScan, scan_portfolio
 from concord.orchestration.runner import ReconciliationRunner
-from concord.providers import QueryResult, provider_statuses
+from concord.providers import (
+    FoundryHostedProvider,
+    FoundryHostedResponseError,
+    ProviderNotConfigured,
+    QueryResult,
+    provider_statuses,
+)
+from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
 from concord.storage.repositories import (
     ProposalAlreadyDecided,
     ProposalDecisionResult,
@@ -46,15 +55,51 @@ class AskResponse(BaseModel):
 
 
 def _runner(request: Request) -> ReconciliationRunner:
-    return request.app.state.reconciliation_runner
+    runner = request.app.state.reconciliation_runner
+    if runner is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This endpoint requires the in-process reconciliation runtime.",
+        )
+    return runner
 
 
 def _workflow(request: Request) -> ConcordAgentWorkflow:
-    return request.app.state.agent_workflow
+    workflow = request.app.state.agent_workflow
+    if workflow is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This endpoint requires the in-process reconciliation runtime.",
+        )
+    return workflow
+
+
+def _settings(request: Request) -> Settings:
+    return request.app.state.settings
+
+
+def _hosted_runtime(request: Request) -> FoundryHostedProvider | None:
+    return request.app.state.foundry_hosted_provider
 
 
 @router.get("/health")
 def health(request: Request) -> dict[str, object]:
+    hosted = _hosted_runtime(request)
+    if hosted is not None:
+        llm_provider = request.app.state.llm_provider
+        return {
+            "status": "ok",
+            "orchestration": "Microsoft Agent Framework",
+            "workflow_mode": "strict",
+            "provider": hosted.name,
+            "provider_mode": hosted.mode.value,
+            "runtime": hosted.name,
+            "cloud_enabled": hosted.settings.allow_cloud,
+            "data_type": hosted.data_type,
+            "llm_provider": llm_provider.name,
+            "llm_enabled": llm_provider.enabled,
+            "llm_model": llm_provider.model,
+        }
     runner = _runner(request)
     return {
         "status": "ok",
@@ -72,14 +117,25 @@ def health(request: Request) -> dict[str, object]:
 @router.get("/providers")
 def providers(request: Request) -> list[dict[str, object]]:
     """Expose readiness without probing any cloud endpoint."""
-    return provider_statuses(_runner(request).settings)
+    return provider_statuses(_settings(request))
 
 
+@router.post("/analyze", response_model=ReconciliationCase)
 @router.post("/reconcile", response_model=ReconciliationCase)
 async def reconcile(
     payload: ReconciliationRequest,
     request: Request,
 ) -> ReconciliationCase:
+    hosted = _hosted_runtime(request)
+    if hosted is not None:
+        try:
+            return await asyncio.to_thread(hosted.analyze, payload)
+        except CloudAccessDisabled as error:
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
+        except (ProviderNotConfigured, CloudCallBudgetExceeded) as error:
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
+        except (FoundryHostedResponseError, CloudTransportError) as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
     try:
         return await _workflow(request).run(payload)
     except UnsupportedScenario as error:
@@ -92,6 +148,16 @@ async def reconcile(
 @router.post("/ask", response_model=AskResponse)
 async def ask(payload: AskRequest, request: Request) -> AskResponse:
     """Resolve a business question to grounded meaning, then reconcile it."""
+    hosted = _hosted_runtime(request)
+    if hosted is not None:
+        result = hosted.nl_query(payload.question)
+        if not result.matched or not result.canonical_name:
+            return AskResponse(query=result)
+        case = await reconcile(
+            ReconciliationRequest(question=payload.question, term=result.canonical_name),
+            request,
+        )
+        return AskResponse(query=result, case=case)
     runner = _runner(request)
     result = runner.provider.nl_query(payload.question)
     case: ReconciliationCase | None = None
@@ -205,4 +271,4 @@ async def run_demo_scenario(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Unknown demo scenario: {scenario_id}",
         ) from error
-    return await _workflow(request).run(scenario.request())
+    return await reconcile(scenario.request(), request)

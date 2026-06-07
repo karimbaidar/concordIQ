@@ -8,7 +8,9 @@ interface ProviderBadgeProps {
 export function ProviderBadge({ health, result }: ProviderBadgeProps) {
   const metadata = result?.context_packet?.provider_metadata;
   const provider = metadata?.name ?? health?.provider ?? "Connecting";
-  const mode = metadata?.mode ?? "local";
+  const mode = metadata?.mode ?? health?.provider_mode ?? "local";
+  const hostedRuntime = mode === "foundry_hosted" || health?.runtime === "Foundry Agent Service";
+  const modeLabel = hostedRuntime ? "hosted runtime" : `${mode} mode`;
   const cloudEnabled = metadata?.uses_cloud ?? health?.cloud_enabled ?? false;
   const dataType = metadata?.data_type ?? health?.data_type ?? "synthetic";
   const llmLabel = health?.llm_enabled
@@ -20,9 +22,9 @@ export function ProviderBadge({ health, result }: ProviderBadgeProps) {
       <span className="status-dot" aria-hidden="true" />
       <span>
         <strong>{provider}</strong>
-        <small className="provider-mode">{mode} mode</small>
+        <small className="provider-mode">{modeLabel}</small>
         <small className="runtime-summary">
-          {mode} · {cloudEnabled ? "cloud on" : "cloud off"} · {llmLabel}
+          {modeLabel} · {cloudEnabled ? "cloud enabled" : "cloud disabled"} · {llmLabel}
         </small>
       </span>
       <span className="badge-divider" />

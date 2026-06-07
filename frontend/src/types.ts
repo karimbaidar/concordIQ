@@ -5,6 +5,8 @@ export interface HealthStatus {
   status: string;
   workflow_mode: "fast" | "strict";
   provider: string;
+  provider_mode?: string;
+  runtime?: string;
   cloud_enabled: boolean;
   data_type: string;
   llm_provider: string;
@@ -231,6 +233,11 @@ export interface ReconciliationCase {
       mode: string;
       uses_cloud: boolean;
       data_type: string;
+      runtime?: string;
+      semantic_provider?: {
+        name?: string;
+        mode?: string;
+      };
     };
     active_scenario: string;
   } | null;

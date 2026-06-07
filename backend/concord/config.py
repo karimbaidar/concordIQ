@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,10 +14,13 @@ class CloudAccessDisabled(RuntimeError):
 class Settings(BaseSettings):
     """Concord IQ runtime settings."""
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", populate_by_name=True)
 
     provider: str = "local"
-    agent_workflow_mode: Literal["fast", "strict"] = "fast"
+    agent_workflow_mode: Literal["fast", "strict"] = Field(
+        default="fast",
+        validation_alias=AliasChoices("CONCORD_WORKFLOW_MODE", "AGENT_WORKFLOW_MODE"),
+    )
     allow_cloud: bool = False
     max_cloud_calls: int = 0
     llm_provider: str = "disabled"
