@@ -62,6 +62,8 @@ class ReconciliationRepository:
     def save(self, case: ReconciliationCase) -> UUID:
         if not case.verifier_report or not case.verifier_report.passed:
             raise ValueError("Only verifier-approved cases may be persisted as complete.")
+        if case.verification_status != "passed":
+            raise ValueError("Only cases with passed verification status may be persisted.")
         if not case.context_packet or not case.resolved_concept:
             raise ValueError("Resolved concept and context packet are required.")
         if not case.impact_assessment or not case.authority_assessment:

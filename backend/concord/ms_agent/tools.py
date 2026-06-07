@@ -118,7 +118,7 @@ class RunnerReconciliationTool:
         return self.runner.reconcile_or_refuse(case)
 
     def verify(self, case: ReconciliationCase) -> ReconciliationCase:
-        return self.runner.verify(case)
+        return self.runner.verify_strict(case)
 
     def audit(self, case: ReconciliationCase) -> ReconciliationCase:
         return self.runner.audit(case)

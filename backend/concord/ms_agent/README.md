@@ -24,6 +24,13 @@ AGENT_WORKFLOW_MODE=strict make agent-smoke
 The command prints `workflow=fast` or `workflow=strict`. Strict mode never invokes
 the runner's complete `run()` path.
 
+Strict verification checks deterministic evidence IDs, exact SQL, result-set
+equality or divergence, authority, and proposal/refusal consistency. It may
+recompute one wholly missing stage output once from the configured provider.
+Partial or contradictory evidence is never patched: the case returns `blocked`,
+or `needs_review` when the single recovery attempt still fails, and is not
+persisted as complete.
+
 The period format is `YYYY-MM-DD/YYYY-MM-DD`. Hosted messages may be a plain term
 or a JSON object:
 

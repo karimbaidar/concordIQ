@@ -111,6 +111,14 @@ export interface VerifierReport {
   passed: boolean;
   checks: Record<string, boolean>;
   failures: string[];
+  attempt: number;
+  recoverable: boolean;
+  recovery_stage:
+    | "execute_definitions"
+    | "rank_impact"
+    | "resolve_authority"
+    | "reconcile_or_refuse"
+    | null;
   advisory_notes: string[];
   narration: NarrationResult | null;
 }
@@ -225,6 +233,14 @@ export interface ReconciliationCase {
   binding_semantics: DefinitionBinding[];
   execution_results: DefinitionEvaluation[];
   verdict: Verdict;
+  verification_status: "pending" | "passed" | "needs_review" | "blocked";
+  verifier_attempts: number;
+  verification_recovery:
+    | "execute_definitions"
+    | "rank_impact"
+    | "resolve_authority"
+    | "reconcile_or_refuse"
+    | null;
   impact_assessment: ImpactAssessment | null;
   authority_assessment: AuthorityAssessment | null;
   reconciliation_proposal: ReconciliationProposal | null;

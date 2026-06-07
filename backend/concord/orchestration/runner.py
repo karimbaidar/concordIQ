@@ -21,6 +21,9 @@ from concord.orchestration.casefile import (
     ImpactAssessment,
     ReconciliationCase,
     ReconciliationRequest,
+    TimelineEntry,
+    VerificationRecoveryStage,
+    VerifierReport,
 )
 from concord.orchestration.context_packet import build_context_packet
 from concord.orchestration.state_machine import ReconciliationState
@@ -176,27 +179,45 @@ class ReconciliationRunner:
         return case
 
     def verify(self, case: ReconciliationCase) -> ReconciliationCase:
-        """Run deterministic blocking checks over the assembled casefile."""
-        verifier = SkepticalVerifierAgent(self.llm_provider).run(case)
-        case.verifier_report = verifier
-        if verifier.narration:
-            case.narrations = (*case.narrations, verifier.narration)
-        case.transition(
-            ReconciliationState.VERIFY,
-            agent="SkepticalVerifierAgent",
-            summary=(
-                "All deterministic blocking checks passed."
-                if verifier.passed
-                else f"Blocking checks failed: {', '.join(verifier.failures)}."
-            ),
-        )
-        if not verifier.passed:
+        """Run the stable fast-mode verifier and raise on blocking failure."""
+        report = self._evaluate_verifier(case, attempt=1)
+        self._finalize_verification(case, report)
+        if not report.passed:
+            case.verification_status = "blocked"
             case.verdict = "incomplete"
-            raise VerificationFailed(", ".join(verifier.failures))
+            raise VerificationFailed(", ".join(report.failures))
+        return case
+
+    def verify_strict(self, case: ReconciliationCase) -> ReconciliationCase:
+        """Verify, retry one missing stage once, then return a safe status."""
+        report = self._evaluate_verifier(case, attempt=1)
+        if not report.passed and report.recoverable and report.recovery_stage:
+            case.verification_recovery = report.recovery_stage
+            self._recover_missing_stage(case, report.recovery_stage)
+            report = self._evaluate_verifier(case, attempt=2)
+        self._finalize_verification(case, report)
+        if not report.passed:
+            case.verification_status = "needs_review" if case.verification_recovery else "blocked"
+            case.verdict = "incomplete"
         return case
 
     def audit(self, case: ReconciliationCase) -> ReconciliationCase:
         """Finalize the timeline and persist one verifier-approved case."""
+        if not case.verifier_report or not case.verifier_report.passed:
+            case.audit_log = (
+                *case.audit_log,
+                TimelineEntry(
+                    sequence=len(case.audit_log) + 1,
+                    state=case.state,
+                    agent="AuditAgent",
+                    summary=(
+                        "Skipped complete persistence because deterministic "
+                        f"verification ended {case.verification_status}."
+                    ),
+                    status="failed",
+                ),
+            )
+            return case
         concept = self._resolved_concept(case)
         case.transition(
             ReconciliationState.AUDIT,
@@ -241,3 +262,88 @@ class ReconciliationRunner:
         if case.authority_assessment is None:
             raise ValueError("The authority resolution stage must complete first.")
         return case.authority_assessment
+
+    def _evaluate_verifier(
+        self,
+        case: ReconciliationCase,
+        *,
+        attempt: int,
+    ) -> VerifierReport:
+        report = SkepticalVerifierAgent(self.llm_provider).run(case)
+        return report.model_copy(update={"attempt": attempt})
+
+    @staticmethod
+    def _finalize_verification(
+        case: ReconciliationCase,
+        report: VerifierReport,
+    ) -> None:
+        case.verifier_report = report
+        case.verifier_attempts = report.attempt
+        case.verification_status = "passed" if report.passed else "blocked"
+        if report.narration:
+            case.narrations = (*case.narrations, report.narration)
+        recovery_note = (
+            f" after retrying {case.verification_recovery}" if case.verification_recovery else ""
+        )
+        case.transition(
+            ReconciliationState.VERIFY,
+            agent="SkepticalVerifierAgent",
+            summary=(
+                f"All deterministic blocking checks passed{recovery_note}."
+                if report.passed
+                else (f"Blocking checks failed{recovery_note}: {', '.join(report.failures)}.")
+            ),
+        )
+
+    def _recover_missing_stage(
+        self,
+        case: ReconciliationCase,
+        stage: VerificationRecoveryStage,
+    ) -> None:
+        """Recompute one wholly missing output from source; never patch evidence."""
+        if stage == "execute_definitions":
+            execution = DataExecutionAgent(self.provider).run(
+                str(case.run_id),
+                case.binding_semantics,
+                case.request.period,
+            )
+            case.execution_results = execution.evaluations
+            case.evidence = execution.evidence
+            case.verdict = execution.verdict
+            return
+        if stage == "rank_impact":
+            case.impact_assessment = ImpactRankerAgent().run(
+                case.binding_semantics,
+                case.execution_results,
+            )
+            return
+        if stage == "resolve_authority":
+            concept = self._resolved_concept(case)
+            authority = AuthorityResolverAgent(self.provider).run(concept.concept_id)
+            case.authority_assessment = authority
+            case.context_packet = build_context_packet(
+                case.request.question,
+                self.provider,
+                concept,
+                list(case.binding_semantics),
+                self.provider.get_subgraph(concept.concept_id),
+                list(authority.rules),
+            )
+            return
+        if stage == "reconcile_or_refuse":
+            concept = self._resolved_concept(case)
+            decision = ReconciliationAgent(self.llm_provider).run(
+                concept.concept_id,
+                case.verdict,
+                case.binding_semantics,
+                self._impact_assessment(case),
+                self._authority_assessment(case),
+                case.evidence,
+            )
+            case.reconciliation_proposal = decision.proposal
+            case.refusal_reason = decision.refusal_reason
+            case.requires_human_approval = decision.requires_human_approval
+            if decision.narration:
+                case.narrations = (*case.narrations, decision.narration)
+            return
+        raise ValueError(f"Unsupported verifier recovery stage: {stage}")

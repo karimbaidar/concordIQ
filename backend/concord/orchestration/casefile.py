@@ -130,12 +130,23 @@ class ReconciliationDecision(CaseModel):
     narration: NarrationResult | None = None
 
 
+VerificationRecoveryStage = Literal[
+    "execute_definitions",
+    "rank_impact",
+    "resolve_authority",
+    "reconcile_or_refuse",
+]
+
+
 class VerifierReport(CaseModel):
     """Blocking deterministic checks over the completed casefile."""
 
     passed: bool
     checks: dict[str, bool]
     failures: tuple[str, ...] = ()
+    attempt: int = 1
+    recoverable: bool = False
+    recovery_stage: VerificationRecoveryStage | None = None
     advisory_notes: tuple[str, ...] = ()
     narration: NarrationResult | None = None
 
@@ -153,6 +164,14 @@ class ReconciliationCase(CaseModel):
     conflict_hypotheses: tuple[ConflictHypothesis, ...] = ()
     execution_results: tuple[DefinitionEvaluation, ...] = ()
     verdict: Literal["conflict", "consistent", "incomplete"] = "incomplete"
+    verification_status: Literal[
+        "pending",
+        "passed",
+        "needs_review",
+        "blocked",
+    ] = "pending"
+    verifier_attempts: int = 0
+    verification_recovery: VerificationRecoveryStage | None = None
     impact_assessment: ImpactAssessment | None = None
     authority_assessment: AuthorityAssessment | None = None
     reconciliation_proposal: ReconciliationProposal | None = None

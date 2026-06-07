@@ -83,12 +83,18 @@ SPECIALIST_AGENTS: tuple[SpecialistAgentNode, ...] = (
     ),
     SpecialistAgentNode(
         "SkepticalVerifierAgent",
-        "a passing deterministic verifier report",
-        lambda case: case.verifier_report is not None and case.verifier_report.passed,
+        "an explicit deterministic verifier outcome",
+        lambda case: (
+            case.verifier_report is not None
+            and (
+                case.verifier_report.passed
+                or case.verification_status in {"blocked", "needs_review"}
+            )
+        ),
     ),
     SpecialistAgentNode(
         "AuditAgent",
-        "a persisted audit timeline",
+        "a finalized audit timeline",
         lambda case: bool(case.audit_log),
     ),
 )
