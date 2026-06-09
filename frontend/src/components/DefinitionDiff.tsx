@@ -242,6 +242,7 @@ export function DefinitionDiff({
                 </button>
                 <input
                   aria-label={`Time window for ${selectedBinding.name}`}
+                  aria-valuetext={`${timeWindowDays} days`}
                   type="range"
                   min="30"
                   max="180"

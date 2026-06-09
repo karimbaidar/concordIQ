@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { axe } from "jest-axe";
 
 import App from "./App";
 import type { ConflictHypothesis, ReconciliationCase } from "./types";
@@ -683,4 +684,28 @@ describe("Concord IQ demo", () => {
     // Never fabricates a result for an ungoverned term.
     expect(screen.queryByText("Material conflict confirmed")).not.toBeInTheDocument();
   });
+
+  it("has no serious or critical accessibility violations (landing + workbench)", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    // Landing: provider badge, term selector, ask form, portfolio board.
+    await screen.findByText("Cloud disabled");
+    const landing = await axe(container);
+    expect(
+      landing.violations
+        .filter((violation) => violation.impact === "serious" || violation.impact === "critical")
+        .map((violation) => violation.id),
+    ).toEqual([]);
+
+    // Workbench: dashboard, meaning graph, diff + slider, trace, semantic-PR, evidence.
+    await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
+    expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
+    const workbench = await axe(container);
+    expect(
+      workbench.violations
+        .filter((violation) => violation.impact === "serious" || violation.impact === "critical")
+        .map((violation) => violation.id),
+    ).toEqual([]);
+  }, 30000);
 });

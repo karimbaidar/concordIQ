@@ -5,7 +5,7 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --ink: #142036;
-  --muted: #65728a;
+  --muted: #54607a;
   --line: #dce3ed;
   --navy: #0b1530;
   --blue: #2f67f6;
@@ -49,9 +49,12 @@ summary {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-summary:focus-visible {
-  outline: 3px solid rgba(69, 104, 242, 0.35);
-  outline-offset: 3px;
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .sr-only {
@@ -364,6 +367,11 @@ summary:focus-visible {
   display: grid;
   gap: 8px;
   margin: 15px 0;
+}
+
+/* Keep the list/listitem semantics (WCAG) without changing the grid layout. */
+.scenario-listitem {
+  display: contents;
 }
 
 .scenario-option {

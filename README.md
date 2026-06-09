@@ -609,6 +609,11 @@ Work IQ adapters are guarded and injected-transport tested with tenant capture p
 **Creativity and UX:** Concord IQ reasons about *meaning*, not answers — and turns
 governance into a product: ask in plain English, an autonomous semantic scan, a
 single Concord Score with a team leaderboard, and code-review-style approval gates.
+The workbench targets **WCAG 2.2 AA**: full keyboard operability with visible focus,
+list/landmark semantics, a slider with an accessible name and value text, a
+text-equivalent for the meaning graph, AA-contrast text, honored
+`prefers-reduced-motion`, and an automated axe check (no serious or critical
+violations on the landing and workbench) in the test suite.
 
 **Reliability and safety:** The system is designed to reject false conflicts, refuse
 unsupported governance choices, preserve evidence, and keep cloud access opt-in.

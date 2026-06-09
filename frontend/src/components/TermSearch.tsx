@@ -59,21 +59,22 @@ export function TermSearch({
       </label>
       <div className="scenario-list" role="list">
         {visibleScenarios.map((scenario) => (
-          <button
-            className={`scenario-option ${
-              selectedId === scenario.scenario_id ? "is-selected" : ""
-            }`}
-            aria-pressed={selectedId === scenario.scenario_id}
-            key={scenario.scenario_id}
-            onClick={() => onSelect(scenario.scenario_id)}
-            type="button"
-          >
-            <span className="scenario-radio" aria-hidden="true" />
-            <span>
-              <strong>{scenario.term}</strong>
-              <small>{SCENARIO_LABELS[scenario.scenario_id]}</small>
-            </span>
-          </button>
+          <div className="scenario-listitem" role="listitem" key={scenario.scenario_id}>
+            <button
+              className={`scenario-option ${
+                selectedId === scenario.scenario_id ? "is-selected" : ""
+              }`}
+              aria-pressed={selectedId === scenario.scenario_id}
+              onClick={() => onSelect(scenario.scenario_id)}
+              type="button"
+            >
+              <span className="scenario-radio" aria-hidden="true" />
+              <span>
+                <strong>{scenario.term}</strong>
+                <small>{SCENARIO_LABELS[scenario.scenario_id]}</small>
+              </span>
+            </button>
+          </div>
         ))}
       </div>
       {canInvestigateTerm && (
