@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel
 
-from concord.agents.coordinator import UnsupportedScenario
+from concord.agents.coordinator import CoordinatorAgent, UnsupportedScenario
 from concord.config import CloudAccessDisabled, Settings
 from concord.demo import DEMO_SCENARIOS, get_demo_scenario
 from concord.ms_agent import ConcordAgentWorkflow
@@ -31,6 +31,7 @@ from concord.providers import (
     QueryResult,
     provider_statuses,
 )
+from concord.providers.base import ConceptNotFound
 from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
 from concord.storage.repositories import (
     ProposalAlreadyDecided,
@@ -61,6 +62,19 @@ class AskResponse(BaseModel):
     case: ReconciliationCase | None = None
 
 
+class UngovernedTermRefusal(BaseModel):
+    """A graceful, typed refusal when a term has no governed definition.
+
+    Concord IQ never fabricates a definition for an unknown term. It refuses,
+    explains why, and points to the governed terms it can actually reconcile.
+    """
+
+    refused: bool = True
+    term: str
+    reason: str
+    known_terms: list[str]
+
+
 def _runner(request: Request) -> ReconciliationRunner:
     runner = request.app.state.reconciliation_runner
     if runner is None:
@@ -87,6 +101,31 @@ def _settings(request: Request) -> Settings:
 
 def _hosted_runtime(request: Request) -> FoundryHostedProvider | None:
     return request.app.state.foundry_hosted_provider
+
+
+def _known_terms(request: Request) -> list[str]:
+    """The governed terms Concord IQ can actually reconcile (never fabricated)."""
+    runner = request.app.state.reconciliation_runner
+    provider = getattr(runner, "provider", None)
+    if isinstance(provider, LocalProvider):
+        return [
+            concept.canonical_name
+            for concept in provider.list_concepts()
+            if concept.concept_id in CoordinatorAgent.supported_concepts
+        ]
+    return []
+
+
+def _ungoverned_refusal(request: Request, term: str) -> UngovernedTermRefusal:
+    """Build the typed refusal for a term with no governed definition."""
+    return UngovernedTermRefusal(
+        term=term,
+        reason=(
+            f"No governed definition for '{term}'. Concord IQ will not guess. "
+            "Add it to the ontology to reconcile it."
+        ),
+        known_terms=_known_terms(request),
+    )
 
 
 @router.get("/health")
@@ -127,12 +166,13 @@ def providers(request: Request) -> list[dict[str, object]]:
     return provider_statuses(_settings(request))
 
 
-@router.post("/analyze", response_model=ReconciliationCase)
-@router.post("/reconcile", response_model=ReconciliationCase)
-async def reconcile(
-    payload: ReconciliationRequest,
-    request: Request,
-) -> ReconciliationCase:
+async def _run_case(payload: ReconciliationRequest, request: Request) -> ReconciliationCase:
+    """Dispatch one reconciliation to the hosted runtime or in-process workflow.
+
+    Raises ``UnsupportedScenario`` / ``ConceptNotFound`` for ungoverned terms; the
+    public ``/analyze`` route turns those into a graceful, typed refusal. Hosted
+    cloud failures are mapped to HTTP errors here so every caller is consistent.
+    """
     hosted = _hosted_runtime(request)
     if hosted is not None:
         try:
@@ -143,13 +183,24 @@ async def reconcile(
             raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
         except (FoundryHostedResponseError, CloudTransportError) as error:
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+    return await _workflow(request).run(payload)
+
+
+@router.post("/analyze", response_model=ReconciliationCase | UngovernedTermRefusal)
+@router.post("/reconcile", response_model=ReconciliationCase | UngovernedTermRefusal)
+async def reconcile(
+    payload: ReconciliationRequest,
+    request: Request,
+) -> ReconciliationCase | UngovernedTermRefusal:
+    """Reconcile a governed term, or refuse gracefully when it is ungoverned.
+
+    An unknown term is never an error and never a fabricated definition: it returns
+    a typed refusal (HTTP 200) that names the governed terms Concord IQ can settle.
+    """
     try:
-        return await _workflow(request).run(payload)
-    except UnsupportedScenario as error:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=str(error),
-        ) from error
+        return await _run_case(payload, request)
+    except (UnsupportedScenario, ConceptNotFound):
+        return _ungoverned_refusal(request, payload.term)
 
 
 @router.post("/reconcile/whatif", response_model=WhatIfResult)
@@ -182,7 +233,7 @@ async def ask(payload: AskRequest, request: Request) -> AskResponse:
         result = hosted.nl_query(payload.question)
         if not result.matched or not result.canonical_name:
             return AskResponse(query=result)
-        case = await reconcile(
+        case = await _run_case(
             ReconciliationRequest(question=payload.question, term=result.canonical_name),
             request,
         )
@@ -195,7 +246,7 @@ async def ask(payload: AskRequest, request: Request) -> AskResponse:
             case = await _workflow(request).run(
                 ReconciliationRequest(question=payload.question, term=result.canonical_name)
             )
-        except UnsupportedScenario:
+        except (UnsupportedScenario, ConceptNotFound):
             case = None
     return AskResponse(query=result, case=case)
 
@@ -300,4 +351,4 @@ async def run_demo_scenario(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Unknown demo scenario: {scenario_id}",
         ) from error
-    return await reconcile(scenario.request(), request)
+    return await _run_case(scenario.request(), request)

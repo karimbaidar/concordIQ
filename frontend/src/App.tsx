@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchDemoScenarios,
   fetchHealth,
+  isUngovernedRefusal,
   reconcileTerm,
   reconcileWhatIf,
   runDemoScenario,
@@ -20,11 +21,13 @@ import { ReasoningTimeline } from "./components/ReasoningTimeline";
 import { RefusalCard } from "./components/RefusalCard";
 import { SemanticPullRequest } from "./components/SemanticPullRequest";
 import { TermSearch } from "./components/TermSearch";
+import { UngovernedRefusalCard } from "./components/UngovernedRefusalCard";
 import type {
   DemoScenario,
   HealthStatus,
   ImpactAssessment,
   ReconciliationCase,
+  UngovernedTermRefusal,
   WhatIfResult,
 } from "./types";
 
@@ -98,6 +101,7 @@ export default function App() {
   const [result, setResult] = useState<ReconciliationCase | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refusal, setRefusal] = useState<UngovernedTermRefusal | null>(null);
   const [whatIf, setWhatIf] = useState<WhatIfResult | null>(null);
   const [whatIfBusy, setWhatIfBusy] = useState(false);
   const [whatIfError, setWhatIfError] = useState<string | null>(null);
@@ -193,6 +197,7 @@ export default function App() {
     }
     setBusy(true);
     setError(null);
+    setRefusal(null);
     resetWhatIf();
     try {
       const caseResult = await runDemoScenario(selectedScenario.scenario_id);
@@ -215,6 +220,7 @@ export default function App() {
   }
 
   function handleAskAnswer(caseResult: ReconciliationCase) {
+    setRefusal(null);
     resetWhatIf();
     setResult(caseResult);
     requestAnimationFrame(() => {
@@ -228,10 +234,22 @@ export default function App() {
   async function handleInvestigate(term: string) {
     setBusy(true);
     setError(null);
+    setRefusal(null);
     resetWhatIf();
     try {
-      const caseResult = await reconcileTerm(term);
-      setResult(caseResult);
+      const outcome = await reconcileTerm(term);
+      if (isUngovernedRefusal(outcome)) {
+        setResult(null);
+        setRefusal(outcome);
+        requestAnimationFrame(() => {
+          document.getElementById("ungoverned-refusal")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+        return;
+      }
+      setResult(outcome);
       requestAnimationFrame(() => {
         document.getElementById("case-result")?.scrollIntoView({
           behavior: "smooth",
@@ -302,9 +320,11 @@ export default function App() {
             onSelect={(scenarioId) => {
               setSelectedId(scenarioId);
               setResult(null);
+              setRefusal(null);
               resetWhatIf();
             }}
             onRun={handleRun}
+            onInvestigate={handleInvestigate}
           />
         </section>
 
@@ -312,6 +332,16 @@ export default function App() {
           <div className="error-banner" role="alert">
             <strong>Local demo unavailable.</strong>
             <span>{error}</span>
+          </div>
+        )}
+
+        {refusal && !result && (
+          <div id="ungoverned-refusal">
+            <UngovernedRefusalCard
+              refusal={refusal}
+              busy={busy}
+              onInvestigate={handleInvestigate}
+            />
           </div>
         )}
 

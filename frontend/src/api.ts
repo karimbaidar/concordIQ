@@ -5,6 +5,7 @@ import type {
   PortfolioScan,
   ProposalDecisionResult,
   ReconciliationCase,
+  UngovernedTermRefusal,
   WhatIfResult,
 } from "./types";
 
@@ -50,14 +51,22 @@ export function askConcord(question: string): Promise<AskResponse> {
   });
 }
 
-export function reconcileTerm(term: string): Promise<ReconciliationCase> {
-  return requestJson<ReconciliationCase>("/analyze", {
+export function reconcileTerm(
+  term: string,
+): Promise<ReconciliationCase | UngovernedTermRefusal> {
+  return requestJson<ReconciliationCase | UngovernedTermRefusal>("/analyze", {
     method: "POST",
     body: JSON.stringify({
       term,
       question: `Why do our ${term} definitions disagree?`,
     }),
   });
+}
+
+export function isUngovernedRefusal(
+  value: ReconciliationCase | UngovernedTermRefusal,
+): value is UngovernedTermRefusal {
+  return (value as UngovernedTermRefusal).refused === true;
 }
 
 export function reconcileWhatIf(

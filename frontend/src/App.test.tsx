@@ -477,4 +477,63 @@ describe("Concord IQ demo", () => {
     expect(screen.queryByText("Exploration — not governed")).not.toBeInTheDocument();
     expect(screen.getByText("16")).toBeInTheDocument();
   });
+
+  it("refuses an ungoverned term gracefully without fabricating a definition", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith("/health")) {
+          return mockJson({
+            status: "ok",
+            provider: "LocalProvider",
+            cloud_enabled: false,
+            data_type: "synthetic",
+            llm_provider: "DisabledLLMProvider",
+            llm_enabled: false,
+            llm_model: null,
+          });
+        }
+        if (url.endsWith("/demo/scenarios")) {
+          return mockJson(scenarios);
+        }
+        if (url.endsWith("/analyze")) {
+          return mockJson({
+            refused: true,
+            term: "Gross Margin",
+            reason:
+              "No governed definition for 'Gross Margin'. Concord IQ will not guess. " +
+              "Add it to the ontology to reconcile it.",
+            known_terms: [
+              "Active Customer",
+              "Net Revenue",
+              "Churned Customer",
+              "Qualified Lead",
+            ],
+          });
+        }
+        return mockJson(makeCase("active_customer"));
+      }),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+
+    const search = await screen.findByPlaceholderText("Search governed terms");
+    await user.type(search, "Gross Margin");
+    await user.click(
+      await screen.findByRole("button", { name: /investigate .* as a term/i }),
+    );
+
+    expect(
+      await screen.findByRole("heading", { name: /Concord IQ will not guess/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/No governed definition for 'Gross Margin'/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Terms Concord IQ can reconcile today:"),
+    ).toBeInTheDocument();
+    // Never fabricates a result for an ungoverned term.
+    expect(screen.queryByText("Material conflict confirmed")).not.toBeInTheDocument();
+  });
 });

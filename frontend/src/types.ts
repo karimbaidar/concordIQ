@@ -241,6 +241,13 @@ export interface AskResponse {
   case: ReconciliationCase | null;
 }
 
+export interface UngovernedTermRefusal {
+  refused: true;
+  term: string;
+  reason: string;
+  known_terms: string[];
+}
+
 export interface ProposalDecisionResult {
   run_id: string;
   term: string;

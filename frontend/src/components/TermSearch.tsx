@@ -9,6 +9,7 @@ interface TermSearchProps {
   hostedRuntime?: boolean;
   onSelect: (scenarioId: string) => void;
   onRun: () => void;
+  onInvestigate?: (term: string) => void;
 }
 
 const SCENARIO_LABELS: Record<string, string> = {
@@ -24,18 +25,22 @@ export function TermSearch({
   hostedRuntime = false,
   onSelect,
   onRun,
+  onInvestigate,
 }: TermSearchProps) {
   const [query, setQuery] = useState("");
+  const trimmedQuery = query.trim();
   const visibleScenarios = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
+    const normalized = trimmedQuery.toLowerCase();
     if (!normalized) {
       return scenarios;
     }
     return scenarios.filter((scenario) =>
       `${scenario.term} ${scenario.question}`.toLowerCase().includes(normalized),
     );
-  }, [query, scenarios]);
+  }, [trimmedQuery, scenarios]);
   const selected = scenarios.find((scenario) => scenario.scenario_id === selectedId);
+  const canInvestigateTerm =
+    Boolean(onInvestigate) && trimmedQuery.length > 0 && visibleScenarios.length === 0;
 
   return (
     <section className="term-search" aria-labelledby="term-search-title">
@@ -71,6 +76,19 @@ export function TermSearch({
           </button>
         ))}
       </div>
+      {canInvestigateTerm && (
+        <div className="term-investigate" role="note">
+          <p>No governed scenario matches “{trimmedQuery}”.</p>
+          <button
+            type="button"
+            className="ghost-button"
+            disabled={busy}
+            onClick={() => onInvestigate?.(trimmedQuery)}
+          >
+            Investigate “{trimmedQuery}” as a term
+          </button>
+        </div>
+      )}
       <button
         className="run-button"
         disabled={!selected || busy}
