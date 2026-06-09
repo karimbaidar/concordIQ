@@ -82,12 +82,24 @@ export interface TimelineEntry {
   status: "completed" | "failed";
 }
 
+export interface ConflictHypothesis {
+  left_binding_id: string;
+  right_binding_id: string;
+  differing_dimensions: string[];
+  rationale: string;
+  claim: string;
+  skeptic_challenge: string;
+  data_verdict: "pending" | "confirmed" | "overturned";
+  evidence_ids: string[];
+}
+
 export interface AgentTraceStep {
   step_number: number;
   agent_name: string;
   input_summary: string;
   output_summary: string;
   evidence_ids: string[];
+  deliberations: ConflictHypothesis[];
   provider_mode: string;
   verifier_status: "pending" | "passed" | "needs_review" | "blocked" | null;
   duration_ms: number | null;
@@ -268,6 +280,7 @@ export interface ReconciliationCase {
     definition_ids: string[];
   } | null;
   binding_semantics: DefinitionBinding[];
+  conflict_hypotheses: ConflictHypothesis[];
   execution_results: DefinitionEvaluation[];
   verdict: Verdict;
   verification_status: "pending" | "passed" | "needs_review" | "blocked";

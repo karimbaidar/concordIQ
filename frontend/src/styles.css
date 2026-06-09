@@ -1121,6 +1121,146 @@ summary:focus-visible {
   color: #34445d;
 }
 
+.deliberation-panel {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 13px;
+  border: 1px solid #dce3f2;
+  border-radius: 12px;
+  background: #f8f9fd;
+}
+
+.deliberation-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.deliberation-labels span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #4d5f82;
+  background: #e9edf6;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deliberation-labels span:first-child {
+  color: #176e58;
+  background: #e5f5ef;
+}
+
+.deliberation-card {
+  overflow: hidden;
+  border: 1px solid #dfe5ee;
+  border-left: 4px solid #7c8aaa;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.deliberation-card.ruling-confirmed {
+  border-left-color: var(--red);
+}
+
+.deliberation-card.ruling-overturned {
+  border-left-color: var(--green);
+}
+
+.deliberation-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.deliberation-card > header span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #8f4242;
+  background: #fff0f0;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.deliberation-card.ruling-overturned > header span {
+  color: #176e58;
+  background: #e8f7f1;
+}
+
+.deliberation-card dl {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 13px;
+}
+
+.deliberation-card dl div {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 9px;
+}
+
+.deliberation-card dt {
+  color: #7d899d;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deliberation-card dd {
+  margin: 0;
+  color: #45536a;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.deliberation-card details {
+  border-top: 1px solid #edf0f5;
+}
+
+.deliberation-card summary {
+  padding: 9px 13px;
+  color: #596982;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.deliberation-evidence {
+  display: grid;
+  gap: 8px;
+  padding: 0 13px 13px;
+}
+
+.deliberation-evidence > div {
+  display: grid;
+  gap: 5px;
+}
+
+.deliberation-evidence span {
+  color: #65728a;
+  font-size: 9px;
+}
+
+.deliberation-evidence code {
+  overflow-x: auto;
+  padding: 9px;
+  border-radius: 7px;
+  color: #cbd7ed;
+  background: #101b32;
+  font-size: 8px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 .verifier-panel {
   padding: 17px;
   margin-top: 12px;

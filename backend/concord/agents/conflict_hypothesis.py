@@ -20,14 +20,25 @@ class ConflictHypothesisAgent:
                 differences.add("activity-window")
             if left.source_tables != right.source_tables:
                 differences.add("source-lineage")
+            dimensions = tuple(sorted(differences))
+            dimension_text = ", ".join(item.replace("-", " ") for item in dimensions)
             hypotheses.append(
                 ConflictHypothesis(
                     left_binding_id=left.binding_id,
                     right_binding_id=right.binding_id,
-                    differing_dimensions=tuple(sorted(differences)),
+                    differing_dimensions=dimensions,
                     rationale=(
                         f"{left.owner} and {right.owner} use different operational "
                         "dimensions; execute both bindings to determine materiality."
+                    ),
+                    claim=(
+                        f"{left.owner} and {right.owner} are suspected to select "
+                        f"different populations because their bindings differ on "
+                        f"{dimension_text or 'operational wording'}."
+                    ),
+                    skeptic_challenge=(
+                        "Operational wording alone is not proof. Confirm the conflict "
+                        "only if deterministic SQL returns unequal entity sets."
                     ),
                 )
             )

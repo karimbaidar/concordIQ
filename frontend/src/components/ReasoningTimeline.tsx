@@ -1,4 +1,4 @@
-import type { ReconciliationCase } from "../types";
+import type { ConflictHypothesis, ReconciliationCase } from "../types";
 
 interface ReasoningTimelineProps {
   result: ReconciliationCase;
@@ -8,7 +8,31 @@ function checkLabel(check: string) {
   return check.replaceAll("_", " ");
 }
 
+function bindingOwner(result: ReconciliationCase, bindingId: string) {
+  return (
+    result.binding_semantics.find((binding) => binding.binding_id === bindingId)?.owner ??
+    bindingId
+  );
+}
+
+function dataRuling(result: ReconciliationCase, hypothesis: ConflictHypothesis) {
+  const evaluations = new Map(
+    result.execution_results.map((evaluation) => [evaluation.binding_id, evaluation]),
+  );
+  const leftCount = evaluations.get(hypothesis.left_binding_id)?.entity_count ?? 0;
+  const rightCount = evaluations.get(hypothesis.right_binding_id)?.entity_count ?? 0;
+  if (hypothesis.data_verdict === "confirmed") {
+    return `Confirmed: executed entity sets differ (${leftCount} vs ${rightCount}).`;
+  }
+  if (hypothesis.data_verdict === "overturned") {
+    return `Overturned: executed entity sets are equal (${leftCount} = ${rightCount}).`;
+  }
+  return "Pending deterministic execution.";
+}
+
 export function ReasoningTimeline({ result }: ReasoningTimelineProps) {
+  const evidence = new Map(result.evidence.map((item) => [item.evidence_id, item]));
+
   return (
     <section className="surface reasoning-timeline" aria-labelledby="timeline-title">
       <div className="section-heading">
@@ -45,6 +69,63 @@ export function ReasoningTimeline({ result }: ReasoningTimelineProps) {
                 <span>Output</span>
                 {step.output_summary}
               </p>
+              {step.deliberations.length > 0 && (
+                <div className="deliberation-panel">
+                  <div className="deliberation-labels">
+                    <span>Deterministic</span>
+                    <span>LLM did not decide</span>
+                  </div>
+                  {step.deliberations.map((hypothesis) => {
+                    const citedEvidence = hypothesis.evidence_ids
+                      .map((evidenceId) => evidence.get(evidenceId))
+                      .filter((item) => item !== undefined);
+                    return (
+                      <article
+                        className={`deliberation-card ruling-${hypothesis.data_verdict}`}
+                        key={`${hypothesis.left_binding_id}-${hypothesis.right_binding_id}`}
+                      >
+                        <header>
+                          <strong>
+                            {bindingOwner(result, hypothesis.left_binding_id)} ↔{" "}
+                            {bindingOwner(result, hypothesis.right_binding_id)}
+                          </strong>
+                          <span>{hypothesis.data_verdict}</span>
+                        </header>
+                        <dl>
+                          <div>
+                            <dt>Claim</dt>
+                            <dd>{hypothesis.claim}</dd>
+                          </div>
+                          <div>
+                            <dt>Challenge</dt>
+                            <dd>{hypothesis.skeptic_challenge}</dd>
+                          </div>
+                          <div>
+                            <dt>Data ruling</dt>
+                            <dd>{dataRuling(result, hypothesis)}</dd>
+                          </div>
+                        </dl>
+                        <details>
+                          <summary>
+                            {citedEvidence.length} evidence records · exact SQL
+                          </summary>
+                          <div className="deliberation-evidence">
+                            {citedEvidence.map((item) => (
+                              <div key={item.evidence_id}>
+                                <span>
+                                  {bindingOwner(result, item.binding_id)} ·{" "}
+                                  {item.entity_count} entities
+                                </span>
+                                <code>{item.sql_text}</code>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </li>
         ))}

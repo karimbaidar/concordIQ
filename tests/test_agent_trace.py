@@ -35,8 +35,10 @@ def test_completed_run_persists_complete_typed_agent_trace(
     assert case.agent_trace[-1].duration_ms is None
 
     execution_step = case.agent_trace[4]
+    hypothesis_step = case.agent_trace[3]
     verifier_step = case.agent_trace[8]
     assert execution_step.evidence_ids == tuple(item.evidence_id for item in case.evidence)
+    assert hypothesis_step.deliberations == case.conflict_hypotheses
     assert verifier_step.verifier_status == "passed"
 
     with Session(postgres_engine) as session:
@@ -73,6 +75,8 @@ def test_agent_trace_api_returns_ordered_completed_run_artifact(
     trace = trace_response.json()
     assert [step["step_number"] for step in trace] == list(range(1, 11))
     assert [step["agent_name"] for step in trace] == [agent.name for agent in SPECIALIST_AGENTS]
+    assert trace[3]["deliberations"][0]["data_verdict"] == "overturned"
+    assert len(trace[3]["deliberations"][0]["evidence_ids"]) == 2
     assert trace[4]["evidence_ids"]
     assert trace[8]["verifier_status"] == "passed"
 

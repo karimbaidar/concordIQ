@@ -59,8 +59,17 @@ SPECIALIST_AGENTS: tuple[SpecialistAgentNode, ...] = (
     ),
     SpecialistAgentNode(
         "DataExecutionAgent",
-        "executed definition results and evidence",
-        lambda case: bool(case.execution_results) and bool(case.evidence),
+        "executed definition results, evidence, and deterministic hypothesis rulings",
+        lambda case: (
+            bool(case.execution_results)
+            and bool(case.evidence)
+            and bool(case.conflict_hypotheses)
+            and all(
+                hypothesis.data_verdict in {"confirmed", "overturned"}
+                and len(hypothesis.evidence_ids) == 2
+                for hypothesis in case.conflict_hypotheses
+            )
+        ),
     ),
     SpecialistAgentNode(
         "ImpactRankerAgent",

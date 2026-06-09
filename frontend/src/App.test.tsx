@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
-import type { ReconciliationCase } from "./types";
+import type { ConflictHypothesis, ReconciliationCase } from "./types";
 
 const scenarios = [
   {
@@ -62,6 +62,22 @@ function makeCase(
     entity_ids: Array.from({ length: counts[index] }, (_, entityIndex) => `C-${entityIndex}`),
     sql_text: "SELECT customer_id FROM customers ORDER BY customer_id",
   }));
+  const hypotheses: ConflictHypothesis[] = bindings.flatMap((left, leftIndex) =>
+    bindings.slice(leftIndex + 1).map((right, rightOffset) => {
+      const rightIndex = leftIndex + rightOffset + 1;
+      return {
+        left_binding_id: left.binding_id,
+        right_binding_id: right.binding_id,
+        differing_dimensions: ["reporting-period"],
+        rationale: `${left.owner} and ${right.owner} use different operational wording.`,
+        claim: `${left.owner} and ${right.owner} are suspected to select different populations.`,
+        skeptic_challenge:
+          "Operational wording alone is not proof. Require unequal executed entity sets.",
+        data_verdict: scenario === "net_revenue" ? "overturned" : "confirmed",
+        evidence_ids: [evidence[leftIndex].evidence_id, evidence[rightIndex].evidence_id],
+      };
+    }),
+  );
   const refusalReason =
     scenario === "churned_customer"
       ? "Automatic reconciliation refused because authority is ambiguous. Human approval is required."
@@ -92,6 +108,7 @@ function makeCase(
       definition_ids: bindings.map((binding) => binding.definition_id),
     },
     binding_semantics: bindings,
+    conflict_hypotheses: hypotheses,
     execution_results: bindings.map((binding, index) => ({
       binding_id: binding.binding_id,
       definition_id: binding.definition_id,
@@ -197,26 +214,40 @@ function makeCase(
         input_summary: "Requested a governed reconciliation.",
         output_summary: "Created the typed casefile and workflow plan.",
         evidence_ids: [],
+        deliberations: [],
         provider_mode: "local",
         verifier_status: null,
         duration_ms: 0.1,
       },
       {
         step_number: 2,
+        agent_name: "ConflictHypothesisAgent",
+        input_summary: `Compare ${bindings.length} normalized bindings.`,
+        output_summary: "Recorded deterministic data rulings.",
+        evidence_ids: [],
+        deliberations: hypotheses,
+        provider_mode: "local",
+        verifier_status: null,
+        duration_ms: 0.3,
+      },
+      {
+        step_number: 3,
         agent_name: "DataExecutionAgent",
         input_summary: `Execute ${bindings.length} trusted bindings.`,
         output_summary: `Settled verdict as ${verdict}.`,
         evidence_ids: evidence.map((item) => item.evidence_id),
+        deliberations: [],
         provider_mode: "local",
         verifier_status: null,
         duration_ms: 2.4,
       },
       {
-        step_number: 3,
+        step_number: 4,
         agent_name: "SkepticalVerifierAgent",
         input_summary: `Verify ${evidence.length} evidence records.`,
         output_summary: "Passed deterministic checks.",
         evidence_ids: evidence.map((item) => item.evidence_id),
+        deliberations: [],
         provider_mode: "local",
         verifier_status: "passed",
         duration_ms: 0.4,
@@ -321,6 +352,11 @@ describe("Concord IQ demo", () => {
     expect(screen.getByLabelText("3 evidence records")).toBeInTheDocument();
     expect(screen.getByText("Evidence narration")).toBeInTheDocument();
     expect(screen.getAllByText("deterministic fallback")).toHaveLength(3);
+    expect(screen.getByText("LLM did not decide")).toBeInTheDocument();
+    expect(screen.getAllByText("Data ruling")).toHaveLength(3);
+    expect(
+      screen.getByText("Confirmed: executed entity sets differ (96 vs 90)."),
+    ).toBeInTheDocument();
   });
 
   it("surfaces both the decoy and governed-refusal outcomes", async () => {
@@ -337,6 +373,10 @@ describe("Concord IQ demo", () => {
       await screen.findByText("Different words, same operational result"),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("2 evidence records")).toBeInTheDocument();
+    expect(
+      screen.getByText("Overturned: executed entity sets are equal (96 = 96)."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("LLM did not decide")).toBeInTheDocument();
 
     await user.click(within(scenarioList).getByRole("button", { name: /churned customer/i }));
     await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));

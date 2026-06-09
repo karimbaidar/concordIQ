@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from uuid import NAMESPACE_URL, uuid5
 
-from concord.orchestration.casefile import EvidenceRecord
+from concord.orchestration.casefile import ConflictHypothesis, EvidenceRecord
 from concord.providers import (
     DefinitionBinding,
     DefinitionEvaluation,
@@ -16,6 +16,7 @@ from concord.providers import (
 class ExecutionBundle:
     evaluations: tuple[DefinitionEvaluation, ...]
     evidence: tuple[EvidenceRecord, ...]
+    hypotheses: tuple[ConflictHypothesis, ...]
     verdict: str
 
 
@@ -30,6 +31,7 @@ class DataExecutionAgent:
         run_id: str,
         bindings: tuple[DefinitionBinding, ...],
         period: EvaluationPeriod,
+        hypotheses: tuple[ConflictHypothesis, ...] = (),
     ) -> ExecutionBundle:
         evaluations = tuple(
             self.provider.evaluate_definition(binding.binding_id, period) for binding in bindings
@@ -52,8 +54,36 @@ class DataExecutionAgent:
             )
             for evaluation in evaluations
         )
+        ruled_hypotheses = self._rule_on_hypotheses(hypotheses, evaluations, evidence)
         return ExecutionBundle(
             evaluations=evaluations,
             evidence=evidence,
+            hypotheses=ruled_hypotheses,
             verdict=verdict,
         )
+
+    @staticmethod
+    def _rule_on_hypotheses(
+        hypotheses: tuple[ConflictHypothesis, ...],
+        evaluations: tuple[DefinitionEvaluation, ...],
+        evidence: tuple[EvidenceRecord, ...],
+    ) -> tuple[ConflictHypothesis, ...]:
+        evaluations_by_binding = {item.binding_id: item for item in evaluations}
+        evidence_by_binding = {item.binding_id: item for item in evidence}
+        ruled: list[ConflictHypothesis] = []
+        for hypothesis in hypotheses:
+            left = evaluations_by_binding[hypothesis.left_binding_id]
+            right = evaluations_by_binding[hypothesis.right_binding_id]
+            unequal_sets = frozenset(left.entity_ids) != frozenset(right.entity_ids)
+            ruled.append(
+                hypothesis.model_copy(
+                    update={
+                        "data_verdict": "confirmed" if unequal_sets else "overturned",
+                        "evidence_ids": (
+                            evidence_by_binding[hypothesis.left_binding_id].evidence_id,
+                            evidence_by_binding[hypothesis.right_binding_id].evidence_id,
+                        ),
+                    }
+                )
+            )
+        return tuple(ruled)

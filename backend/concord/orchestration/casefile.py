@@ -65,6 +65,19 @@ class TimelineEntry(CaseModel):
     status: Literal["completed", "failed"] = "completed"
 
 
+class ConflictHypothesis(CaseModel):
+    """A possible semantic conflict to be settled by execution."""
+
+    left_binding_id: str
+    right_binding_id: str
+    differing_dimensions: tuple[str, ...]
+    rationale: str
+    claim: str = ""
+    skeptic_challenge: str = ""
+    data_verdict: Literal["pending", "confirmed", "overturned"] = "pending"
+    evidence_ids: tuple[UUID, ...] = ()
+
+
 class AgentTraceStep(CaseModel):
     """One typed specialist execution record for review and replay."""
 
@@ -73,6 +86,7 @@ class AgentTraceStep(CaseModel):
     input_summary: str
     output_summary: str
     evidence_ids: tuple[UUID, ...] = ()
+    deliberations: tuple[ConflictHypothesis, ...] = ()
     provider_mode: str
     verifier_status: (
         Literal[
@@ -84,15 +98,6 @@ class AgentTraceStep(CaseModel):
         | None
     ) = None
     duration_ms: float | None = None
-
-
-class ConflictHypothesis(CaseModel):
-    """A possible semantic conflict to be settled by execution."""
-
-    left_binding_id: str
-    right_binding_id: str
-    differing_dimensions: tuple[str, ...]
-    rationale: str
 
 
 class ImpactAssessment(CaseModel):

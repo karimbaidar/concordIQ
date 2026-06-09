@@ -21,6 +21,7 @@ from concord.llm import DisabledLLMProvider, LLMProvider
 from concord.orchestration.casefile import (
     AgentTraceStep,
     AuthorityAssessment,
+    ConflictHypothesis,
     ImpactAssessment,
     ReconciliationCase,
     ReconciliationRequest,
@@ -130,6 +131,7 @@ class ReconciliationRunner:
             agent_name="ConflictHypothesisAgent",
             input_summary=f"Compare {len(case.binding_semantics)} normalized bindings.",
             output_summary=f"Generated {len(hypotheses)} execution-testable hypotheses.",
+            deliberations=hypotheses,
             started=started,
         )
         return case
@@ -141,10 +143,13 @@ class ReconciliationRunner:
             str(case.run_id),
             case.binding_semantics,
             case.request.period,
+            case.conflict_hypotheses,
         )
         case.execution_results = execution.evaluations
         case.evidence = execution.evidence
+        case.conflict_hypotheses = execution.hypotheses
         case.verdict = execution.verdict
+        self._settle_deliberation_trace(case)
         case.transition(
             ReconciliationState.EXECUTE_DEFINITIONS,
             agent="DataExecutionAgent",
@@ -155,13 +160,22 @@ class ReconciliationRunner:
             ),
         )
         counts = "/".join(str(result.entity_count) for result in execution.evaluations)
+        confirmed = sum(
+            hypothesis.data_verdict == "confirmed" for hypothesis in execution.hypotheses
+        )
+        overturned = sum(
+            hypothesis.data_verdict == "overturned" for hypothesis in execution.hypotheses
+        )
         self._record_trace(
             case,
             agent_name="DataExecutionAgent",
             input_summary=(
                 f"Execute {len(case.binding_semantics)} trusted bindings for the requested period."
             ),
-            output_summary=(f"Settled verdict as {execution.verdict} with entity counts {counts}."),
+            output_summary=(
+                f"Settled verdict as {execution.verdict} with entity counts {counts}; "
+                f"data confirmed {confirmed} claims and overturned {overturned}."
+            ),
             evidence_ids=tuple(item.evidence_id for item in execution.evidence),
             started=started,
         )
@@ -428,10 +442,13 @@ class ReconciliationRunner:
                 str(case.run_id),
                 case.binding_semantics,
                 case.request.period,
+                case.conflict_hypotheses,
             )
             case.execution_results = execution.evaluations
             case.evidence = execution.evidence
+            case.conflict_hypotheses = execution.hypotheses
             case.verdict = execution.verdict
+            self._settle_deliberation_trace(case)
             return
         if stage == "rank_impact":
             case.impact_assessment = ImpactRankerAgent().run(
@@ -507,6 +524,7 @@ class ReconciliationRunner:
         input_summary: str,
         output_summary: str,
         evidence_ids: tuple[UUID, ...] = (),
+        deliberations: tuple[ConflictHypothesis, ...] = (),
         verifier_status: str | None = None,
         started: float | None,
     ) -> None:
@@ -521,10 +539,30 @@ class ReconciliationRunner:
                 input_summary=input_summary,
                 output_summary=output_summary,
                 evidence_ids=evidence_ids,
+                deliberations=deliberations,
                 provider_mode=self.provider.mode.value,
                 verifier_status=verifier_status,
                 duration_ms=duration_ms,
             ),
+        )
+
+    @staticmethod
+    def _settle_deliberation_trace(case: ReconciliationCase) -> None:
+        evidence_ids = tuple(item.evidence_id for item in case.evidence)
+        case.agent_trace = tuple(
+            step.model_copy(
+                update={
+                    "deliberations": case.conflict_hypotheses,
+                    "evidence_ids": evidence_ids,
+                    "output_summary": (
+                        f"Raised {len(case.conflict_hypotheses)} claims; deterministic "
+                        "execution recorded the final data rulings."
+                    ),
+                }
+            )
+            if step.agent_name == "ConflictHypothesisAgent"
+            else step
+            for step in case.agent_trace
         )
 
     @staticmethod

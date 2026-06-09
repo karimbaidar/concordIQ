@@ -212,6 +212,7 @@ class AgentTraceEvent(Base):
     input_summary: Mapped[str] = mapped_column(Text)
     output_summary: Mapped[str] = mapped_column(Text)
     evidence_ids: Mapped[list[str]] = mapped_column(JSON, default=list)
+    deliberations: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
     provider_mode: Mapped[str] = mapped_column(String(40))
     verifier_status: Mapped[str | None] = mapped_column(String(40))
     duration_ms: Mapped[float | None] = mapped_column(Float)

@@ -9,7 +9,12 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from concord.orchestration.casefile import AgentTraceStep, ReconciliationCase
+from concord.orchestration.casefile import (
+    AgentTraceStep,
+    ConflictHypothesis,
+    ReconciliationCase,
+)
+from concord.storage.db import ensure_schema_compatibility
 from concord.storage.models import (
     AgentTraceEvent,
     AuditEvent,
@@ -59,6 +64,7 @@ class ReconciliationRepository:
 
     def initialize(self) -> None:
         Base.metadata.create_all(self.engine)
+        ensure_schema_compatibility(self.engine)
 
     def save(self, case: ReconciliationCase) -> UUID:
         if not case.verifier_report or not case.verifier_report.passed:
@@ -108,6 +114,10 @@ class ReconciliationRepository:
                     "verifier": case.verifier_report.model_dump(mode="json"),
                     "narrations": [
                         narration.model_dump(mode="json") for narration in case.narrations
+                    ],
+                    "conflict_hypotheses": [
+                        hypothesis.model_dump(mode="json")
+                        for hypothesis in case.conflict_hypotheses
                     ],
                 },
             )
@@ -165,6 +175,9 @@ class ReconciliationRepository:
                     input_summary=step.input_summary,
                     output_summary=step.output_summary,
                     evidence_ids=[str(evidence_id) for evidence_id in step.evidence_ids],
+                    deliberations=[
+                        hypothesis.model_dump(mode="json") for hypothesis in step.deliberations
+                    ],
                     provider_mode=step.provider_mode,
                     verifier_status=step.verifier_status,
                     duration_ms=step.duration_ms,
@@ -190,6 +203,10 @@ class ReconciliationRepository:
                     input_summary=event.input_summary,
                     output_summary=event.output_summary,
                     evidence_ids=tuple(UUID(value) for value in event.evidence_ids),
+                    deliberations=tuple(
+                        ConflictHypothesis.model_validate(item)
+                        for item in (event.deliberations or [])
+                    ),
                     provider_mode=event.provider_mode,
                     verifier_status=event.verifier_status,
                     duration_ms=event.duration_ms,

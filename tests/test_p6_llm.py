@@ -155,6 +155,7 @@ def test_llm_output_cannot_override_evidence(
         item.evidence_id for item in case.evidence
     }
     assert case.verifier_report and case.verifier_report.passed is True
+    assert {item.data_verdict for item in case.conflict_hypotheses} == {"confirmed"}
     assert len(malicious.requests) == 3
     assert all("999 customers" in narration.text for narration in case.narrations)
 

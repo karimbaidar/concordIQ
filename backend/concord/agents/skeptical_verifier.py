@@ -92,6 +92,8 @@ class SkepticalVerifierAgent:
                     or (case.verdict == "consistent" and len(entity_sets) == 1)
                 )
             ),
+            "hypothesis_rulings_match_executed_sets": (self._hypothesis_rulings_match(case)),
+            "hypotheses_cite_pair_evidence": (self._hypotheses_cite_pair_evidence(case)),
             "authority_and_decision_are_consistent": (
                 self._authority_and_decision_are_consistent(case)
             ),
@@ -141,6 +143,38 @@ class SkepticalVerifierAgent:
             and evidence.entity_count == result.entity_count
             and evidence.metric_total == result.metric_total
             and evidence.entity_ids == result.entity_ids
+        )
+
+    @staticmethod
+    def _hypothesis_rulings_match(case: ReconciliationCase) -> bool:
+        if not case.conflict_hypotheses:
+            return False
+        results = {item.binding_id: item for item in case.execution_results}
+        for hypothesis in case.conflict_hypotheses:
+            if (
+                hypothesis.left_binding_id not in results
+                or hypothesis.right_binding_id not in results
+            ):
+                return False
+            left = frozenset(results[hypothesis.left_binding_id].entity_ids)
+            right = frozenset(results[hypothesis.right_binding_id].entity_ids)
+            expected = "confirmed" if left != right else "overturned"
+            if hypothesis.data_verdict != expected:
+                return False
+        return True
+
+    @staticmethod
+    def _hypotheses_cite_pair_evidence(case: ReconciliationCase) -> bool:
+        if not case.conflict_hypotheses:
+            return False
+        evidence = {item.binding_id: item.evidence_id for item in case.evidence}
+        return all(
+            hypothesis.evidence_ids
+            == (
+                evidence.get(hypothesis.left_binding_id),
+                evidence.get(hypothesis.right_binding_id),
+            )
+            for hypothesis in case.conflict_hypotheses
         )
 
     @staticmethod
