@@ -186,6 +186,19 @@ Net Revenue: CONSISTENT | counts=1600/1600 | decoy ruled out; no reconciliation 
 Churned Customer: CONFLICT | counts=333/666 | automatic reconciliation refused; human approval required
 ```
 
+### Score the safety behaviors
+
+```bash
+make eval
+```
+
+This runs a small, fixed, deterministic eval set (the LLM is disabled) over a
+disposable schema and prints a precision scorecard over the safety-critical behaviors
+— conflict, decoy, refusal, no-fabrication, no-LLM-verdict, and provider-label accuracy
+— plus the red-team prompts that must fail closed (guess a definition, ignore
+governance, merge without approval, pretend an IQ capture is verified). The committed
+scorecard is [`docs/eval-scorecard.md`](docs/eval-scorecard.md).
+
 ### Scan the whole semantic portfolio
 
 ```bash
