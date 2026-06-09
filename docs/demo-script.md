@@ -1,121 +1,150 @@
-# Five-minute demo script
+# Demo script — Concord IQ
 
-The judged artifact is the recorded video, never a live tenant. Record against
-the local/replay stack. This script is the click order and the line for each beat.
+The judged artifact is the recorded video (≤5 min, your own work), never a live
+tenant. Record against the local/replay stack. This file is the spine: the click
+order, the screen, and the one line for each beat.
+
+**Two honesty rules that override everything below:**
+1. **No claim exceeds the build.** Only show what runs. Beats marked `PENDING` depend
+   on unbuilt features (T1.5 merge-acts, T1.6 meaning-graph) — do **not** record them
+   until those land. The 3-minute "core spine" is 100% recordable today.
+2. **Never overstate the IQ layer.** Say "verified Fabric IQ semantic grounding" only
+   after `make capture` + `make replay-check` pass with real Fabric calls and the badge
+   reads `FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
 
 ## Before recording
 
 ```bash
 make setup
 make seed
-make test     # 65 backend + 2 frontend green
+make test     # 138 backend + 5 frontend green
 make dev
 ```
 
-Open `http://127.0.0.1:5173`. Confirm the `ProviderBadge` reads `LocalProvider`,
-cloud disabled, data synthetic. Keep `make scan` and `http://127.0.0.1:8000/docs`
-in a second terminal/tab for the closing beats.
+Open `http://127.0.0.1:5173`. Confirm `ProviderBadge` reads `LocalProvider`, cloud
+disabled, data synthetic. Keep `http://127.0.0.1:8000/docs` and a terminal for
+`make scan` in a second tab for the optional closing beats.
 
-If a sanitized Fabric capture is committed, also run `make replay-check` and have
-`PROVIDER=replay make dev` ready so the badge can read `FabricIQProvider`.
+## The spine at a glance
 
-## 0:00–0:30 — The pain
+| # | Beat | Screen (component) | Status |
+| --- | --- | --- | --- |
+| 1 | The pain (board cold open) | `DashboardDisagreement` (1,600 / 1,500 / 1,334) | ✅ LIVE |
+| 2 | Proven conflict + real deliberation | `DefinitionDiff`, `ReasoningTimeline` (claim→challenge→data ruling), `ImpactPanel` | ✅ LIVE (T1.2) |
+| 3 | Glass-box: drag the window, watch the dollars | `DefinitionDiff` what-if slider | ✅ LIVE (T1.1) |
+| 4 | It does not cry wolf (the decoy) | `DecoyRuledOut` (Net Revenue 1,600 = 1,600) | ✅ LIVE |
+| 5 | It refuses rather than guess | `RefusalCard` (Churned) + `UngovernedRefusalCard` (any term) | ✅ LIVE (T1.3) |
+| 6 | Governance: gate the merge | `SemanticPullRequest` (authority-gated Approve & merge) | ✅ LIVE — but the *post-merge re-run resolves* is `PENDING T1.5` |
+| 7 | Score the whole org (optional) | `PortfolioBoard` / `make scan` (Concord Score 60/100) | ✅ LIVE |
+| — | Cold-open hero visual | `MeaningGraph` | ⏳ `PENDING T1.6` (until then, open on beat 1) |
 
-Say: *"Before a board meeting, three dashboards disagree on Active Enterprise
-Customers: Finance 1,600, Sales 1,500, Customer Success 1,334. Same metric, three
-numbers. The data is fine — the **definitions** disagree, and nobody reconciled
-them."*
+---
 
-Show the `DashboardDisagreement` hook with the three numbers.
+## Core spine (~3:00 — record this today)
 
-## 0:30–1:10 — Ask in plain English (NL2Ontology)
+### 1 — 0:00–0:25 · The pain (lead here, not with architecture)
 
-1. In the **Ask Concord IQ** box, type *"Why do our active customer numbers
-   disagree?"* (or click the suggestion chip).
-2. Concord IQ grounds the question in the ontology, names the three competing
-   definitions, then runs the full reconciliation and drops you into the workbench.
+Open on the workbench with the three numbers visible (`DashboardDisagreement`).
 
-Say: *"You ask in business terms. It resolves the meaning against the ontology —
-not free-text search — then proves the answer on data."*
+Say: *"A board decision rode on one number: Finance said 1,600 active customers.
+Sales' system said 1,500. Customer Success said 1,334. Same metric, three numbers.
+Nobody lied — they never agreed on what 'active' means. That gap is 266 customers and
+**$33.2M** of ARR."*
 
-## 1:10–2:20 — The proven conflict
+> When **T1.6** lands, open on the `MeaningGraph` (one term node forking into three
+> departmental nodes, lit conflict edge, $ delta) and say the same line over it.
 
-1. Show the three definitions and their 30 / 90 / 180-day windows in the
-   `DefinitionDiff`.
-2. Point to executed counts **1,600 / 1,500 / 1,334** and the **$33.2M ARR delta**
-   in the `ImpactPanel` (ranked high).
-3. Walk the ten-step **agent trace** / `ReasoningTimeline` — each specialist node,
-   its evidence IDs, and the green skeptical-verifier status. Mention that in
-   strict mode (`CONCORD_WORKFLOW_MODE=strict`) the Agent Framework drives each stage
-   one at a time, and the same trace is served at `GET /runs/{run_id}/agent-trace`.
-4. Expand one evidence item to show the exact SQL.
+### 2 — 0:25–1:10 · The proven conflict, and a real argument settled by data
 
-Say: *"The conflict is decided by executing both definitions and comparing the
-result sets — behaviour on data, not wording. Every claim has stored SQL."*
+1. `DefinitionDiff`: show the three definitions and their trailing windows
+   (Finance 90 / Sales 180 / Customer Success 30 days).
+2. `ReasoningTimeline`: walk one hypothesis as a **Claim → Challenge → Data ruling**
+   triple — e.g. *"Confirmed: executed entity sets differ (1,600 vs 1,500)"* — with the
+   **"Deterministic · LLM did not decide"** label and the exact SQL.
+3. `ImpactPanel`: counts **1,600 / 1,500 / 1,334**, **$33.2M ARR delta**, ranked high.
 
-## 2:20–2:55 — It does not cry wolf (the decoy)
+Say: *"The agent doesn't assert the conflict — it designs the test that proves it.
+A specialist claims they diverge, a skeptic demands proof, and **executed SQL** is the
+referee. The model never decides the verdict; the data does."*
 
-1. Return home; ask *"Are our net revenue definitions equivalent?"*
-2. Show the two differently-worded definitions and the **equal 1,600 / 1,600**
-   result sets and equal totals → **consistent, no action**.
+### 3 — 1:10–1:40 · Glass-box: edit a definition, watch the money move
 
-Say: *"A naive tool screams CONFLICT on different wording. Concord runs both and
-proves they are identical. It earns the right to be believed when it does flag
-one."*
+1. In `DefinitionDiff`, drag the Finance time-window slider **90 → 120 days**.
+2. The count re-derives live **1,600 → 1,667** (**+67 customers, +$8,567,000**); overall
+   impact jumps to **333 / $41,765,000**. The **"Exploration — not governed"** chip shows.
+3. Click **Reset to governed** — back to **266 / $33,198,000**.
 
-## 2:55–3:30 — The subtle catch (Qualified Lead)
+Say: *"This is the glass box. Change one rule and the dollars re-derive instantly —
+real SQL over real rows, no model in the loop. And it's clearly fenced as exploration:
+nothing here touches the governed definition."*
 
-1. From the autonomous board (or ask *"Do Sales and Marketing agree on a qualified
-   lead?"*), open **Qualified Lead**.
-2. Show the small **20-customer / 1.3%** gap: Marketing counts a `nurturing`
-   cohort that Sales does not — a silent **$2.26M** divergence — caught and
-   quantified, and (authority is clear) drafted as a proposal.
+### 4 — 1:40–2:05 · It does not cry wolf (the decoy)
 
-Say: *"It does not only catch the obvious three-way splits. It catches the silent
-one-status-value gaps too, and tells you exactly what they cost."*
+1. Run **Net Revenue**. Two differently-worded definitions; executed sets are
+   **equal 1,600 = 1,600** → `DecoyRuledOut`, verdict **consistent**.
+2. Point to the ruling: *"Overturned: executed entity sets are equal (1,600 = 1,600)."*
 
-## 3:30–4:00 — Governance: refuse, then gate
+Say: *"A naive tool screams CONFLICT at different wording. Concord ran both and proved
+they're identical — so it earns the right to be believed when it does flag one."*
 
-1. Open **Churned Customer**: divergent **333 / 666** populations, but authority
-   is shared/ambiguous → the `RefusalCard` refuses to auto-pick a winner.
-2. Back on a clear-authority case (Active Customer), open the
-   `SemanticPullRequest`: only the **authority owner** can **Approve & merge**;
-   the decision is recorded in the audit trail.
+### 5 — 2:05–2:35 · It refuses rather than guess (two ways)
 
-Say: *"Definitions get reviewed like code. The agent refuses when no one owns the
-call, and gates the merge to the owner when someone does."*
+1. **Ambiguous authority:** open **Churned Customer** — divergent **333 / 666**, but
+   ownership is shared → `RefusalCard` refuses to auto-pick a winner, routes to a human.
+2. **Ungoverned term:** in the workbench search, type **"Gross Margin"** and click
+   *Investigate* → `UngovernedRefusalCard`: *"Concord IQ will not guess 'Gross Margin'"*
+   with the governed terms it **can** reconcile as chips.
 
-## 4:00–4:35 — Watch and score the whole org
+Say: *"In a field of agents that do more autonomously, Concord is proud of what it
+won't do. No owner? It refuses. No governed definition? It won't invent one. Restraint
+is the feature."*
 
-1. Run `make scan` in the terminal (or show the `PortfolioBoard`):
-   **Concord Score 60/100 (grade D)** — Churned #1, Active #2, Qualified Lead #3,
-   Net Revenue consistent — plus the per-team leaderboard.
+### 6 — 2:35–3:00 · Governance: definitions reviewed like code
 
-Say: *"This isn't a one-off report. It sweeps every governed concept, scores your
-semantic health, and ranks who has the most unreconciled meaning. That's the
-thing people open every Monday."*
+1. Back on **Active Customer**, open `SemanticPullRequest` — the proposed canonical
+   definition, evidence refs, migration checklist.
+2. Show that only the **Data Governance Council** (the authority owner) can
+   **Approve & merge**; the decision is written to the audit trail.
 
-## 4:35–5:00 — The IQ layer and the close
+Say: *"Meaning gets a pull request. Only the owner can merge, and every decision is
+audited."*
 
-Point to the `ProviderBadge` / `GET /providers`:
+> `PENDING T1.5` — do **not** yet claim "the merge changes the governed definition and a
+> re-run shows it resolved." Today, Approve & merge flips proposal status + writes audit;
+> it does not yet promote the canonical definition. Record beat 6′ below only after T1.5.
 
-- Microsoft Agent Framework orchestrates the specialist workflow (fast + strict
-  modes); the workflow is hosted through a Foundry Agent Service entrypoint
-  validated cloud-free (`make foundry-agent-smoke`).
-- **Fabric IQ** ontology + NL2Ontology is the semantic grounding layer; the
-  `nl_query` path is genuinely IQ-served. REST/MCP surfaces are verified against
-  current Microsoft Learn (see `docs/iq-integration.md`).
-- Capture is honest about what Fabric returns: **full-snapshot mode** when the MCP
-  returns the scenario JSON, or **semantic-proof mode** when it only matches the
-  governed entity type (`ActiveCustomer`, …) — then the deterministic LocalProvider
-  snapshot supplies the SQL/evidence, marked transparently with `iq_proof_mode`.
-- Foundry IQ is the fallback; Local is reproducibility mode; Replay shows a
-  sanitized real-IQ capture; cloud is off until an operator opts in with a budget.
+Close: *"Enterprises built a single source of truth for **data**, but not for
+**meaning**. Concord IQ proves where definitions silently disagree, settles it on data,
+gates it under governance, or refuses — version control for the meaning of your metrics."*
 
-Only say "verified Fabric IQ semantic grounding" if `make capture` and
-`make replay-check` passed with real Fabric calls and the badge reads
-`FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
+---
 
-Close: *"Concord IQ finds where your enterprise's definitions silently disagree —
-proves it on data, scores it, and either reconciles it under governance or refuses.
-It's a single source of truth for **meaning**."*
+## Extended beats (fold in for the ≤5:00 cut)
+
+- **Ask in plain English (NL2Ontology).** `AskConcord`: *"Why do our active customer
+  numbers disagree?"* → grounds the question in the ontology, names the competing
+  definitions, runs the proof. Say: *"You ask in business terms; it resolves meaning
+  against the ontology, not free-text search."*
+- **The subtle catch (Qualified Lead).** Open Qualified Lead: a **20-customer / 1.3%**
+  gap (Marketing counts a `nurturing` cohort Sales doesn't) — a silent **$2.26M**
+  divergence, caught and quantified.
+- **Score the whole org.** `PortfolioBoard` / `make scan`: **Concord Score 60/100
+  (grade D)** — Churned #1, Active #2, Qualified Lead #3, Net Revenue consistent — plus
+  the per-team leaderboard. Say: *"Not a one-off report — it sweeps every governed
+  concept every Monday."*
+- **The IQ + runtime layer.** `ProviderBadge` / `GET /providers`: Microsoft Agent
+  Framework orchestrates the 10 specialist nodes; the workflow is hosted on **Foundry
+  Agent Service** (`PROVIDER=foundry_hosted`); **Fabric IQ** is the semantic grounding
+  layer and the committed sanitized capture replays it with no tenant. Keep the wording
+  honest per rule 2.
+
+## Beats to record only after they're built
+
+- **6′ — Merge that acts (`PENDING T1.5`).** After Approve & merge, show the terminal
+  *"Merged — canonical definition is now governed"* state, then **Re-run with governed
+  definition** → the term now resolves, the CONFLICT badge becomes **Governed: Canonical
+  vN**. Line: *"It doesn't just write a document — it safely changes the enterprise's
+  source of meaning, and only the owner can."*
+- **Cold-open hero (`PENDING T1.6`).** Replace beat 1's static three numbers with the
+  animated `MeaningGraph` fork; on the what-if (beat 3) the nodes animate; after the
+  merge (beat 6′) the fork collapses to a single canonical node.
