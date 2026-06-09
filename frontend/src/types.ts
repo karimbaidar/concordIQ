@@ -123,11 +123,21 @@ export interface AuthorityRule {
   rationale: string;
 }
 
+export interface AuthorityGrounding {
+  source: string;
+  retrieved_owner: string | null;
+  citation: string;
+  note: string;
+  agrees_with_rule: boolean;
+  advisory_only: boolean;
+}
+
 export interface AuthorityAssessment {
   status: "clear" | "shared" | "ambiguous" | "missing";
   owner: string | null;
   rules: AuthorityRule[];
   rationale: string;
+  advisory_grounding?: AuthorityGrounding | null;
 }
 
 export interface EvidenceRecord {

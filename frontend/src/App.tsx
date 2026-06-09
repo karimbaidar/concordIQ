@@ -458,6 +458,18 @@ export default function App() {
                   <span className="authority-status">
                     {result.authority_assessment?.status ?? "missing"}
                   </span>
+                  {result.authority_assessment?.advisory_grounding && (
+                    <div className="authority-grounding">
+                      <span className="grounding-kicker">Governance grounding · advisory</span>
+                      <p>{result.authority_assessment.advisory_grounding.note}</p>
+                      <span className="grounding-source">
+                        {result.authority_assessment.advisory_grounding.source} ·{" "}
+                        {result.authority_assessment.advisory_grounding.agrees_with_rule
+                          ? "corroborates the deterministic rule"
+                          : "differs — the deterministic rule still decides"}
+                      </span>
+                    </div>
+                  )}
                 </section>
               </div>
             </div>

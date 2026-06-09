@@ -1,6 +1,8 @@
 """Grounding provider boundaries."""
 
 from concord.providers.base import (
+    AuthorityGrounding,
+    AuthorityGroundingProvider,
     AuthorityRule,
     ConceptResolution,
     DefinitionBinding,
@@ -34,6 +36,8 @@ from concord.providers.replay import ReplayProvider
 from concord.providers.work_iq import WorkIQProvider
 
 __all__ = [
+    "AuthorityGrounding",
+    "AuthorityGroundingProvider",
     "AuthorityRule",
     "ConceptResolution",
     "DefinitionBinding",

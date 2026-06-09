@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from concord.providers.base import (
+    AuthorityGrounding,
     AuthorityRule,
     BindingNotFound,
     ConceptNotFound,
@@ -14,6 +15,7 @@ from concord.providers.base import (
     ProviderMode,
     ProviderNotConfigured,
     QueryResult,
+    authority_grounding_from_rules,
     build_query_result,
     unmatched_query_result,
 )
@@ -123,3 +125,14 @@ class ReplayProvider:
         if snapshot is None:
             raise ConceptNotFound(f"No replay authority registered for concept: {concept_id}")
         return list(snapshot.authority_rules)
+
+    def retrieve_authority_grounding(self, concept_id: str) -> AuthorityGrounding | None:
+        """Advisory governance clue from the sanitized capture replay — never decides."""
+        snapshot = self._by_concept.get(concept_id)
+        if snapshot is None:
+            return None
+        return authority_grounding_from_rules(
+            snapshot.authority_rules,
+            source=f"{self.name} (sanitized capture replay)",
+            citation=f"replay:{snapshot.scenario_id}",
+        )

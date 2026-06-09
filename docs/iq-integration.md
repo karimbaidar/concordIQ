@@ -39,6 +39,18 @@ LocalProvider snapshot supplies the SQL/evidence
 guarded and injected-transport tested but **not** marked verified until a real
 sanitized tenant capture exists.
 
+## Advisory authority grounding (Foundry IQ, load-bearing)
+
+During authority resolution, a configured provider may contribute an advisory, cited
+governance clue via `retrieve_authority_grounding`. The Foundry IQ adapter supplies this
+from its retrieved snapshot, making Foundry IQ retrieval load-bearing in a real live
+step — yet the deterministic authority rule still decides the owner and status. The clue
+is recorded as `advisory_grounding` on the authority assessment with `advisory_only=true`
+and an `agrees_with_rule` flag; a clue that disagrees is surfaced but can never change the
+decision. `LocalProvider` and `ReplayProvider` supply the same shape, labelled
+"Deterministic local registry" / "sanitized capture replay", so reviewers see the step
+without a tenant. Injected-transport tests cover it; no cloud call is made in CI.
+
 ## Verified Fabric API surfaces (confirmed 2026-06)
 
 The bootstrap and adapter REST/MCP surfaces were checked against current

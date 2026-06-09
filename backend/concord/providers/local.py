@@ -9,6 +9,7 @@ from typing import Any
 import duckdb
 
 from concord.providers.base import (
+    AuthorityGrounding,
     AuthorityRule,
     BindingNotFound,
     ConceptNotFound,
@@ -23,6 +24,7 @@ from concord.providers.base import (
     ProviderMode,
     ProviderNotConfigured,
     QueryResult,
+    authority_grounding_from_rules,
     build_query_result,
     unmatched_query_result,
 )
@@ -280,6 +282,14 @@ class LocalProvider:
             for item in self._authority_rules()
             if item["concept_id"] == concept_id
         ]
+
+    def retrieve_authority_grounding(self, concept_id: str) -> AuthorityGrounding | None:
+        """Advisory governance clue from the local registry — never decides."""
+        return authority_grounding_from_rules(
+            self.get_authority_rules(concept_id),
+            source="Deterministic local registry",
+            citation=f"local:{concept_id}",
+        )
 
     @staticmethod
     def _to_binding(definition: dict[str, Any]) -> DefinitionBinding:

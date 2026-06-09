@@ -1058,6 +1058,38 @@ summary:focus-visible {
   text-transform: uppercase;
 }
 
+/* T2.2 — advisory governance grounding (Foundry IQ retrieval clue; never decides) */
+.authority-grounding {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  background: rgba(47, 103, 246, 0.05);
+}
+
+.authority-grounding p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.grounding-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.grounding-source {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 .verdict-conflict,
 .severity-high {
   color: #9d3d3d;

@@ -12,6 +12,7 @@ from concord.orchestration.state_machine import (
     require_transition,
 )
 from concord.providers import (
+    AuthorityGrounding,
     AuthorityRule,
     ConceptResolution,
     DefinitionBinding,
@@ -113,12 +114,18 @@ class ImpactAssessment(CaseModel):
 
 
 class AuthorityAssessment(CaseModel):
-    """Deterministic authority result from configured rules."""
+    """Deterministic authority result from configured rules.
+
+    ``advisory_grounding`` is an optional, cited governance clue (for example a
+    Foundry IQ retrieval) attached after the deterministic decision. It never changes
+    ``status`` or ``owner``.
+    """
 
     status: Literal["clear", "shared", "ambiguous", "missing"]
     owner: str | None
     rules: tuple[AuthorityRule, ...]
     rationale: str
+    advisory_grounding: AuthorityGrounding | None = None
 
 
 class EvidenceRecord(CaseModel):

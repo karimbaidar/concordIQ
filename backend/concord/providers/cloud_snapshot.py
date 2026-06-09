@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 from concord.config import Settings
 from concord.providers.base import (
+    AuthorityGrounding,
     AuthorityRule,
     BindingNotFound,
     ConceptNotFound,
@@ -14,6 +15,7 @@ from concord.providers.base import (
     OntologySubgraph,
     ProviderMode,
     QueryResult,
+    authority_grounding_from_rules,
     build_query_result,
 )
 from concord.providers.cloud import GuardedCloudClient, JsonTransport
@@ -118,3 +120,14 @@ class CloudSnapshotProvider(ABC):
         if snapshot is None:
             raise ConceptNotFound(f"Resolve the cloud concept before reading: {concept_id}")
         return list(snapshot.authority_rules)
+
+    def retrieve_authority_grounding(self, concept_id: str) -> AuthorityGrounding | None:
+        """Advisory governance clue from the retrieved IQ snapshot — never decides."""
+        snapshot = self._by_concept.get(concept_id)
+        if snapshot is None:
+            return None
+        return authority_grounding_from_rules(
+            snapshot.authority_rules,
+            source=f"{self.name} retrieval",
+            citation=f"{self.mode.value}:{snapshot.scenario_id}",
+        )

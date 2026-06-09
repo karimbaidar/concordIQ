@@ -1,5 +1,6 @@
 """Typed contracts shared by every semantic grounding provider."""
 
+from collections.abc import Sequence
 from datetime import date
 from enum import StrEnum
 from typing import Any, Protocol, runtime_checkable
@@ -135,6 +136,22 @@ class AuthorityRule(ContractModel):
     rationale: str
 
 
+class AuthorityGrounding(ContractModel):
+    """Advisory governance grounding — a cited clue that NEVER decides authority.
+
+    The deterministic authority rule owns the decision. This corroborates or flags it
+    with a labelled, cited source (for example a Foundry IQ retrieval), and is always
+    advisory: it can change nothing about the resolved owner or status.
+    """
+
+    source: str
+    retrieved_owner: str | None = None
+    citation: str
+    note: str
+    agrees_with_rule: bool = False
+    advisory_only: bool = True
+
+
 class QueryDefinitionSummary(ContractModel):
     """A compact, ontology-grounded view of one competing definition."""
 
@@ -211,6 +228,56 @@ def unmatched_query_result(question: str, *, provider_name: str) -> QueryResult:
     )
 
 
+def _governing_owner(rules: Sequence[AuthorityRule]) -> str | None:
+    """The single governing owner named by the rules, or None when not unambiguous.
+
+    Mirrors the deterministic resolver's precedence so the advisory clue surfaces the
+    real governance owner (e.g. the Data Governance Council), not a domain owner.
+    """
+    canonical = next(
+        (rule for rule in rules if rule.semantic_dimension == "canonical-active-customer"),
+        None,
+    )
+    if canonical and canonical.status == "clear" and canonical.owner:
+        return canonical.owner
+    clear_owners = {rule.owner for rule in rules if rule.status == "clear" and rule.owner}
+    if rules and all(rule.status == "clear" for rule in rules) and len(clear_owners) == 1:
+        return next(iter(clear_owners))
+    return None
+
+
+def authority_grounding_from_rules(
+    rules: Sequence[AuthorityRule],
+    *,
+    source: str,
+    citation: str,
+) -> AuthorityGrounding | None:
+    """Build an advisory governance clue from retrieved authority rules.
+
+    Never decides: the caller compares this clue against the independently computed
+    deterministic owner. An empty rule set yields no clue.
+    """
+    if not rules:
+        return None
+    owner = _governing_owner(rules)
+    if owner is None:
+        note = (
+            f"{source} found no single governing owner for this concept; the "
+            "deterministic authority rule independently routes it to human governance."
+        )
+    else:
+        note = (
+            f"{source} surfaced {owner} as the governing owner; the deterministic "
+            "authority rule independently owns the decision."
+        )
+    return AuthorityGrounding(
+        source=source,
+        retrieved_owner=owner,
+        citation=citation,
+        note=note,
+    )
+
+
 @runtime_checkable
 class GroundingProvider(Protocol):
     """Backend-independent semantic grounding and execution contract."""
@@ -240,3 +307,16 @@ class GroundingProvider(Protocol):
 
     def nl_query(self, question: str) -> QueryResult:
         """Resolve a natural-language business question to grounded meaning."""
+
+
+@runtime_checkable
+class AuthorityGroundingProvider(Protocol):
+    """Optional capability: contribute an advisory, cited governance clue.
+
+    Providers MAY implement this to surface a retrievable governance grounding during
+    authority resolution. It is advisory only and never changes the deterministic
+    authority decision (owner or status).
+    """
+
+    def retrieve_authority_grounding(self, concept_id: str) -> AuthorityGrounding | None:
+        """Return a cited advisory governance clue for a concept, or None."""
