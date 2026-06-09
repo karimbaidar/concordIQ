@@ -131,6 +131,7 @@ class ReconciliationAgent:
             authority_owner=authority.owner or "",
             requires_human_approval=True,
             evidence_refs=tuple(item.evidence_id for item in evidence),
+            canonical_source_definition_id=customer_success.definition_id,
         )
 
     @staticmethod
@@ -179,6 +180,7 @@ class ReconciliationAgent:
             authority_owner=authority.owner or "",
             requires_human_approval=True,
             evidence_refs=tuple(item.evidence_id for item in evidence),
+            canonical_source_definition_id=anchor.definition_id,
         )
 
     def _narrate(

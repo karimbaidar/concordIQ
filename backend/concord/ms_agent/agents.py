@@ -55,7 +55,10 @@ SPECIALIST_AGENTS: tuple[SpecialistAgentNode, ...] = (
     SpecialistAgentNode(
         "ConflictHypothesisAgent",
         "pairwise conflict hypotheses",
-        lambda case: bool(case.conflict_hypotheses),
+        lambda case: (
+            bool(case.conflict_hypotheses)
+            or (case.governed_canonical is not None and len(case.binding_semantics) == 1)
+        ),
     ),
     SpecialistAgentNode(
         "DataExecutionAgent",
@@ -63,7 +66,10 @@ SPECIALIST_AGENTS: tuple[SpecialistAgentNode, ...] = (
         lambda case: (
             bool(case.execution_results)
             and bool(case.evidence)
-            and bool(case.conflict_hypotheses)
+            and (
+                bool(case.conflict_hypotheses)
+                or (case.governed_canonical is not None and len(case.execution_results) == 1)
+            )
             and all(
                 hypothesis.data_verdict in {"confirmed", "overturned"}
                 and len(hypothesis.evidence_ids) == 2

@@ -50,6 +50,9 @@ const SCENARIO_STORIES = [
 ];
 
 function outcomeTitle(result: ReconciliationCase) {
+  if (result.governed_canonical) {
+    return `Governed canonical v${result.governed_canonical.version} in force`;
+  }
   if (result.reconciliation_proposal) {
     return "Material conflict confirmed";
   }
@@ -267,6 +270,35 @@ export default function App() {
     }
   }
 
+  async function handleGovernedRerun(term: string) {
+    setBusy(true);
+    setError(null);
+    resetWhatIf();
+    try {
+      const outcome = await reconcileTerm(term);
+      if (isUngovernedRefusal(outcome)) {
+        throw new Error(outcome.reason);
+      }
+      setRefusal(null);
+      setResult(outcome);
+      requestAnimationFrame(() => {
+        document.getElementById("case-result")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    } catch (requestError) {
+      const failure =
+        requestError instanceof Error
+          ? requestError
+          : new Error("The governed reconciliation re-run failed.");
+      setError(failure.message);
+      throw failure;
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -419,6 +451,11 @@ export default function App() {
               <SemanticPullRequest
                 proposal={result.reconciliation_proposal}
                 runId={result.run_id}
+                onRerun={() =>
+                  handleGovernedRerun(
+                    result.resolved_concept?.canonical_name ?? result.request.term,
+                  )
+                }
               />
             )}
             {result.refusal_reason && result.authority_assessment && (

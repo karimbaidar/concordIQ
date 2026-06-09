@@ -8,6 +8,7 @@ from concord.providers import LocalProvider
 from concord.storage.models import (
     AuditEvent,
     EvidenceItem,
+    MetricDefinition,
     ReconciliationRun,
     SemanticProposal,
 )
@@ -20,6 +21,7 @@ PERSISTED_MODELS = (
     SemanticProposal,
     EvidenceItem,
     AuditEvent,
+    MetricDefinition,
 )
 
 

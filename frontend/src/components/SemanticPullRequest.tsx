@@ -6,11 +6,24 @@ import type { ProposalDecisionResult, ReconciliationProposal } from "../types";
 interface SemanticPullRequestProps {
   proposal: ReconciliationProposal;
   runId: string;
+  onRerun: () => Promise<void>;
 }
 
-export function SemanticPullRequest({ proposal, runId }: SemanticPullRequestProps) {
+function formatDecisionTime(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+export function SemanticPullRequest({
+  proposal,
+  runId,
+  onRerun,
+}: SemanticPullRequestProps) {
   const [decision, setDecision] = useState<ProposalDecisionResult | null>(null);
   const [pending, setPending] = useState(false);
+  const [rerunPending, setRerunPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function decide(action: "approve" | "reject") {
@@ -29,6 +42,21 @@ export function SemanticPullRequest({ proposal, runId }: SemanticPullRequestProp
     }
   }
 
+  async function rerunGovernedDefinition() {
+    setRerunPending(true);
+    setError(null);
+    try {
+      await onRerun();
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "The governed re-run could not be completed.",
+      );
+      setRerunPending(false);
+    }
+  }
+
   return (
     <section className="semantic-pr" aria-labelledby="semantic-pr-title">
       <header>
@@ -42,7 +70,11 @@ export function SemanticPullRequest({ proposal, runId }: SemanticPullRequestProp
           <h2 id="semantic-pr-title">Proposed canonical definition</h2>
         </div>
         <span className={`draft-badge status-${decision?.status ?? "draft"}`}>
-          {decision ? `${decision.status} · ${decision.decided_by}` : "Draft · approval required"}
+          {decision?.status === "approved"
+            ? `Merged · Canonical v${decision.canonical_version}`
+            : decision
+              ? `${decision.status} · ${decision.decided_by}`
+              : "Draft · approval required"}
         </span>
       </header>
       <div className="pr-definition">
@@ -79,9 +111,35 @@ export function SemanticPullRequest({ proposal, runId }: SemanticPullRequestProp
           Only <strong>{proposal.authority_owner}</strong> can merge this change. Concord IQ
           enforces the owner server-side and records the decision in the audit trail.
         </p>
-        {decision ? (
+        {decision?.status === "approved" ? (
+          <div className="merged-state" aria-live="polite">
+            <div>
+              <span className="merged-check" aria-hidden="true">
+                ✓
+              </span>
+              <div>
+                <strong>Merged — canonical definition is now governed</strong>
+                <p>
+                  Canonical v{decision.canonical_version} · approved by{" "}
+                  {decision.decided_by} · {formatDecisionTime(decision.decided_at)}
+                </p>
+              </div>
+            </div>
+            <span className="registry-scope">
+              Concord IQ registry · no Fabric/Foundry writeback
+            </span>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={rerunPending}
+              onClick={rerunGovernedDefinition}
+            >
+              {rerunPending ? "Re-running governed definition…" : "Re-run with governed definition"}
+            </button>
+          </div>
+        ) : decision ? (
           <span className={`gate-result gate-${decision.status}`}>
-            {decision.status === "approved" ? "Merged" : "Changes requested"} by {decision.decided_by}
+            Changes requested by {decision.decided_by}
           </span>
         ) : (
           <div className="pr-actions">

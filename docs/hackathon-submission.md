@@ -71,7 +71,9 @@ Score with a team leaderboard, and approval gates that merge meaning like code.
 - **NL chat:** `POST /ask` grounds a business question through NL2Ontology, then
   reconciles it on data.
 - **Approval gate:** `POST /proposals/{id}/approve|reject` merges canonical
-  definitions only with the configured authority owner, recorded in the audit log.
+  definitions only with the configured authority owner, promotes one versioned
+  canonical in Concord's registry, and makes a re-run use the governed meaning
+  while preserving prior departmental views and audit history.
 - Every completed case retains executed SQL, evidence, verifier checks, and audit.
 - Cloud calls are impossible under default configuration.
 - The HTTP API executes through the Microsoft Agent Framework workflow.

@@ -74,6 +74,8 @@ Concord IQ:
 10. Sweep every concept and rank conflicts by business impact (`make scan`, `GET /scan`).
 11. Grade organizational semantic health as a single Concord Score (`GET /score`).
 12. Gate canonical definitions behind owner-only approval (`POST /proposals/{id}/approve`).
+13. Promote an approved, versioned canonical meaning in Concord's registry and use it
+    on the next reconciliation while preserving departmental definitions as named views.
 
 ## Beyond detection — watch, score, and gate
 
@@ -90,7 +92,10 @@ it inserts itself into a workflow teams cannot skip:
   single 0–100 scale with a per-business-unit leaderboard.
 - **Semantic pull requests.** A canonical definition is reviewed like code:
   `POST /proposals/{id}/approve|reject` merges only with the configured authority
-  owner, is idempotent, and is written to the audit trail. Ambiguous ownership is
+  owner, is idempotent, promotes exactly one versioned canonical definition, and
+  is written to the audit trail. A re-run uses that governed meaning; prior
+  departmental variants remain named domain views. This updates Concord's own
+  registry and does not claim Fabric or Foundry writeback. Ambiguous ownership is
   refused, not guessed.
 
 All four are deterministic and evidence-backed; the LLM never decides any of them.
@@ -584,6 +589,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] Enterprise-scale data and the subtle Qualified Lead conflict
 - [x] Engagement layer: autonomous scan, Concord Score, Semantic-PR approval gate
 - [x] Natural-language chat (`/ask`) with a genuinely IQ-served `nl_query` path
+- [x] Owner-approved canonical promotion with governed re-run and preserved domain views
 - [x] Fabric REST/MCP surfaces verified against Microsoft Learn; F2 budget runbook
 - [ ] Real tenant capture and reviewed sanitized replay
 

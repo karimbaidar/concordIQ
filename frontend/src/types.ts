@@ -149,6 +149,19 @@ export interface ReconciliationProposal {
   authority_owner: string;
   requires_human_approval: boolean;
   evidence_refs: string[];
+  canonical_source_definition_id?: string | null;
+}
+
+export interface GovernedCanonical {
+  canonical_definition_id: string;
+  version: string;
+  rule_text: string;
+  source_definition_id: string;
+  approved_by: string;
+  approved_at: string;
+  approving_run_id: string;
+  registry_scope: "concord_iq";
+  domain_views: DefinitionBinding[];
 }
 
 export interface VerifierReport {
@@ -255,6 +268,10 @@ export interface ProposalDecisionResult {
   authority_owner: string;
   decided_by: string;
   decided_at: string;
+  canonical_definition_id: string | null;
+  canonical_version: string | null;
+  canonical_source_definition_id: string | null;
+  registry_scope: "concord_iq" | null;
 }
 
 export interface ReconciliationCase {
@@ -300,6 +317,7 @@ export interface ReconciliationCase {
     | null;
   impact_assessment: ImpactAssessment | null;
   authority_assessment: AuthorityAssessment | null;
+  governed_canonical: GovernedCanonical | null;
   reconciliation_proposal: ReconciliationProposal | null;
   refusal_reason: string | null;
   requires_human_approval: boolean;

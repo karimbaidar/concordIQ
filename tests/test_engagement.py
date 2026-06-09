@@ -67,6 +67,7 @@ def active_case(reconciliation_runner: ReconciliationRunner) -> ReconciliationCa
 def test_only_authority_owner_can_approve(
     active_case: ReconciliationCase,
     reconciliation_runner: ReconciliationRunner,
+    isolated_canonical_registry: None,
 ) -> None:
     repository = reconciliation_runner.repository
 
@@ -126,6 +127,7 @@ def test_scan_and_score_endpoints(
 def test_approval_gate_endpoint_enforces_owner(
     postgres_engine: Engine,
     p2_local_provider: LocalProvider,
+    isolated_canonical_registry: None,
 ) -> None:
     app = create_app(Settings(), provider=p2_local_provider, engine=postgres_engine)
     with TestClient(app) as client:

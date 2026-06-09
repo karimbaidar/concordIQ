@@ -1,6 +1,6 @@
 """Typed blackboard shared by the deterministic reconciliation agents."""
 
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
@@ -144,6 +144,21 @@ class ReconciliationProposal(CaseModel):
     authority_owner: str
     requires_human_approval: bool = True
     evidence_refs: tuple[UUID, ...]
+    canonical_source_definition_id: str | None = None
+
+
+class GovernedCanonical(CaseModel):
+    """One approved canonical meaning in Concord IQ's local registry."""
+
+    canonical_definition_id: UUID
+    version: str
+    rule_text: str
+    source_definition_id: str
+    approved_by: str
+    approved_at: datetime
+    approving_run_id: UUID
+    registry_scope: Literal["concord_iq"] = "concord_iq"
+    domain_views: tuple[DefinitionBinding, ...] = ()
 
 
 class ReconciliationDecision(CaseModel):
@@ -200,6 +215,7 @@ class ReconciliationCase(CaseModel):
     verification_recovery: VerificationRecoveryStage | None = None
     impact_assessment: ImpactAssessment | None = None
     authority_assessment: AuthorityAssessment | None = None
+    governed_canonical: GovernedCanonical | None = None
     reconciliation_proposal: ReconciliationProposal | None = None
     refusal_reason: str | None = None
     requires_human_approval: bool = False

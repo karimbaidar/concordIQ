@@ -629,6 +629,11 @@ summary:focus-visible {
   background: #eaf8f3;
 }
 
+.verdict-governed {
+  color: #315f83;
+  background: #e8f3fb;
+}
+
 .quiet-label {
   color: #6c7890;
   background: #f1f4f8;
@@ -830,6 +835,46 @@ summary:focus-visible {
 
 .definition-card.is-exploring footer {
   background: linear-gradient(120deg, #142240, #5141ad);
+}
+
+.domain-view-section {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e1e6ed;
+}
+
+.domain-view-section > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.domain-view-section h3,
+.domain-view-section p {
+  margin: 0;
+}
+
+.domain-view-section h3 {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.domain-view-section p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.domain-view-card {
+  opacity: 0.9;
+}
+
+.domain-view-card footer {
+  background: #536178;
+}
+
+.domain-view-card footer strong {
+  font-size: 12px;
 }
 
 .whatif-lab {
@@ -2345,6 +2390,57 @@ summary:focus-visible {
 .gate-result.gate-rejected,
 .gate-result.gate-error {
   color: var(--red);
+}
+
+.merged-state {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #bde3d5;
+  border-radius: 13px;
+  background: #effaf6;
+}
+
+.merged-state > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.merged-state strong,
+.merged-state p {
+  margin: 0;
+}
+
+.merged-state strong {
+  color: #12644f;
+  font-size: 13px;
+}
+
+.merged-state p {
+  margin-top: 3px;
+  color: #537367;
+  font-size: 10px;
+}
+
+.merged-check {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--green);
+  font-weight: 900;
+}
+
+.registry-scope {
+  color: #56766b;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .draft-badge.status-approved {

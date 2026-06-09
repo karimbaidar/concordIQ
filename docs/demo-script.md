@@ -5,9 +5,9 @@ tenant. Record against the local/replay stack. This file is the spine: the click
 order, the screen, and the one line for each beat.
 
 **Two honesty rules that override everything below:**
-1. **No claim exceeds the build.** Only show what runs. Beats marked `PENDING` depend
-   on unbuilt features (T1.5 merge-acts, T1.6 meaning-graph) — do **not** record them
-   until those land. The 3-minute "core spine" is 100% recordable today.
+1. **No claim exceeds the build.** Only show what runs. The beat marked `PENDING`
+   depends on the unbuilt T1.6 meaning-graph — do **not** record it until that lands.
+   The merge-and-rerun act-loop is live in Concord's own governed registry.
 2. **Never overstate the IQ layer.** Say "verified Fabric IQ semantic grounding" only
    after `make capture` + `make replay-check` pass with real Fabric calls and the badge
    reads `FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
@@ -34,13 +34,13 @@ disabled, data synthetic. Keep `http://127.0.0.1:8000/docs` and a terminal for
 | 3 | Glass-box: drag the window, watch the dollars | `DefinitionDiff` what-if slider | ✅ LIVE (T1.1) |
 | 4 | It does not cry wolf (the decoy) | `DecoyRuledOut` (Net Revenue 1,600 = 1,600) | ✅ LIVE |
 | 5 | It refuses rather than guess | `RefusalCard` (Churned) + `UngovernedRefusalCard` (any term) | ✅ LIVE (T1.3) |
-| 6 | Governance: gate the merge | `SemanticPullRequest` (authority-gated Approve & merge) | ✅ LIVE — but the *post-merge re-run resolves* is `PENDING T1.5` |
+| 6 | Governance: merge, promote, and re-run | `SemanticPullRequest` → `DashboardDisagreement` | ✅ LIVE (T1.5) |
 | 7 | Score the whole org (optional) | `PortfolioBoard` / `make scan` (Concord Score 60/100) | ✅ LIVE |
 | — | Cold-open hero visual | `MeaningGraph` | ⏳ `PENDING T1.6` (until then, open on beat 1) |
 
 ---
 
-## Core spine (~3:00 — record this today)
+## Core spine (~3:15 — record this today)
 
 ### 1 — 0:00–0:25 · The pain (lead here, not with architecture)
 
@@ -99,19 +99,23 @@ Say: *"In a field of agents that do more autonomously, Concord is proud of what 
 won't do. No owner? It refuses. No governed definition? It won't invent one. Restraint
 is the feature."*
 
-### 6 — 2:35–3:00 · Governance: definitions reviewed like code
+### 6 — 2:35–3:15 · Governance: the merge acts
 
 1. Back on **Active Customer**, open `SemanticPullRequest` — the proposed canonical
    definition, evidence refs, migration checklist.
 2. Show that only the **Data Governance Council** (the authority owner) can
-   **Approve & merge**; the decision is written to the audit trail.
+   **Approve & merge**.
+3. Point to **"Merged — canonical definition is now governed"**, Canonical v1,
+   approver, timestamp, and the explicit **Concord IQ registry / no external
+   writeback** label.
+4. Click **Re-run with governed definition**. The conflict result becomes
+   **Governed: Canonical v1** and the original Finance/Sales/Customer Success
+   definitions remain visible as named domain views.
 
-Say: *"Meaning gets a pull request. Only the owner can merge, and every decision is
-audited."*
-
-> `PENDING T1.5` — do **not** yet claim "the merge changes the governed definition and a
-> re-run shows it resolved." Today, Approve & merge flips proposal status + writes audit;
-> it does not yet promote the canonical definition. Record beat 6′ below only after T1.5.
+Say: *"Meaning gets a pull request. Only the owner can merge. Approval promotes one
+versioned canonical definition in Concord's governed registry, records the audit event,
+and the next run uses it. The old definitions remain named views — history is not
+erased."*
 
 Close: *"Enterprises built a single source of truth for **data**, but not for
 **meaning**. Concord IQ proves where definitions silently disagree, settles it on data,
@@ -138,13 +142,8 @@ gates it under governance, or refuses — version control for the meaning of you
   layer and the committed sanitized capture replays it with no tenant. Keep the wording
   honest per rule 2.
 
-## Beats to record only after they're built
+## Beat to record only after it is built
 
-- **6′ — Merge that acts (`PENDING T1.5`).** After Approve & merge, show the terminal
-  *"Merged — canonical definition is now governed"* state, then **Re-run with governed
-  definition** → the term now resolves, the CONFLICT badge becomes **Governed: Canonical
-  vN**. Line: *"It doesn't just write a document — it safely changes the enterprise's
-  source of meaning, and only the owner can."*
 - **Cold-open hero (`PENDING T1.6`).** Replace beat 1's static three numbers with the
   animated `MeaningGraph` fork; on the what-if (beat 3) the nodes animate; after the
-  merge (beat 6′) the fork collapses to a single canonical node.
+  merge (beat 6) the fork collapses to a single canonical node.

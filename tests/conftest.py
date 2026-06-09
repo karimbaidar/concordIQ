@@ -8,9 +8,9 @@ from concord.config import Settings
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import LocalProvider
 from concord.seed.seed_duckdb import seed_duckdb
-from concord.storage.models import Base
+from concord.storage.models import Base, MetricDefinition
 from concord.storage.repositories import ReconciliationRepository
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Engine, create_engine, delete, text
 from sqlalchemy.engine import make_url
 
 
@@ -41,6 +41,18 @@ def p2_local_provider(tmp_path_factory: pytest.TempPathFactory) -> LocalProvider
     database_path = data_dir / "concord-iq.duckdb"
     seed_duckdb(database_path=database_path, data_dir=data_dir / "csv")
     return LocalProvider(duckdb_path=database_path)
+
+
+@pytest.fixture
+def isolated_canonical_registry(postgres_engine: Engine) -> Iterator[None]:
+    """Prevent mutable canonical state from leaking across independent tests."""
+    with postgres_engine.begin() as connection:
+        connection.execute(delete(MetricDefinition))
+    try:
+        yield
+    finally:
+        with postgres_engine.begin() as connection:
+            connection.execute(delete(MetricDefinition))
 
 
 @pytest.fixture

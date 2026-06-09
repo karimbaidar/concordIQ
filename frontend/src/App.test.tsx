@@ -153,6 +153,7 @@ function makeCase(
           ? "No single owner can approve the definition."
           : "Configured authority can approve the definition.",
     },
+    governed_canonical: null,
     reconciliation_proposal:
       scenario === "active_customer"
         ? {
@@ -163,6 +164,8 @@ function makeCase(
             authority_owner: "Data Governance Council",
             requires_human_approval: true,
             evidence_refs: evidence.map((item) => item.evidence_id),
+            canonical_source_definition_id:
+              "active_customer-definition-2",
           }
         : null,
     refusal_reason: refusalReason,
@@ -269,6 +272,51 @@ function makeCase(
         status: "completed",
       },
     ],
+  };
+}
+
+function makeGovernedCase(): ReconciliationCase {
+  const governed = makeCase("active_customer");
+  const domainViews = governed.binding_semantics;
+  const source = domainViews[2];
+  const sourceResult = governed.execution_results[2];
+  const sourceEvidence = governed.evidence[2];
+  return {
+    ...governed,
+    run_id: "00000000-0000-0000-0000-000000000100",
+    binding_semantics: [
+      {
+        ...source,
+        name: "Canonical v1 — approved by Data Governance Council",
+        owner: "Data Governance Council",
+        rule_text: "Active Customer requires contract and qualifying usage.",
+      },
+    ],
+    conflict_hypotheses: [],
+    execution_results: [sourceResult],
+    evidence: [sourceEvidence],
+    verdict: "consistent",
+    impact_assessment: {
+      ...governed.impact_assessment!,
+      rank: 0,
+      severity: "low",
+      customer_count_delta: 0,
+      arr_delta: 0,
+      decision_criticality: "low",
+    },
+    governed_canonical: {
+      canonical_definition_id: "00000000-0000-0000-0000-000000000200",
+      version: "1",
+      rule_text: "Active Customer requires contract and qualifying usage.",
+      source_definition_id: source.definition_id,
+      approved_by: "Data Governance Council",
+      approved_at: "2026-06-09T18:30:00Z",
+      approving_run_id: governed.run_id,
+      registry_scope: "concord_iq",
+      domain_views: domainViews,
+    },
+    reconciliation_proposal: null,
+    requires_human_approval: false,
   };
 }
 
@@ -476,6 +524,82 @@ describe("Concord IQ demo", () => {
     expect(slider).toHaveValue("90");
     expect(screen.queryByText("Exploration — not governed")).not.toBeInTheDocument();
     expect(screen.getByText("16")).toBeInTheDocument();
+  });
+
+  it("merges a Semantic-PR and re-runs the governed canonical definition", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith("/health")) {
+          return mockJson({
+            status: "ok",
+            provider: "LocalProvider",
+            cloud_enabled: false,
+            data_type: "synthetic",
+            llm_provider: "DisabledLLMProvider",
+            llm_enabled: false,
+            llm_model: null,
+          });
+        }
+        if (url.endsWith("/demo/scenarios")) {
+          return mockJson(scenarios);
+        }
+        if (url.endsWith("/demo/run/active-customer")) {
+          return mockJson(makeCase("active_customer"));
+        }
+        if (url.endsWith("/approve")) {
+          return mockJson({
+            run_id: "00000000-0000-0000-0000-000000000099",
+            term: "Active Customer",
+            status: "approved",
+            authority_owner: "Data Governance Council",
+            decided_by: "Data Governance Council",
+            decided_at: "2026-06-09T18:30:00Z",
+            canonical_definition_id: "00000000-0000-0000-0000-000000000200",
+            canonical_version: "1",
+            canonical_source_definition_id: "active_customer-definition-2",
+            registry_scope: "concord_iq",
+          });
+        }
+        if (url.endsWith("/analyze")) {
+          return mockJson(makeGovernedCase());
+        }
+        return mockJson(makeCase("active_customer"));
+      }),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(
+      await screen.findByRole("button", { name: /analyze disagreement/i }),
+    );
+    await user.click(
+      await screen.findByRole("button", { name: "Approve & merge" }),
+    );
+
+    expect(
+      await screen.findByText("Merged — canonical definition is now governed"),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Canonical v1 · approved by Data Governance Council/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Concord IQ registry · no Fabric/Foundry writeback"),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: "Re-run with governed definition" }),
+    );
+
+    expect(
+      await screen.findByText("Governed canonical v1 in force"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Governed: Canonical v1")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Governed meaning and named domain views" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Named departmental views")).toBeInTheDocument();
+    expect(screen.getAllByText(/domain view/i).length).toBeGreaterThanOrEqual(3);
+    expect(screen.queryByText("Proposed canonical definition")).not.toBeInTheDocument();
   });
 
   it("refuses an ungoverned term gracefully without fabricating a definition", async () => {

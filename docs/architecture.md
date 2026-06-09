@@ -138,8 +138,13 @@ and never weaken the truth path:
   leaderboard (`GET /score`).
 - **The Semantic-PR approval gate** (`POST /proposals/{id}/approve|reject`) merges
   a canonical definition only when the caller equals the proposal's configured
-  authority owner. Decisions are idempotent and appended to the audit trail. The
-  owner check is a configuration lookup, never an LLM judgement.
+  authority owner. Approval atomically versions and promotes exactly one canonical
+  `MetricDefinition`, links it to the proposal, supersedes a prior canonical, and
+  appends both decision and promotion events to the audit trail. The next local
+  reconciliation executes the approved source binding as the unqualified governed
+  meaning while retaining prior definitions as named domain views. This is a write
+  to Concord's own registry, not Fabric or Foundry. The owner check is a
+  configuration lookup, never an LLM judgement.
 
 ## Data flow and trust
 

@@ -56,6 +56,7 @@ export function DefinitionDiff({
     editableBindings[0];
   const governedDays = selectedBinding?.time_window_days ?? 30;
   const [timeWindowDays, setTimeWindowDays] = useState(governedDays);
+  const governedCanonical = result.governed_canonical;
 
   useEffect(() => {
     const firstBinding = editableBindings[0];
@@ -94,9 +95,17 @@ export function DefinitionDiff({
       <div className="section-heading">
         <div>
           <span className="section-kicker">Operational semantics</span>
-          <h2 id="definition-diff-title">Why the definitions differ</h2>
+          <h2 id="definition-diff-title">
+            {governedCanonical
+              ? "Governed meaning and named domain views"
+              : "Why the definitions differ"}
+          </h2>
         </div>
-        <span className="quiet-label">{result.binding_semantics.length} definitions</span>
+        <span className="quiet-label">
+          {governedCanonical
+            ? `Canonical v${governedCanonical.version}`
+            : `${result.binding_semantics.length} definitions`}
+        </span>
       </div>
       <div className="definition-grid">
         {result.binding_semantics.map((binding) => {
@@ -149,6 +158,51 @@ export function DefinitionDiff({
           );
         })}
       </div>
+      {governedCanonical && (
+        <div className="domain-view-section">
+          <div>
+            <span className="section-kicker">Preserved history</span>
+            <h3>Named departmental views</h3>
+            <p>
+              These definitions remain available under explicit domain names. They no
+              longer publish under the unqualified canonical term.
+            </p>
+          </div>
+          <div className="definition-grid domain-view-grid">
+            {governedCanonical.domain_views.map((binding) => (
+              <article className="definition-card domain-view-card" key={binding.binding_id}>
+                <header>
+                  <span>{binding.owner} · domain view</span>
+                  <strong>{binding.name}</strong>
+                </header>
+                <p>{binding.rule_text}</p>
+                <dl>
+                  <div>
+                    <dt>Population</dt>
+                    <dd>{binding.population}</dd>
+                  </div>
+                  <div>
+                    <dt>Window</dt>
+                    <dd>
+                      {binding.time_window_days
+                        ? `${binding.time_window_days} trailing days`
+                        : "Selected reporting period"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Source</dt>
+                    <dd>{binding.source_tables.join(" + ")}</dd>
+                  </div>
+                </dl>
+                <footer>
+                  <strong>Named view</strong>
+                  <span>preserved for domain use and audit history</span>
+                </footer>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
       {whatIfEnabled && selectedBinding && (
         <div className="whatif-lab">
           <div className="whatif-heading">

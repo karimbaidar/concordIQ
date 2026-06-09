@@ -22,6 +22,7 @@ from concord.orchestration.casefile import (
     AgentTraceStep,
     AuthorityAssessment,
     ConflictHypothesis,
+    GovernedCanonical,
     ImpactAssessment,
     ReconciliationCase,
     ReconciliationRequest,
@@ -31,7 +32,7 @@ from concord.orchestration.casefile import (
 )
 from concord.orchestration.context_packet import build_context_packet
 from concord.orchestration.state_machine import ReconciliationState
-from concord.providers import ConceptResolution, GroundingProvider
+from concord.providers import ConceptResolution, GroundingProvider, LocalProvider
 from concord.storage.repositories import ReconciliationRepository
 
 
@@ -98,19 +99,53 @@ class ReconciliationRunner:
         started = perf_counter()
         concept = self._resolved_concept(case)
         bindings = BindingInspectorAgent(self.provider).run(concept.concept_id)
+        canonical = self.repository.get_canonical_definition(concept.canonical_name)
+        if canonical is not None and isinstance(self.provider, LocalProvider):
+            canonical_binding, domain_views = self.provider.get_canonical_binding(
+                concept.concept_id,
+                source_definition_id=canonical.source_definition_id,
+                rule_text=canonical.rule_text,
+                version=canonical.version,
+                approved_by=canonical.approved_by,
+            )
+            bindings = (canonical_binding,)
+            case.candidate_definitions = (canonical.source_definition_id,)
+            case.governed_canonical = GovernedCanonical(
+                canonical_definition_id=canonical.canonical_definition_id,
+                version=canonical.version,
+                rule_text=canonical.rule_text,
+                source_definition_id=canonical.source_definition_id,
+                approved_by=canonical.approved_by,
+                approved_at=canonical.approved_at,
+                approving_run_id=canonical.approving_run_id,
+                domain_views=domain_views,
+            )
         case.binding_semantics = bindings
         case.transition(
             ReconciliationState.INSPECT_BINDINGS,
             agent="BindingInspectorAgent",
-            summary=f"Normalized {len(bindings)} operational definitions.",
+            summary=(
+                f"Selected governed canonical v{case.governed_canonical.version} "
+                "and retained named domain views."
+                if case.governed_canonical
+                else f"Normalized {len(bindings)} operational definitions."
+            ),
         )
         self._record_trace(
             case,
             agent_name="BindingInspectorAgent",
             input_summary=f"Inspect bindings for concept {concept.concept_id}.",
             output_summary=(
-                f"Normalized {len(bindings)} bindings owned by "
-                f"{', '.join(binding.owner for binding in bindings)}."
+                (
+                    f"Selected Canonical v{case.governed_canonical.version}, approved by "
+                    f"{case.governed_canonical.approved_by}; retained "
+                    f"{len(case.governed_canonical.domain_views)} named domain views."
+                )
+                if case.governed_canonical
+                else (
+                    f"Normalized {len(bindings)} bindings owned by "
+                    f"{', '.join(binding.owner for binding in bindings)}."
+                )
             ),
             started=started,
         )

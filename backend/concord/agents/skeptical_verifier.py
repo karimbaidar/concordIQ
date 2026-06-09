@@ -148,7 +148,7 @@ class SkepticalVerifierAgent:
     @staticmethod
     def _hypothesis_rulings_match(case: ReconciliationCase) -> bool:
         if not case.conflict_hypotheses:
-            return False
+            return case.governed_canonical is not None and len(case.execution_results) == 1
         results = {item.binding_id: item for item in case.execution_results}
         for hypothesis in case.conflict_hypotheses:
             if (
@@ -166,7 +166,7 @@ class SkepticalVerifierAgent:
     @staticmethod
     def _hypotheses_cite_pair_evidence(case: ReconciliationCase) -> bool:
         if not case.conflict_hypotheses:
-            return False
+            return case.governed_canonical is not None and len(case.evidence) == 1
         evidence = {item.binding_id: item.evidence_id for item in case.evidence}
         return all(
             hypothesis.evidence_ids
@@ -241,6 +241,31 @@ class SkepticalVerifierAgent:
         concept_id: str,
         entity_sets: set[frozenset[str]],
     ) -> None:
+        if case.governed_canonical is not None:
+            checks.update(
+                {
+                    "governed_canonical_is_only_execution": (
+                        len(case.binding_semantics) == 1
+                        and len(case.execution_results) == 1
+                        and case.binding_semantics[0].definition_id
+                        == case.governed_canonical.source_definition_id
+                    ),
+                    "governed_canonical_is_consistent": (
+                        case.verdict == "consistent" and len(entity_sets) == 1
+                    ),
+                    "governed_canonical_has_no_new_proposal": (
+                        case.reconciliation_proposal is None
+                        and case.refusal_reason is None
+                        and not case.requires_human_approval
+                    ),
+                    "governed_canonical_has_zero_impact": (
+                        case.impact_assessment is not None
+                        and case.impact_assessment.customer_count_delta == 0
+                        and case.impact_assessment.arr_delta == 0
+                    ),
+                }
+            )
+            return
         if concept_id == "active_customer":
             checks.update(
                 {

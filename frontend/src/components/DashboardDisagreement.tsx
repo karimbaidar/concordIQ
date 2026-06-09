@@ -24,6 +24,8 @@ export function DashboardDisagreement({ result }: DashboardDisagreementProps) {
     result.binding_semantics.map((binding) => [binding.binding_id, binding]),
   );
 
+  const governed = result.governed_canonical;
+
   return (
     <section className="dashboard-disagreement" aria-labelledby="dashboard-title">
       <div className="section-heading">
@@ -33,7 +35,13 @@ export function DashboardDisagreement({ result }: DashboardDisagreementProps) {
             {result.resolved_concept?.canonical_name ?? result.request.term}
           </h2>
         </div>
-        <span className={`verdict-pill verdict-${result.verdict}`}>{result.verdict}</span>
+        <span
+          className={`verdict-pill ${
+            governed ? "verdict-governed" : `verdict-${result.verdict}`
+          }`}
+        >
+          {governed ? `Governed: Canonical v${governed.version}` : result.verdict}
+        </span>
       </div>
       <div className="dashboard-metrics">
         {result.execution_results.map((evaluation) => {

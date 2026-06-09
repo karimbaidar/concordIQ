@@ -144,6 +144,34 @@ class LocalProvider:
             raise ConceptNotFound(f"No concept or definitions registered for: {concept_id}")
         return bindings
 
+    def get_canonical_binding(
+        self,
+        concept_id: str,
+        *,
+        source_definition_id: str,
+        rule_text: str,
+        version: str,
+        approved_by: str,
+    ) -> tuple[DefinitionBinding, tuple[DefinitionBinding, ...]]:
+        """Overlay one approved registry meaning without mutating the YAML views."""
+        domain_views = tuple(self.get_binding_semantics(concept_id))
+        source = next(
+            (binding for binding in domain_views if binding.definition_id == source_definition_id),
+            None,
+        )
+        if source is None:
+            raise BindingNotFound(
+                f"Canonical source definition {source_definition_id!r} is not registered."
+            )
+        canonical = source.model_copy(
+            update={
+                "name": f"Canonical v{version} — approved by {approved_by}",
+                "owner": approved_by,
+                "rule_text": rule_text,
+            }
+        )
+        return canonical, domain_views
+
     def evaluate_definition(
         self,
         binding_id: str,
