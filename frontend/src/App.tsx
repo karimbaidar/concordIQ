@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchDemoScenarios, fetchHealth, reconcileTerm, runDemoScenario } from "./api";
+import {
+  fetchDemoScenarios,
+  fetchHealth,
+  reconcileTerm,
+  reconcileWhatIf,
+  runDemoScenario,
+} from "./api";
 import { AskConcord } from "./components/AskConcord";
 import { DashboardDisagreement } from "./components/DashboardDisagreement";
 import { DecoyRuledOut } from "./components/DecoyRuledOut";
@@ -14,7 +20,13 @@ import { ReasoningTimeline } from "./components/ReasoningTimeline";
 import { RefusalCard } from "./components/RefusalCard";
 import { SemanticPullRequest } from "./components/SemanticPullRequest";
 import { TermSearch } from "./components/TermSearch";
-import type { DemoScenario, HealthStatus, ReconciliationCase } from "./types";
+import type {
+  DemoScenario,
+  HealthStatus,
+  ImpactAssessment,
+  ReconciliationCase,
+  WhatIfResult,
+} from "./types";
 
 const SCENARIO_STORIES = [
   {
@@ -44,6 +56,41 @@ function outcomeTitle(result: ReconciliationCase) {
   return "Apparent conflict ruled out";
 }
 
+function rederiveImpact(
+  result: ReconciliationCase,
+  whatIf: WhatIfResult | null,
+): ImpactAssessment | null {
+  if (!result.impact_assessment || !whatIf) {
+    return result.impact_assessment;
+  }
+  const evaluations = result.execution_results.map((evaluation) =>
+    evaluation.binding_id === whatIf.binding_id
+      ? {
+          entityCount: whatIf.whatif.entity_count,
+          metricTotal: whatIf.whatif.metric_value,
+        }
+      : {
+          entityCount: evaluation.entity_count,
+          metricTotal: evaluation.metric_total,
+        },
+  );
+  const counts = evaluations.map((evaluation) => evaluation.entityCount);
+  const totals = evaluations.map((evaluation) => evaluation.metricTotal);
+  const customerDelta = Math.max(...counts) - Math.min(...counts);
+  const metricDelta = Math.round((Math.max(...totals) - Math.min(...totals)) * 100) / 100;
+  const consistent = customerDelta === 0 && metricDelta === 0;
+  const highImpact = customerDelta >= 10 || metricDelta >= 1_000_000;
+
+  return {
+    ...result.impact_assessment,
+    rank: consistent ? 0 : 1,
+    severity: consistent ? "low" : highImpact ? "high" : "medium",
+    customer_count_delta: customerDelta,
+    arr_delta: metricDelta,
+    decision_criticality: consistent ? "low" : "high",
+  };
+}
+
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
@@ -51,6 +98,10 @@ export default function App() {
   const [result, setResult] = useState<ReconciliationCase | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [whatIf, setWhatIf] = useState<WhatIfResult | null>(null);
+  const [whatIfBusy, setWhatIfBusy] = useState(false);
+  const [whatIfError, setWhatIfError] = useState<string | null>(null);
+  const whatIfRequest = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -88,6 +139,53 @@ export default function App() {
   const foundryHosted =
     health?.provider_mode === "foundry_hosted" ||
     result?.context_packet?.provider_metadata.mode === "foundry_hosted";
+  const whatIfEnabled = result?.context_packet?.provider_metadata.mode === "local";
+  const displayedImpact = useMemo(
+    () => (result ? rederiveImpact(result, whatIf) : null),
+    [result, whatIf],
+  );
+
+  const resetWhatIf = useCallback(() => {
+    whatIfRequest.current += 1;
+    setWhatIf(null);
+    setWhatIfBusy(false);
+    setWhatIfError(null);
+  }, []);
+
+  const handleWhatIf = useCallback(
+    async (bindingId: string, timeWindowDays: number) => {
+      if (!result) {
+        return;
+      }
+      const requestId = whatIfRequest.current + 1;
+      whatIfRequest.current = requestId;
+      setWhatIfBusy(true);
+      setWhatIfError(null);
+      try {
+        const response = await reconcileWhatIf(
+          result.resolved_concept?.canonical_name ?? result.request.term,
+          bindingId,
+          timeWindowDays,
+        );
+        if (whatIfRequest.current === requestId) {
+          setWhatIf(response);
+        }
+      } catch (requestError) {
+        if (whatIfRequest.current === requestId) {
+          setWhatIfError(
+            requestError instanceof Error
+              ? requestError.message
+              : "The deterministic what-if run failed.",
+          );
+        }
+      } finally {
+        if (whatIfRequest.current === requestId) {
+          setWhatIfBusy(false);
+        }
+      }
+    },
+    [result],
+  );
 
   async function handleRun() {
     if (!selectedScenario) {
@@ -95,6 +193,7 @@ export default function App() {
     }
     setBusy(true);
     setError(null);
+    resetWhatIf();
     try {
       const caseResult = await runDemoScenario(selectedScenario.scenario_id);
       setResult(caseResult);
@@ -116,6 +215,7 @@ export default function App() {
   }
 
   function handleAskAnswer(caseResult: ReconciliationCase) {
+    resetWhatIf();
     setResult(caseResult);
     requestAnimationFrame(() => {
       document.getElementById("case-result")?.scrollIntoView({
@@ -128,6 +228,7 @@ export default function App() {
   async function handleInvestigate(term: string) {
     setBusy(true);
     setError(null);
+    resetWhatIf();
     try {
       const caseResult = await reconcileTerm(term);
       setResult(caseResult);
@@ -201,6 +302,7 @@ export default function App() {
             onSelect={(scenarioId) => {
               setSelectedId(scenarioId);
               setResult(null);
+              resetWhatIf();
             }}
             onRun={handleRun}
           />
@@ -256,12 +358,22 @@ export default function App() {
             </section>
 
             <DashboardDisagreement result={result} />
-            <DefinitionDiff result={result} />
+            <DefinitionDiff
+              result={result}
+              whatIf={whatIf}
+              whatIfBusy={whatIfBusy}
+              whatIfError={whatIfError}
+              whatIfEnabled={whatIfEnabled}
+              onWhatIf={handleWhatIf}
+              onResetWhatIf={resetWhatIf}
+            />
 
             <div className="analysis-grid" id="reasoning">
               <ReasoningTimeline result={result} />
               <div className="analysis-sidebar">
-                {result.impact_assessment && <ImpactPanel impact={result.impact_assessment} />}
+                {displayedImpact && (
+                  <ImpactPanel impact={displayedImpact} exploring={Boolean(whatIf)} />
+                )}
                 <section className="surface authority-panel">
                   <span className="section-kicker">Decision authority</span>
                   <h2>{result.authority_assessment?.owner ?? "No single owner"}</h2>

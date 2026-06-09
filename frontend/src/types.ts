@@ -55,6 +55,25 @@ export interface DefinitionEvaluation {
   executed_sql: string;
 }
 
+export interface WhatIfMetric {
+  entity_count: number;
+  metric_value: number;
+}
+
+export interface WhatIfResult {
+  term: string;
+  binding_id: string;
+  overrides: {
+    time_window_days: number;
+  };
+  baseline: WhatIfMetric;
+  whatif: WhatIfMetric;
+  delta: WhatIfMetric;
+  sql: string;
+  ephemeral: true;
+  note: string;
+}
+
 export interface TimelineEntry {
   sequence: number;
   state: string;

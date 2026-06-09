@@ -2,6 +2,7 @@ import type { ImpactAssessment } from "../types";
 
 interface ImpactPanelProps {
   impact: ImpactAssessment;
+  exploring?: boolean;
 }
 
 function formatCurrency(value: number) {
@@ -12,25 +13,35 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export function ImpactPanel({ impact }: ImpactPanelProps) {
+export function ImpactPanel({ impact, exploring = false }: ImpactPanelProps) {
   return (
-    <section className="surface impact-panel" aria-labelledby="impact-title">
+    <section
+      className={`surface impact-panel${exploring ? " is-exploring" : ""}`}
+      aria-labelledby="impact-title"
+    >
       <div className="section-heading">
         <div>
           <span className="section-kicker">Materiality</span>
           <h2 id="impact-title">Business impact</h2>
         </div>
-        <span className={`severity-badge severity-${impact.severity}`}>
-          {impact.severity} impact
-        </span>
+        <div className="impact-badges">
+          {exploring && <span className="exploration-chip">Exploration</span>}
+          <span className={`severity-badge severity-${impact.severity}`}>
+            {impact.severity} impact
+          </span>
+        </div>
       </div>
       <div className="impact-primary">
         <div>
-          <strong>{impact.customer_count_delta}</strong>
+          <strong className="rederived-value" key={impact.customer_count_delta}>
+            {impact.customer_count_delta}
+          </strong>
           <span>customer delta</span>
         </div>
         <div>
-          <strong>{formatCurrency(impact.arr_delta)}</strong>
+          <strong className="rederived-value" key={impact.arr_delta}>
+            {formatCurrency(impact.arr_delta)}
+          </strong>
           <span>metric delta</span>
         </div>
       </div>

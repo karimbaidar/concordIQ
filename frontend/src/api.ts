@@ -5,6 +5,7 @@ import type {
   PortfolioScan,
   ProposalDecisionResult,
   ReconciliationCase,
+  WhatIfResult,
 } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
@@ -55,6 +56,21 @@ export function reconcileTerm(term: string): Promise<ReconciliationCase> {
     body: JSON.stringify({
       term,
       question: `Why do our ${term} definitions disagree?`,
+    }),
+  });
+}
+
+export function reconcileWhatIf(
+  term: string,
+  bindingId: string,
+  timeWindowDays: number,
+): Promise<WhatIfResult> {
+  return requestJson<WhatIfResult>("/reconcile/whatif", {
+    method: "POST",
+    body: JSON.stringify({
+      term,
+      binding_id: bindingId,
+      overrides: { time_window_days: timeWindowDays },
     }),
   });
 }

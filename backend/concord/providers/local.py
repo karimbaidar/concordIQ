@@ -1,6 +1,7 @@
 """Deterministic local semantic grounding and DuckDB execution."""
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -31,6 +32,7 @@ DEFAULT_ONTOLOGY_PATH = REPOSITORY_ROOT / "ontology" / "ontology.yaml"
 DEFAULT_DEFINITIONS_PATH = REPOSITORY_ROOT / "ontology" / "metric_definitions.yaml"
 DEFAULT_AUTHORITY_RULES_PATH = REPOSITORY_ROOT / "ontology" / "authority_rules.yaml"
 DEFAULT_DUCKDB_PATH = REPOSITORY_ROOT / "data" / "concord_iq.duckdb"
+TRAILING_WINDOW_PATTERN = re.compile(r"INTERVAL \d+ DAY")
 
 
 def _load_yaml_document(path: Path) -> dict[str, Any]:
@@ -153,13 +155,34 @@ class LocalProvider:
         )
         if definition is None:
             raise BindingNotFound(f"No binding registered with id: {binding_id}")
+        return self.evaluate_binding(self._to_binding(definition), period)
+
+    def evaluate_binding(
+        self,
+        binding: DefinitionBinding,
+        period: EvaluationPeriod,
+    ) -> DefinitionEvaluation:
+        """Execute a trusted binding, including an ephemeral copied binding."""
         if not self.duckdb_path.exists():
             raise ProviderNotConfigured(
                 f"DuckDB data is missing at {self.duckdb_path}. Run `make seed` first."
             )
 
-        binding = self._to_binding(definition)
-        rendered_sql = binding.sql_template.format(
+        sql_template = binding.sql_template
+        if binding.time_window_days is not None:
+            if binding.time_window_days < 1:
+                raise ValueError("time_window_days must be positive.")
+            sql_template, replacements = TRAILING_WINDOW_PATTERN.subn(
+                f"INTERVAL {binding.time_window_days - 1} DAY",
+                sql_template,
+            )
+            if replacements != 1:
+                raise ProviderNotConfigured(
+                    f"Binding {binding.binding_id} must have exactly one trusted "
+                    "trailing-window SQL clause."
+                )
+
+        rendered_sql = sql_template.format(
             period_start=period.start_date.isoformat(),
             period_end=period.end_date.isoformat(),
             as_of_date=period.end_date.isoformat(),

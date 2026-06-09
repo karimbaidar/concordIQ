@@ -823,6 +823,198 @@ summary:focus-visible {
   font-size: 9px;
 }
 
+.definition-card.is-exploring {
+  border-color: rgba(116, 87, 239, 0.55);
+  box-shadow: 0 12px 30px rgba(116, 87, 239, 0.12);
+}
+
+.definition-card.is-exploring footer {
+  background: linear-gradient(120deg, #142240, #5141ad);
+}
+
+.whatif-lab {
+  display: grid;
+  gap: 15px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #ddd8fb;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #faf9ff, #f4f7ff);
+}
+
+.whatif-heading,
+.whatif-heading > div,
+.window-control,
+.window-control > span {
+  display: flex;
+}
+
+.whatif-heading {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.whatif-heading > div {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.whatif-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.exploration-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #5d4bc3;
+  background: #ece8ff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.whatif-controls {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.85fr) minmax(260px, 1.4fr) auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.whatif-controls label {
+  display: grid;
+  gap: 7px;
+  color: #66748c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.whatif-controls select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d8deea;
+  border-radius: 9px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+}
+
+.window-control {
+  flex-direction: column;
+}
+
+.window-control > span {
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.window-control strong {
+  color: #5542be;
+  font-size: 13px;
+}
+
+.window-stepper {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+}
+
+.window-stepper input {
+  width: 100%;
+  accent-color: var(--violet);
+}
+
+.window-stepper button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  color: #5542be;
+  background: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.window-stepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.window-control small {
+  color: #8994a7;
+  font-size: 9px;
+}
+
+.whatif-controls .ghost-button {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.whatif-controls .ghost-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.whatif-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 31px;
+}
+
+.whatif-proof > span {
+  padding: 8px 10px;
+  border: 1px solid #e0e4ef;
+  border-radius: 8px;
+  color: #65728a;
+  background: rgba(255, 255, 255, 0.78);
+  font-size: 10px;
+}
+
+.whatif-proof strong {
+  color: var(--ink);
+}
+
+.whatif-note,
+.whatif-error {
+  margin: 0;
+  font-size: 10px;
+}
+
+.whatif-note {
+  color: #7b6ab7;
+}
+
+.whatif-error {
+  color: var(--red);
+}
+
+.rederived-value {
+  animation: rederived-pop 280ms ease-out;
+}
+
+@keyframes rederived-pop {
+  from {
+    opacity: 0.35;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .analysis-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.65fr);
@@ -1021,6 +1213,17 @@ summary:focus-visible {
 .impact-details span {
   color: #8490a3;
   font-size: 9px;
+}
+
+.impact-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.impact-panel.is-exploring {
+  border-color: rgba(116, 87, 239, 0.45);
 }
 
 .impact-details {
@@ -1550,6 +1753,15 @@ summary:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .whatif-controls {
+    grid-template-columns: 1fr 1.5fr;
+  }
+
+  .whatif-controls .ghost-button {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
   .analysis-grid {
     grid-template-columns: 1fr;
   }
@@ -1645,6 +1857,19 @@ summary:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .whatif-heading {
+    flex-direction: column;
+  }
+
+  .whatif-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .whatif-controls .ghost-button {
+    grid-column: auto;
+    width: 100%;
+  }
+
   .semantic-pr > header {
     grid-template-columns: auto 1fr;
   }
@@ -1703,6 +1928,7 @@ summary:focus-visible {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }
 

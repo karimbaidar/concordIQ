@@ -17,9 +17,16 @@ from concord.orchestration.casefile import (
 )
 from concord.orchestration.portfolio import ConcordScore, PortfolioScan, scan_portfolio
 from concord.orchestration.runner import ReconciliationRunner
+from concord.orchestration.whatif import (
+    WhatIfNotSupported,
+    WhatIfRequest,
+    WhatIfResult,
+    reconcile_what_if,
+)
 from concord.providers import (
     FoundryHostedProvider,
     FoundryHostedResponseError,
+    LocalProvider,
     ProviderNotConfigured,
     QueryResult,
     provider_statuses,
@@ -139,6 +146,28 @@ async def reconcile(
     try:
         return await _workflow(request).run(payload)
     except UnsupportedScenario as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(error),
+        ) from error
+
+
+@router.post("/reconcile/whatif", response_model=WhatIfResult)
+def reconcile_whatif(payload: WhatIfRequest, request: Request) -> WhatIfResult:
+    """Re-derive one copied local binding without persistence or governance."""
+    runner = _runner(request)
+    if not isinstance(runner.provider, LocalProvider):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="What-if exploration is available only in deterministic LocalProvider mode.",
+        )
+    period = ReconciliationRequest(
+        question=f"Explore {payload.term} without changing governed state.",
+        term=payload.term,
+    ).period
+    try:
+        return reconcile_what_if(runner.provider, payload, period)
+    except (LookupError, WhatIfNotSupported, ValueError) as error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(error),

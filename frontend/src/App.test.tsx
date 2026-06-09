@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -275,6 +275,19 @@ describe("Concord IQ demo", () => {
         if (url.endsWith("/demo/run/net-revenue")) {
           return mockJson(makeCase("net_revenue"));
         }
+        if (url.endsWith("/reconcile/whatif")) {
+          return mockJson({
+            term: "active customer",
+            binding_id: "active_customer-0",
+            overrides: { time_window_days: 120 },
+            baseline: { entity_count: 96, metric_value: 1000000 },
+            whatif: { entity_count: 102, metric_value: 1050000 },
+            delta: { entity_count: 6, metric_value: 50000 },
+            sql: "SELECT 1 -- trailing 120 days",
+            ephemeral: true,
+            note: "Exploration only — not governed, not persisted, no proposal, no audit.",
+          });
+        }
         return mockJson(makeCase("churned_customer"));
       }),
     );
@@ -391,5 +404,37 @@ describe("Concord IQ demo", () => {
     await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
     expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
     expect(screen.getByText("foundry_hosted")).toBeInTheDocument();
+  });
+
+  it("re-derives one local definition and resets to governed values", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(
+      await screen.findByRole("button", { name: /analyze disagreement/i }),
+    );
+    expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
+
+    const slider = screen.getByRole("slider", {
+      name: "Time window for Finance definition",
+    });
+    expect(slider).toHaveValue("90");
+    fireEvent.change(slider, { target: { value: "120" } });
+
+    expect(await screen.findByText("Exploration — not governed")).toBeInTheDocument();
+    expect(screen.getByText("+6")).toBeInTheDocument();
+    expect(screen.getByText("+$50,000")).toBeInTheDocument();
+    expect(screen.getByText("22")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        "/api/reconcile/whatif",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Reset to governed" }));
+    expect(slider).toHaveValue("90");
+    expect(screen.queryByText("Exploration — not governed")).not.toBeInTheDocument();
+    expect(screen.getByText("16")).toBeInTheDocument();
   });
 });
