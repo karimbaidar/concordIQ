@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     foundry_iq_api_version: str = "2026-04-01"
     foundry_iq_access_token: SecretStr | None = None
     foundry_iq_api_key: SecretStr | None = None
+    work_iq_endpoint: str | None = None
+    work_iq_access_token: SecretStr | None = None
+    work_iq_data_source: str = "sharePoint"
+    work_iq_api_version: str = "beta"
     foundry_hosted_endpoint: str | None = None
     foundry_hosted_agent_id: str | None = None
     foundry_access_token: SecretStr | None = None

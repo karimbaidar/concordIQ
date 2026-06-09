@@ -9,6 +9,7 @@ from concord.providers.foundry_hosted import FoundryHostedProvider
 from concord.providers.foundry_iq import FoundryIQProvider
 from concord.providers.local import LocalProvider
 from concord.providers.replay import ReplayProvider
+from concord.providers.work_iq import WorkIQProvider
 
 
 def fabric_iq_is_configured(settings: Settings) -> bool:
@@ -23,6 +24,11 @@ def foundry_iq_is_configured(settings: Settings) -> bool:
         and settings.foundry_iq_knowledge_base
         and (settings.foundry_iq_access_token or settings.foundry_iq_api_key)
     )
+
+
+def work_iq_is_configured(settings: Settings) -> bool:
+    """Return Work IQ readiness without making a network request."""
+    return bool(settings.work_iq_endpoint and settings.work_iq_access_token)
 
 
 def foundry_hosted_is_configured(settings: Settings) -> bool:
@@ -59,6 +65,8 @@ def create_provider(settings: Settings) -> GroundingProvider:
         return FoundryIQProvider(settings)
     if mode is ProviderMode.FABRIC_IQ:
         return FabricIQProvider(settings)
+    if mode is ProviderMode.WORK_IQ:
+        return WorkIQProvider(settings)
     if mode is ProviderMode.FOUNDRY_HOSTED:
         raise ProviderNotConfigured(
             "foundry_hosted is a complete-case runtime. Use FoundryHostedProvider "
@@ -111,6 +119,16 @@ def provider_statuses(settings: Settings) -> list[dict[str, Any]]:
             "configured": foundry_iq_is_configured(settings),
             "cloud": True,
             "detail": "Fallback cloud grounding: Azure AI Search knowledge-base adapter.",
+        },
+        {
+            "mode": ProviderMode.WORK_IQ,
+            "name": "WorkIQProvider",
+            "configured": work_iq_is_configured(settings),
+            "cloud": True,
+            "detail": (
+                "Work IQ grounding: M365 Copilot Retrieval artifact-proof adapter "
+                "(guarded; tenant capture pending)."
+            ),
         },
         {
             "mode": ProviderMode.FOUNDRY_HOSTED,

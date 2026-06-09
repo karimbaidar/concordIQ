@@ -11,6 +11,7 @@ integration are different claims.
 | `ReplayProvider` | Rehearsal from a reviewed real-IQ capture | None |
 | `FabricIQProvider` | Primary semantic grounding through ontology MCP | Guarded HTTPS/MCP |
 | `FoundryIQProvider` | Fallback Azure AI Search knowledge-base retrieval | Guarded HTTPS |
+| `WorkIQProvider` | Work IQ via M365 Copilot Retrieval (artifact-sourced definitions) | Guarded HTTPS |
 
 When the Agent Framework tool receives `provider=auto`, it selects configured
 Fabric IQ first. Foundry IQ is used only when Fabric IQ is unavailable. Explicit
@@ -25,6 +26,18 @@ The Fabric adapter initializes the ontology MCP endpoint, lists tools, selects
 `search_ontology` or `query_ontology`, and validates the returned snapshot.
 Fabric tool schemas can evolve, so a tenant smoke test is required before this
 adapter can be described as verified.
+
+The Work IQ adapter calls the Microsoft 365 Copilot Retrieval API and reads its
+`retrievalHits`, and is selected explicitly with `PROVIDER=work_iq` (it is not part of
+the Fabric→Foundry auto-fallback chain). Two honest modes mirror Fabric IQ: a **full
+snapshot** when a retrieved artifact carries the complete scenario JSON, or an
+**artifact proof** when two or more distinct M365 / Power BI artifacts define the same
+metric — Work IQ is then recorded as the real org-artifact proof and the deterministic
+LocalProvider snapshot supplies the SQL/evidence
+(`work_iq_artifact_proof_with_deterministic_snapshot`). Connectivity-only responses
+(fewer than two defining artifacts) are rejected. Like Foundry IQ, the adapter is
+guarded and injected-transport tested but **not** marked verified until a real
+sanitized tenant capture exists.
 
 ## Verified Fabric API surfaces (confirmed 2026-06)
 

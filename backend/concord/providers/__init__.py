@@ -21,6 +21,7 @@ from concord.providers.factory import (
     foundry_hosted_is_configured,
     foundry_iq_is_configured,
     provider_statuses,
+    work_iq_is_configured,
 )
 from concord.providers.foundry_hosted import (
     FoundryHostedProof,
@@ -30,6 +31,7 @@ from concord.providers.foundry_hosted import (
 from concord.providers.foundry_iq import FoundryIQProvider
 from concord.providers.local import LocalProvider
 from concord.providers.replay import ReplayProvider
+from concord.providers.work_iq import WorkIQProvider
 
 __all__ = [
     "AuthorityRule",
@@ -50,10 +52,12 @@ __all__ = [
     "QueryDefinitionSummary",
     "QueryResult",
     "ReplayProvider",
+    "WorkIQProvider",
     "create_preferred_cloud_provider",
     "create_provider",
     "fabric_iq_is_configured",
     "foundry_hosted_is_configured",
     "foundry_iq_is_configured",
     "provider_statuses",
+    "work_iq_is_configured",
 ]

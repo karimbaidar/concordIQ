@@ -396,6 +396,7 @@ The application keeps semantic grounding and hosted runtime modes explicit:
 | `ReplayProvider` | Replays a reviewed real-IQ capture through the same typed contract | Implemented; refuses missing or unverified artifacts |
 | `FabricIQProvider` | Primary cloud grounding through Fabric IQ ontology MCP + NL2Ontology | Real semantic-proof capture verified; deterministic snapshot provenance disclosed |
 | `FoundryIQProvider` | Fallback cloud grounding through Azure AI Search knowledge-base retrieval | Guarded adapter and injected-transport tests complete; tenant smoke test pending |
+| `WorkIQProvider` | Work IQ grounding through Microsoft 365 Copilot Retrieval — sources the competing definitions from real M365 / Power BI artifacts | Guarded adapter and injected-transport tests complete; artifact-proof mode disclosed; tenant capture pending |
 | `FoundryHostedProvider` | Calls a deployed Concord IQ Agent Framework workflow and returns its verified typed case | First-class `/analyze`, `/ask`, demo, health, and provider-status runtime |
 
 The `nl_query` path is genuinely IQ-served: on Fabric/Foundry it calls the real
@@ -477,8 +478,8 @@ MAX_CLOUD_CALLS=0
 LLM_PROVIDER=disabled
 ```
 
-`FabricIQProvider`, `FoundryIQProvider`, and `FoundryHostedProvider` fail closed
-unless explicit cloud permission, a positive call budget, endpoint, and
+`FabricIQProvider`, `FoundryIQProvider`, `WorkIQProvider`, and `FoundryHostedProvider`
+fail closed unless explicit cloud permission, a positive call budget, endpoint, and
 authentication are configured.
 Automated tests use injected transports and never call Microsoft services.
 
@@ -579,12 +580,16 @@ binding inspection, data execution, impact ranking, authority resolution, propos
 or refusal, verification, and audit. The autonomous portfolio scan adds genuine
 multi-concept reasoning beyond single-question Q&A.
 
-**Best Use of IQ Tools:** Fabric IQ ontology + NL2Ontology is the semantic source
-of truth, and the `nl_query` path is genuinely IQ-served. The bootstrap and
-adapter REST/MCP surfaces are verified against current Microsoft Learn. Foundry IQ
-is the fallback knowledge layer, and Foundry Agent Service is the deployment path.
-The integration claim becomes complete only after a real adapter smoke test and
-sanitized replay exist.
+**Best Use of IQ Tools:** Concord IQ spans all three Microsoft IQ layers. **Fabric
+IQ** ontology + NL2Ontology is the semantic source of truth, and the `nl_query` path
+is genuinely IQ-served (a real semantic-proof capture is committed). **Foundry IQ** is
+the fallback Azure AI Search knowledge layer, and **Work IQ** (Microsoft 365 Copilot
+Retrieval) sources the competing definitions from real M365 / Power BI artifacts so a
+conflict comes from org content, not a seed. The bootstrap and adapter REST/MCP
+surfaces are verified against current Microsoft Learn, and Foundry Agent Service is
+the deployment path. Fabric IQ is the only layer claimed verified; the Foundry IQ and
+Work IQ adapters are guarded and injected-transport tested with tenant capture pending
+— never overclaimed.
 
 **Creativity and UX:** Concord IQ reasons about *meaning*, not answers — and turns
 governance into a product: ask in plain English, an autonomous semantic scan, a
