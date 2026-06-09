@@ -74,6 +74,10 @@ Score with a team leaderboard, and approval gates that merge meaning like code.
   definitions only with the configured authority owner, promotes one versioned
   canonical in Concord's registry, and makes a re-run use the governed meaning
   while preserving prior departmental views and audit history.
+- **Meaning fork:** an accessible, dependency-free SVG turns the typed casefile
+  into the demo's visual spine. Executed counts and windows fork by department,
+  deterministic what-if values move live, authority refusal stays unresolved,
+  and owner approval collapses the graph to the server-confirmed canonical version.
 - Every completed case retains executed SQL, evidence, verifier checks, and audit.
 - Cloud calls are impossible under default configuration.
 - The HTTP API executes through the Microsoft Agent Framework workflow.

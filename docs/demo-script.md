@@ -5,9 +5,8 @@ tenant. Record against the local/replay stack. This file is the spine: the click
 order, the screen, and the one line for each beat.
 
 **Two honesty rules that override everything below:**
-1. **No claim exceeds the build.** Only show what runs. The beat marked `PENDING`
-   depends on the unbuilt T1.6 meaning-graph — do **not** record it until that lands.
-   The merge-and-rerun act-loop is live in Concord's own governed registry.
+1. **No claim exceeds the build.** Only show what runs. The meaning graph and the
+   merge-and-rerun act-loop are live in Concord's own governed registry.
 2. **Never overstate the IQ layer.** Say "verified Fabric IQ semantic grounding" only
    after `make capture` + `make replay-check` pass with real Fabric calls and the badge
    reads `FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
@@ -36,7 +35,7 @@ disabled, data synthetic. Keep `http://127.0.0.1:8000/docs` and a terminal for
 | 5 | It refuses rather than guess | `RefusalCard` (Churned) + `UngovernedRefusalCard` (any term) | ✅ LIVE (T1.3) |
 | 6 | Governance: merge, promote, and re-run | `SemanticPullRequest` → `DashboardDisagreement` | ✅ LIVE (T1.5) |
 | 7 | Score the whole org (optional) | `PortfolioBoard` / `make scan` (Concord Score 60/100) | ✅ LIVE |
-| — | Cold-open hero visual | `MeaningGraph` | ⏳ `PENDING T1.6` (until then, open on beat 1) |
+| — | Cold-open hero visual | `MeaningGraph` | ✅ LIVE (T1.6) |
 
 ---
 
@@ -44,15 +43,14 @@ disabled, data synthetic. Keep `http://127.0.0.1:8000/docs` and a terminal for
 
 ### 1 — 0:00–0:25 · The pain (lead here, not with architecture)
 
-Open on the workbench with the three numbers visible (`DashboardDisagreement`).
+Open on `MeaningGraph`: **Active Customer** forks into Finance **1,600 / 90d**,
+Sales **1,500 / 180d**, and Customer Success **1,334 / 30d**. Keep the red
+conflict edges and **266 / $33.2M** impact badge in frame.
 
 Say: *"A board decision rode on one number: Finance said 1,600 active customers.
 Sales' system said 1,500. Customer Success said 1,334. Same metric, three numbers.
 Nobody lied — they never agreed on what 'active' means. That gap is 266 customers and
 **$33.2M** of ARR."*
-
-> When **T1.6** lands, open on the `MeaningGraph` (one term node forking into three
-> departmental nodes, lit conflict edge, $ delta) and say the same line over it.
 
 ### 2 — 0:25–1:10 · The proven conflict, and a real argument settled by data
 
@@ -71,7 +69,8 @@ referee. The model never decides the verdict; the data does."*
 
 1. In `DefinitionDiff`, drag the Finance time-window slider **90 → 120 days**.
 2. The count re-derives live **1,600 → 1,667** (**+67 customers, +$8,567,000**); overall
-   impact jumps to **333 / $41,765,000**. The **"Exploration — not governed"** chip shows.
+   impact jumps to **333 / $41,765,000**. The `MeaningGraph` node and impact badge
+   move with it, and the **"Exploration — not governed"** chip shows.
 3. Click **Reset to governed** — back to **266 / $33,198,000**.
 
 Say: *"This is the glass box. Change one rule and the dollars re-derive instantly —
@@ -110,7 +109,8 @@ is the feature."*
    writeback** label.
 4. Click **Re-run with governed definition**. The conflict result becomes
    **Governed: Canonical v1** and the original Finance/Sales/Customer Success
-   definitions remain visible as named domain views.
+   definitions remain visible as named domain views. The meaning fork collapses
+   into one green governed canonical node.
 
 Say: *"Meaning gets a pull request. Only the owner can merge. Approval promotes one
 versioned canonical definition in Concord's governed registry, records the audit event,
@@ -142,8 +142,8 @@ gates it under governance, or refuses — version control for the meaning of you
   layer and the committed sanitized capture replays it with no tenant. Keep the wording
   honest per rule 2.
 
-## Beat to record only after it is built
+## Recording note
 
-- **Cold-open hero (`PENDING T1.6`).** Replace beat 1's static three numbers with the
-  animated `MeaningGraph` fork; on the what-if (beat 3) the nodes animate; after the
-  merge (beat 6) the fork collapses to a single canonical node.
+Keep the meaning graph in frame for the cold open, the live what-if, the Churned
+Customer authority refusal, and the post-merge convergence. It is the visual spine:
+forked, explored, safely refused, then governed.

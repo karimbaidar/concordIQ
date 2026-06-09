@@ -15,6 +15,7 @@ import { PortfolioBoard } from "./components/PortfolioBoard";
 import { DefinitionDiff } from "./components/DefinitionDiff";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ImpactPanel } from "./components/ImpactPanel";
+import { MeaningGraph } from "./components/MeaningGraph";
 import { NarrationPanel } from "./components/NarrationPanel";
 import { ProviderBadge } from "./components/ProviderBadge";
 import { ReasoningTimeline } from "./components/ReasoningTimeline";
@@ -26,6 +27,7 @@ import type {
   DemoScenario,
   HealthStatus,
   ImpactAssessment,
+  ProposalDecisionResult,
   ReconciliationCase,
   UngovernedTermRefusal,
   WhatIfResult,
@@ -108,6 +110,8 @@ export default function App() {
   const [whatIf, setWhatIf] = useState<WhatIfResult | null>(null);
   const [whatIfBusy, setWhatIfBusy] = useState(false);
   const [whatIfError, setWhatIfError] = useState<string | null>(null);
+  const [mergedDecision, setMergedDecision] =
+    useState<ProposalDecisionResult | null>(null);
   const whatIfRequest = useRef(0);
 
   useEffect(() => {
@@ -201,6 +205,7 @@ export default function App() {
     setBusy(true);
     setError(null);
     setRefusal(null);
+    setMergedDecision(null);
     resetWhatIf();
     try {
       const caseResult = await runDemoScenario(selectedScenario.scenario_id);
@@ -224,6 +229,7 @@ export default function App() {
 
   function handleAskAnswer(caseResult: ReconciliationCase) {
     setRefusal(null);
+    setMergedDecision(null);
     resetWhatIf();
     setResult(caseResult);
     requestAnimationFrame(() => {
@@ -238,6 +244,7 @@ export default function App() {
     setBusy(true);
     setError(null);
     setRefusal(null);
+    setMergedDecision(null);
     resetWhatIf();
     try {
       const outcome = await reconcileTerm(term);
@@ -281,6 +288,7 @@ export default function App() {
       }
       setRefusal(null);
       setResult(outcome);
+      setMergedDecision(null);
       requestAnimationFrame(() => {
         document.getElementById("case-result")?.scrollIntoView({
           behavior: "smooth",
@@ -353,6 +361,7 @@ export default function App() {
               setSelectedId(scenarioId);
               setResult(null);
               setRefusal(null);
+              setMergedDecision(null);
               resetWhatIf();
             }}
             onRun={handleRun}
@@ -419,6 +428,12 @@ export default function App() {
               </div>
             </section>
 
+            <MeaningGraph
+              result={result}
+              whatIf={whatIf}
+              impact={displayedImpact}
+              mergedDecision={mergedDecision}
+            />
             <DashboardDisagreement result={result} />
             <DefinitionDiff
               result={result}
@@ -455,6 +470,9 @@ export default function App() {
                   handleGovernedRerun(
                     result.resolved_concept?.canonical_name ?? result.request.term,
                   )
+                }
+                onDecision={(decision) =>
+                  setMergedDecision(decision.status === "approved" ? decision : null)
                 }
               />
             )}

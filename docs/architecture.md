@@ -145,6 +145,10 @@ and never weaken the truth path:
   meaning while retaining prior definitions as named domain views. This is a write
   to Concord's own registry, not Fabric or Foundry. The owner check is a
   configuration lookup, never an LLM judgement.
+- **The meaning graph** (`frontend/src/components/MeaningGraph.tsx`) is a read-only
+  SVG projection of the typed casefile. It derives nodes, counts, windows, impact,
+  refusal, exploration, and convergence from existing result fields and the
+  ephemeral what-if response. It never computes or overrides a verdict.
 
 ## Data flow and trust
 

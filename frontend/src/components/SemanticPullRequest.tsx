@@ -7,6 +7,7 @@ interface SemanticPullRequestProps {
   proposal: ReconciliationProposal;
   runId: string;
   onRerun: () => Promise<void>;
+  onDecision?: (decision: ProposalDecisionResult) => void;
 }
 
 function formatDecisionTime(value: string) {
@@ -20,6 +21,7 @@ export function SemanticPullRequest({
   proposal,
   runId,
   onRerun,
+  onDecision,
 }: SemanticPullRequestProps) {
   const [decision, setDecision] = useState<ProposalDecisionResult | null>(null);
   const [pending, setPending] = useState(false);
@@ -33,6 +35,7 @@ export function SemanticPullRequest({
       // Only the configured authority owner may decide; the gate is enforced server-side.
       const result = await decideProposal(runId, action, proposal.authority_owner);
       setDecision(result);
+      onDecision?.(result);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : "The approval gate rejected this.",

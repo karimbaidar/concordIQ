@@ -420,6 +420,12 @@ describe("Concord IQ demo", () => {
     expect(
       await screen.findByText("Different words, same operational result"),
     ).toBeInTheDocument();
+    expect(screen.getByText("Operationally equivalent")).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("img", { name: /Meaning graph for net revenue/i })
+        .closest("section"),
+    ).toHaveAttribute("data-state", "aligned");
     expect(screen.getByLabelText("2 evidence records")).toBeInTheDocument();
     expect(
       screen.getByText("Overturned: executed entity sets are equal (96 = 96)."),
@@ -432,6 +438,12 @@ describe("Concord IQ demo", () => {
     expect(
       await screen.findByText("Concord IQ refuses to choose a winner"),
     ).toBeInTheDocument();
+    expect(screen.getByText("Conflict proven - merge refused")).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("img", { name: /Meaning graph for churned customer/i })
+        .closest("section"),
+    ).toHaveAttribute("data-state", "refused");
     expect(screen.getByText("Human governance approval")).toBeInTheDocument();
   });
 
@@ -512,7 +524,9 @@ describe("Concord IQ demo", () => {
     expect(await screen.findByText("Exploration — not governed")).toBeInTheDocument();
     expect(screen.getByText("+6")).toBeInTheDocument();
     expect(screen.getByText("+$50,000")).toBeInTheDocument();
-    expect(screen.getByText("22")).toBeInTheDocument();
+    expect(
+      within(document.querySelector(".impact-panel") as HTMLElement).getByText("22"),
+    ).toBeInTheDocument();
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith(
         "/api/reconcile/whatif",
@@ -523,7 +537,9 @@ describe("Concord IQ demo", () => {
     await user.click(screen.getByRole("button", { name: "Reset to governed" }));
     expect(slider).toHaveValue("90");
     expect(screen.queryByText("Exploration — not governed")).not.toBeInTheDocument();
-    expect(screen.getByText("16")).toBeInTheDocument();
+    expect(
+      within(document.querySelector(".impact-panel") as HTMLElement).getByText("16"),
+    ).toBeInTheDocument();
   });
 
   it("merges a Semantic-PR and re-runs the governed canonical definition", async () => {
@@ -581,7 +597,14 @@ describe("Concord IQ demo", () => {
     expect(
       await screen.findByText("Merged — canonical definition is now governed"),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Canonical v1 · approved by Data Governance Council/)).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("img", { name: /Meaning graph for active customer/i })
+        .closest("section"),
+    ).toHaveAttribute("data-state", "converged");
+    expect(
+      screen.getByText(/Canonical v1 · approved by Data Governance Council/),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Concord IQ registry · no Fabric/Foundry writeback"),
     ).toBeInTheDocument();

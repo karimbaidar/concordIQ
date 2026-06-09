@@ -569,6 +569,447 @@ summary:focus-visible {
   font-size: 14px;
 }
 
+.meaning-graph {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 18px;
+  border: 1px solid #26385f;
+  border-radius: 22px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(67, 102, 228, 0.18), transparent 24rem),
+    linear-gradient(120deg, #081329, #0d1c3a 54%, #101c34);
+  box-shadow: 0 22px 54px rgba(19, 36, 70, 0.18);
+}
+
+.meaning-graph::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to right, #000, transparent 82%);
+}
+
+.meaning-graph-heading,
+.meaning-graph-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.meaning-graph-heading {
+  align-items: flex-start;
+  padding: 25px 28px 0;
+}
+
+.meaning-graph-heading .section-kicker {
+  color: #91a9ef;
+}
+
+.meaning-graph-heading h2 {
+  margin: 6px 0 0;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 24px;
+  letter-spacing: -0.035em;
+}
+
+.meaning-graph-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 133, 133, 0.28);
+  border-radius: 999px;
+  color: #ffb6b6;
+  background: rgba(192, 66, 66, 0.12);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.meaning-graph-exploring .meaning-graph-status {
+  color: #d8ccff;
+  border-color: rgba(183, 163, 255, 0.35);
+  background: rgba(116, 87, 239, 0.14);
+}
+
+.meaning-graph-refused .meaning-graph-status {
+  color: #ffd28d;
+  border-color: rgba(255, 190, 88, 0.3);
+  background: rgba(183, 103, 8, 0.14);
+}
+
+.meaning-graph-aligned .meaning-graph-status,
+.meaning-graph-converged .meaning-graph-status {
+  color: #9ee5cd;
+  border-color: rgba(91, 211, 169, 0.32);
+  background: rgba(21, 134, 99, 0.14);
+}
+
+.meaning-graph-canvas {
+  position: relative;
+  z-index: 1;
+  overflow-x: auto;
+  scrollbar-color: rgba(153, 174, 225, 0.4) transparent;
+}
+
+.meaning-graph svg {
+  display: block;
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  max-height: 500px;
+}
+
+.meaning-graph svg:focus-visible {
+  outline: 3px solid rgba(130, 157, 255, 0.65);
+  outline-offset: -5px;
+}
+
+.meaning-term-halo {
+  fill: rgba(69, 105, 234, 0.08);
+  stroke: rgba(117, 146, 255, 0.16);
+  stroke-width: 1;
+}
+
+.meaning-term-node {
+  fill: #132754;
+  stroke: #7794ff;
+  stroke-width: 2;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.28));
+}
+
+.meaning-term-label,
+.meaning-term-kicker,
+.meaning-node-owner,
+.meaning-node-count,
+.meaning-node-unit,
+.meaning-node-meta,
+.meaning-node-kicker,
+.meaning-canonical-title,
+.meaning-canonical-count,
+.meaning-impact-kicker,
+.meaning-impact-count,
+.meaning-impact-unit,
+.meaning-impact-money,
+.meaning-refusal-marker text,
+.meaning-domain-history text {
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.meaning-term-label {
+  fill: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+
+.meaning-term-kicker {
+  fill: #9eb2ed;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-anchor: middle;
+}
+
+.meaning-edge {
+  fill: none;
+  stroke: #e85b62;
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 7px rgba(232, 91, 98, 0.56));
+  stroke-dasharray: 9 8;
+  animation: meaning-edge-flow 2.6s linear infinite;
+}
+
+.meaning-edge-exploring,
+.meaning-edge.is-explored {
+  stroke: #9a82ff;
+  filter: drop-shadow(0 0 8px rgba(154, 130, 255, 0.65));
+}
+
+.meaning-edge-refused {
+  stroke: #d99a42;
+  filter: drop-shadow(0 0 7px rgba(217, 154, 66, 0.5));
+}
+
+.meaning-edge-aligned,
+.meaning-edge-converged {
+  stroke: #42c49a;
+  filter: drop-shadow(0 0 8px rgba(66, 196, 154, 0.58));
+}
+
+.meaning-edge-converged {
+  stroke-width: 5;
+  stroke-dasharray: none;
+}
+
+.meaning-edge-pulse {
+  fill: #ff8f93;
+  filter: drop-shadow(0 0 8px rgba(255, 116, 122, 0.8));
+  animation: meaning-pulse 1.8s ease-in-out infinite;
+}
+
+.meaning-graph-aligned .meaning-edge-pulse,
+.meaning-graph-converged .meaning-edge-pulse {
+  fill: #65d6b1;
+  filter: drop-shadow(0 0 8px rgba(101, 214, 177, 0.75));
+}
+
+.meaning-graph-refused .meaning-edge-pulse {
+  fill: #efb35d;
+  filter: drop-shadow(0 0 8px rgba(239, 179, 93, 0.72));
+}
+
+.meaning-edge-pulse.is-explored {
+  fill: #bba8ff;
+  filter: drop-shadow(0 0 9px rgba(187, 168, 255, 0.82));
+}
+
+.meaning-definition-node rect {
+  fill: #142443;
+  stroke: #40567d;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 13px 18px rgba(0, 0, 0, 0.24));
+}
+
+.meaning-definition-node.is-explored {
+  animation: meaning-node-pop 320ms ease-out;
+}
+
+.meaning-definition-node.is-explored rect {
+  fill: #241e55;
+  stroke: #a58fff;
+  stroke-width: 2;
+}
+
+.meaning-node-owner {
+  fill: #b9c7e2;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.meaning-node-count,
+.meaning-canonical-count {
+  fill: #fff;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.meaning-node-unit {
+  fill: #8fa0be;
+  font-size: 11px;
+}
+
+.meaning-node-meta {
+  fill: #8495b5;
+  font-size: 10px;
+}
+
+.meaning-impact-badge rect {
+  fill: rgba(8, 18, 39, 0.94);
+  stroke: #ab4f56;
+  stroke-width: 1.5;
+}
+
+.meaning-graph-exploring .meaning-impact-badge rect {
+  stroke: #8069e5;
+}
+
+.meaning-graph-refused .meaning-impact-badge rect {
+  stroke: #b97928;
+}
+
+.meaning-graph-aligned .meaning-impact-badge rect {
+  stroke: #2d9676;
+}
+
+.meaning-impact-kicker {
+  fill: #dc9397;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.meaning-graph-exploring .meaning-impact-kicker {
+  fill: #b9a8ff;
+}
+
+.meaning-graph-refused .meaning-impact-kicker {
+  fill: #efbd76;
+}
+
+.meaning-graph-aligned .meaning-impact-kicker {
+  fill: #81d8bc;
+}
+
+.meaning-impact-count {
+  fill: #fff;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.meaning-impact-unit {
+  fill: #8d9bb4;
+  font-size: 10px;
+}
+
+.meaning-impact-money {
+  fill: #ff9fa3;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.meaning-graph-exploring .meaning-impact-money {
+  fill: #c4b7ff;
+}
+
+.meaning-graph-refused .meaning-impact-money {
+  fill: #f5c47e;
+}
+
+.meaning-graph-aligned .meaning-impact-money {
+  fill: #89dec2;
+}
+
+.meaning-refusal-marker rect {
+  fill: rgba(83, 50, 12, 0.9);
+  stroke: #c98931;
+}
+
+.meaning-refusal-marker text {
+  fill: #f6cf98;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+}
+
+.meaning-refusal-marker text:last-child {
+  fill: #cda96f;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.meaning-canonical-node {
+  animation: meaning-converge 440ms ease-out;
+}
+
+.meaning-canonical-node rect {
+  fill: #123d39;
+  stroke: #53c9a5;
+  stroke-width: 2;
+  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.28));
+}
+
+.meaning-node-kicker {
+  fill: #8cdbc2;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.meaning-canonical-title {
+  fill: #fff;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.meaning-domain-history circle {
+  fill: #70819f;
+}
+
+.meaning-domain-history text {
+  fill: #8c9ab3;
+  font-size: 10px;
+}
+
+.meaning-graph-footer {
+  align-items: center;
+  padding: 0 28px 24px;
+}
+
+.meaning-graph-footer p {
+  max-width: 75ch;
+  margin: 0;
+  color: #aebbd2;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.meaning-graph-footer p strong {
+  color: #fff;
+}
+
+.meaning-graph-footer > span {
+  color: #7f8da9;
+  font-size: 9px;
+  text-align: right;
+}
+
+.meaning-graph.is-reduced-motion *,
+.meaning-graph.is-reduced-motion *::before,
+.meaning-graph.is-reduced-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@keyframes meaning-edge-flow {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+@keyframes meaning-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.78);
+    transform-origin: center;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    transform-origin: center;
+  }
+}
+
+@keyframes meaning-node-pop {
+  from {
+    opacity: 0.6;
+    transform: translateY(5px) scale(0.97);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transform-origin: center;
+  }
+}
+
+@keyframes meaning-converge {
+  from {
+    opacity: 0;
+    transform: translate(700px, 130px) scale(0.88);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: translate(650px, 130px) scale(1);
+    transform-origin: center;
+  }
+}
+
 .dashboard-disagreement,
 .surface,
 .semantic-pr,
@@ -930,17 +1371,22 @@ summary:focus-visible {
   grid-template-columns: minmax(200px, 0.85fr) minmax(260px, 1.4fr) auto;
   gap: 16px;
   align-items: end;
+  min-width: 0;
 }
 
 .whatif-controls label {
   display: grid;
   gap: 7px;
+  min-width: 0;
   color: #66748c;
   font-size: 10px;
   font-weight: 700;
 }
 
 .whatif-controls select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 42px;
   padding: 0 12px;
   border: 1px solid #d8deea;
@@ -969,6 +1415,7 @@ summary:focus-visible {
   grid-template-columns: 30px 1fr 30px;
   gap: 8px;
   align-items: center;
+  min-width: 0;
 }
 
 .window-stepper input {
@@ -2019,6 +2466,29 @@ summary:focus-visible {
     width: 100%;
     gap: 15px;
     justify-content: space-between;
+  }
+
+  .meaning-graph-heading,
+  .meaning-graph-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .meaning-graph-heading {
+    padding: 22px 20px 0;
+  }
+
+  .meaning-graph-heading h2 {
+    font-size: 20px;
+  }
+
+  .meaning-graph-footer {
+    gap: 9px;
+    padding: 0 20px 22px;
+  }
+
+  .meaning-graph-footer > span {
+    text-align: left;
   }
 
   .dashboard-disagreement,

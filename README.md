@@ -9,7 +9,7 @@
 [![Status](https://img.shields.io/badge/Status-Agent_Framework_ready-0078D4)](#implementation-status)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
+![Concord IQ meaning fork showing three Active Customer definitions and their proven impact](docs/assets/meaning-fork.svg)
 
 > Enterprises built a single source of truth for data, but not for meaning.
 
@@ -48,7 +48,10 @@ Beyond one-off detection, Concord IQ **watches, scores, and gates**: an autonomo
 portfolio scan ranks every conflict, a Concord Score grades organizational
 semantic health, a natural-language chat surface grounds questions through
 NL2Ontology, and a Semantic-PR approval gate merges canonical definitions only
-with the configured authority owner.
+with the configured authority owner. The reviewer workbench leads with a
+deterministic meaning-fork visual: real executed counts diverge, T1.1 what-if values
+move live, authority refusal leaves the fork unresolved, and an approved canonical
+collapses it into one governed node.
 
 ## Why it matters
 
@@ -76,6 +79,8 @@ Concord IQ:
 12. Gate canonical definitions behind owner-only approval (`POST /proposals/{id}/approve`).
 13. Promote an approved, versioned canonical meaning in Concord's registry and use it
     on the next reconciliation while preserving departmental definitions as named views.
+14. Render the semantic fork as an accessible SVG driven by those same executed results,
+    including exploration, refusal, equivalence, and governed convergence states.
 
 ## Beyond detection — watch, score, and gate
 
@@ -99,6 +104,19 @@ it inserts itself into a workflow teams cannot skip:
   refused, not guessed.
 
 All four are deterministic and evidence-backed; the LLM never decides any of them.
+
+## The signature meaning fork
+
+The workbench's top visual is a read-only projection of the typed casefile, not a
+second reasoning engine. It labels each departmental definition with its executed
+population and time window, lights the conflict edge only when SQL proves divergence,
+and shows the quantified impact. Moving the deterministic what-if control updates the
+same graph as an explicitly ephemeral exploration. Authorized approval collapses the
+fork using the server-confirmed canonical version; the governed re-run then verifies
+the canonical execution while preserving named domain views.
+
+The SVG is keyboard-focusable, includes a visible text equivalent, and disables its
+motion when the operating system requests reduced motion.
 
 ## The demo scenarios
 
@@ -590,6 +608,7 @@ unsupported governance choices, preserve evidence, and keep cloud access opt-in.
 - [x] Engagement layer: autonomous scan, Concord Score, Semantic-PR approval gate
 - [x] Natural-language chat (`/ask`) with a genuinely IQ-served `nl_query` path
 - [x] Owner-approved canonical promotion with governed re-run and preserved domain views
+- [x] Accessible meaning-fork hero with live exploration, refusal, and convergence states
 - [x] Fabric REST/MCP surfaces verified against Microsoft Learn; F2 budget runbook
 - [ ] Real tenant capture and reviewed sanitized replay
 
