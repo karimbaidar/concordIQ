@@ -7,7 +7,7 @@
 [![IQ architecture](https://img.shields.io/badge/IQ-Fabric_IQ_%2F_Foundry_IQ-00A4EF)](#microsoft-iq-architecture)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Agent_Framework_ready-0078D4)](#implementation-status)
-[![License](https://img.shields.io/badge/License-pending-lightgrey)](#license)
+[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 ![Concord IQ hero placeholder](docs/assets/hero-placeholder.svg)
 
@@ -607,5 +607,6 @@ author's.
 
 ## License
 
-A public license has not been selected yet. Until one is added, normal copyright
-restrictions apply.
+Concord IQ is licensed under the
+[Apache License 2.0](LICENSE), including its explicit patent grant for
+contributors and users.
