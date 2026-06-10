@@ -1,0 +1,95 @@
+{
+  "conflicting_definitions": [
+    {
+      "definition_id": "active_customer_finance",
+      "entity_count": 1600,
+      "executed_sql": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN revenue_events r ON r.customer_id = c.customer_id WHERE r.event_type = 'recognized_revenue' AND CAST(r.event_date AS DATE) BETWEEN DATE '2026-06-01' - INTERVAL 89 DAY AND DATE '2026-06-01' ORDER BY entity_id",
+      "metric_total": 210096000.0,
+      "owner": "Finance",
+      "rule_text": "Customer with recognized revenue during the trailing 90-day reporting window.",
+      "semantic_dimensions": [
+        "revenue-recognition",
+        "activity-window",
+        "customer-population"
+      ],
+      "source_tables": [
+        "customers",
+        "revenue_events"
+      ]
+    },
+    {
+      "definition_id": "active_customer_sales",
+      "entity_count": 1500,
+      "executed_sql": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN opportunities o ON o.customer_id = c.customer_id WHERE o.stage IN ('open', 'won') AND CAST(o.updated_at AS DATE) BETWEEN DATE '2026-06-01' - INTERVAL 179 DAY AND DATE '2026-06-01' ORDER BY entity_id",
+      "metric_total": 196964000.0,
+      "owner": "Sales",
+      "rule_text": "Customer with an open or won opportunity updated during the trailing 180 days.",
+      "semantic_dimensions": [
+        "pipeline-status",
+        "activity-window",
+        "customer-population"
+      ],
+      "source_tables": [
+        "customers",
+        "opportunities"
+      ]
+    },
+    {
+      "definition_id": "active_customer_customer_success",
+      "entity_count": 1334,
+      "executed_sql": "SELECT DISTINCT c.customer_id AS entity_id, c.annual_recurring_revenue AS metric_value FROM customers c JOIN contracts ct ON ct.customer_id = c.customer_id JOIN usage_events u ON u.customer_id = c.customer_id WHERE ct.status = 'active' AND CAST(ct.start_date AS DATE) <= DATE '2026-06-01' AND CAST(ct.end_date AS DATE) >= DATE '2026-06-01' AND u.qualifying = 1 AND CAST(u.event_date AS DATE) BETWEEN DATE '2026-06-01' - INTERVAL 29 DAY AND DATE '2026-06-01' ORDER BY entity_id",
+      "metric_total": 176898000.0,
+      "owner": "Customer Success",
+      "rule_text": "Customer with an active contract and qualifying product usage in the trailing 30 days.",
+      "semantic_dimensions": [
+        "contract-status",
+        "qualifying-usage",
+        "activity-window"
+      ],
+      "source_tables": [
+        "customers",
+        "contracts",
+        "usage_events"
+      ]
+    }
+  ],
+  "evidence_ids": [
+    "cc07f2c3-c9fe-5e96-adbe-a687674d1c39",
+    "06e80e5d-b9b4-508c-b105-0df1b55c7d49",
+    "052d6592-8c64-5b3c-9d1f-18c58e423703"
+  ],
+  "governance": {
+    "authority_status": "clear",
+    "owner": "Data Governance Council",
+    "requires_human_approval": true
+  },
+  "impact": {
+    "arr_delta": 33198000.0,
+    "customer_count_delta": 266,
+    "severity": "high"
+  },
+  "kind": "concord_iq.semantic_pull_request",
+  "proposed_canonical_definition": {
+    "expected_dashboard_impact": "Up to 266 customers and 33,198,000.00 ARR differ across current views.",
+    "migration_notes": [
+      "Rename domain-specific dashboard measures before changing the canonical alias.",
+      "Publish the canonical definition only after steward approval.",
+      "Re-run all three SQL bindings and compare the expected dashboard deltas."
+    ],
+    "rationale": "The three executed definitions diverge by 266 customers and 33,198,000.00 ARR. The proposed canonical definition uses the contract and usage semantics from Customer Success Active Customer; Finance Active Customer remains a governed financial activity view.",
+    "rule_text": "Active Customer means a customer with an active contract and qualifying usage in the trailing 30 days. Finance and Sales variants remain named domain views and must not publish under the unqualified canonical term.",
+    "source_definition_id": "active_customer_customer_success"
+  },
+  "run_id": "4d0e1eda-c65d-4ddb-bc42-2e8aae02f958",
+  "sha256": "81582bd5768365f016032a90dc0c089075aab911e71d03747d5e84ecdb002d5e",
+  "sql_verifier_result": {
+    "checks_passed": 17,
+    "checks_total": 17,
+    "verdict": "conflict",
+    "verification_status": "passed"
+  },
+  "term": "Active Customer",
+  "timestamp_utc": "2026-06-10T00:45:13Z",
+  "verdict": "conflict",
+  "version": "1.0"
+}

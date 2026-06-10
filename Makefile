@@ -2,7 +2,8 @@ UV ?= uv
 PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
-.PHONY: setup postgres seed test lint dev frontend demo scan eval agent-smoke \
+.PHONY: setup postgres seed test test-backend test-frontend lint dev frontend \
+	demo scan eval agent-smoke judge-proof semantic-pr-export work-iq-proof \
 	foundry-agent-dry-run foundry-agent-smoke foundry-hosted-dry-run \
 	foundry-hosted-package foundry-hosted-smoke capture fabric-mcp-diagnose \
 	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
@@ -22,9 +23,13 @@ postgres:
 seed:
 	$(PYTHON) -m concord.seed.seed_duckdb
 
-test:
+test: test-backend test-frontend
+
+test-backend:
 	docker compose up -d --wait postgres
 	$(PYTHON) -m pytest
+
+test-frontend:
 	$(PNPM) --dir frontend test
 
 lint:
@@ -50,6 +55,15 @@ scan: seed
 
 eval: postgres seed
 	$(PYTHON) -m concord.evals
+
+semantic-pr-export: postgres seed
+	$(PYTHON) -m concord.semantic_pr_export
+
+work-iq-proof:
+	$(PYTHON) -m concord.work_iq_proof
+
+judge-proof: postgres seed
+	$(PYTHON) -m concord.judge_proof
 
 agent-smoke: postgres seed
 	PYTHONWARNINGS="ignore::FutureWarning" \

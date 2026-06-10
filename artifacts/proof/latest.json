@@ -1,0 +1,27 @@
+{
+  "commit": "0f8beed6db3656b12edff98fc32a0c5b57b4e45a",
+  "fabric_iq": {
+    "live": "skipped",
+    "mode": "sanitized_replay",
+    "status": "passed"
+  },
+  "foundry_agent_service": {
+    "mode": "hosted_runtime",
+    "status": "skipped"
+  },
+  "local": {
+    "eval": "passed",
+    "frontend_tests": "passed",
+    "lint": "passed",
+    "replay": "passed",
+    "semantic_pr_export": "passed",
+    "tests": "passed"
+  },
+  "mandatory_passed": true,
+  "timestamp_utc": "2026-06-10T00:45:13Z",
+  "work_iq": {
+    "live_recheck": "skipped",
+    "mode": "optional_m365_artifact_grounding",
+    "status": "license_gated"
+  }
+}

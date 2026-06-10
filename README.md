@@ -1,6 +1,6 @@
 # Concord IQ
 
-**The semantic reconciliation agent for enterprise meaning.**
+**Concord IQ detects when different teams use the same business term differently, proves the data impact, and routes a governed fix.**
 
 [![Hackathon](https://img.shields.io/badge/Hackathon-Microsoft_Agents_League_2026-5C2D91)](#hackathon-alignment)
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#hackathon-alignment)
@@ -9,15 +9,50 @@
 [![Status](https://img.shields.io/badge/Status-Agent_Framework_ready-0078D4)](#implementation-status)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
+Finance says **Active Customer** means recognized revenue in the last 90 days.
+
+Sales says **Active Customer** means open or won opportunity updated in the last 180 days.
+
+Customer Success says **Active Customer** means active contract plus qualifying product usage in the last 30 days.
+
+Concord IQ executes each definition, compares the result sets, quantifies the business impact, identifies the governance owner, drafts a semantic pull request, and records an audit trail.
+
+> Concord IQ helps enterprises detect, prove, quantify, and govern conflicting business definitions before those conflicts reach dashboards, AI agents, or board decisions.
+
+| Team | Definition | Count |
+|---|---|---:|
+| Finance | Revenue in trailing 90 days | 1,600 |
+| Sales | Opportunity activity in trailing 180 days | 1,500 |
+| Customer Success | Active contract + usage in trailing 30 days | 1,334 |
+
 ![Concord IQ meaning fork showing three Active Customer definitions and their proven impact](docs/assets/meaning-fork.svg)
 
-> Enterprises built a single source of truth for data, but not for meaning.
+## How Concord IQ uses Microsoft services
 
-Finance, Sales, and Customer Success can use the same business term while binding
-it to different filters, time windows, populations, grains, and sources. Concord IQ
-is designed to find those differences, execute each definition against data, rank
-the material impact, and propose a governed semantic reconciliation. When authority
-is shared or ambiguous, it refuses to choose and routes the decision to a human.
+| Layer | What it does |
+|---|---|
+| Foundry Agent Service | Hosts the Concord IQ agent runtime and exposes the cloud `/responses` endpoint. |
+| Microsoft Agent Framework | Coordinates specialist agents: definition analyst, data executor, authority resolver, verifier, governance drafter. |
+| Fabric IQ | Provides semantic grounding for business terms, reproduced through sanitized replay proof. |
+| Work IQ / SharePoint grounding | Optional path for retrieving real Microsoft 365 definition documents. |
+| Deterministic SQL + verifier | Owns the final verdict. LLMs do not decide conflicts. |
+
+> Work IQ finds where people wrote the definitions. Fabric IQ grounds enterprise semantics. Foundry runs the agents. Concord IQ proves the conflict and governs the fix.
+
+## Prove it in one command
+
+A judge can clone the repo and run a single command to get a full proof report:
+
+```bash
+make judge-proof
+```
+
+It runs the mandatory local verification (tests, lint, eval, replay, semantic PR
+export), runs each optional cloud integration **only** when its credentials are
+present, and writes [`docs/proofs/judge-proof-report.md`](docs/proofs/judge-proof-report.md)
+plus a machine-readable [`artifacts/proof/latest.json`](artifacts/proof/latest.json).
+It fails if a mandatory local proof fails and never fails because optional cloud
+credentials are missing. See the [proof index](docs/proofs/README.md).
 
 ## Implementation status
 
@@ -479,6 +514,55 @@ Framework strict workflow → Concord IQ deterministic tool → ReplayProvider /
 LocalProvider → semantic reconciliation result**. Real `auto` hosting fails closed
 unless cloud access, a positive budget, and a real IQ provider are explicit, and
 never falls back to local silently.
+
+The token examples below never appear in this repo; generate short-lived tokens at
+runtime:
+
+```bash
+export FOUNDRY_HOSTED_ENDPOINT="..."
+export FOUNDRY_ACCESS_TOKEN=$(az account get-access-token \
+  --resource https://ai.azure.com \
+  --query accessToken -o tsv)
+
+PROVIDER=foundry_hosted \
+ALLOW_CLOUD=true \
+MAX_CLOUD_CALLS=1 \
+make foundry-hosted-smoke
+```
+
+## Fabric IQ semantic grounding
+
+Fabric IQ semantic grounding is reproduced through sanitized replay proof — always
+available, no credentials required:
+
+```bash
+make replay-check
+
+ALLOW_CLOUD=true \
+PROVIDER=fabric_iq \
+MAX_CLOUD_CALLS=6 \
+make capture
+```
+
+## Work IQ (Microsoft 365 grounding)
+
+Work IQ retrieves the real SharePoint / Microsoft 365 documents where teams wrote
+the conflicting definitions, through the Microsoft Graph Copilot Retrieval API:
+
+```bash
+export WORK_IQ_ENDPOINT="https://graph.microsoft.com/v1.0/copilot/retrieval"
+export WORK_IQ_DATA_SOURCE="sharePoint"
+export WORK_IQ_ACCESS_TOKEN="<runtime-token>"
+
+ALLOW_CLOUD=true \
+PROVIDER=work_iq \
+MAX_CLOUD_CALLS=3 \
+make work-iq-proof
+```
+
+If the tenant is not entitled for the Retrieval API, Work IQ records `LICENSE-GATED`
+instead of pretending success. See
+[`docs/proofs/work-iq-license-gate.md`](docs/proofs/work-iq-license-gate.md).
 
 ## Cloud and cost safety
 

@@ -22,6 +22,12 @@ node_modules/
 *.duckdb
 postgres-data/
 
+# Tokens and raw cloud payloads (never commit)
+*.token
+.env.local
+concord-work-iq-raw.json
+artifacts/proof/work-iq-status.json
+
 # Replay captures
 artifacts/replay/raw/*
 !artifacts/replay/raw/.gitkeep
