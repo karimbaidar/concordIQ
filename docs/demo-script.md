@@ -1,5 +1,7 @@
 # Demo script — Concord IQ
 
+This document is the reproducible recording runbook for the hackathon demo, including the exact click path, timing, evidence, and approved claims for the submitted build.
+
 The judged artifact is the recorded video (≤5 min, your own work), never a live
 tenant. Record against the local/replay stack. This file is the spine: the click
 order, the screen, and the one line for each beat.
