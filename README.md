@@ -83,7 +83,10 @@ SharePoint, or committed replay artifacts.
 
 ## 5. How Concord IQ works
 
-![Concord IQ architecture](docs/images/concord-iq-architecture.png)
+![Concord IQ architecture: experience, API and runtime, agent orchestration, grounding/data/governance, and governed outcomes](https://gist.githubusercontent.com/karimbaidar/13c0b4f161f4e894afcc39f6e3afbd5f/raw/architecture.png)
+
+> Semantic grounding informs. Deterministic execution proves. Governance authorizes.
+> Humans approve. LLMs explain, but do not decide.
 
 Deterministic SQL owns the verdict. Configured governance owns authority. The Microsoft
 Agent Framework coordinates ten specialist nodes through a typed casefile; the LLM is
