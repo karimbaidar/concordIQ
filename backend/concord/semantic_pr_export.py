@@ -1,4 +1,4 @@
-"""Export the latest governed semantic pull request as a signed proof artifact.
+"""Export the latest governed semantic pull request as a content-hashed proof artifact.
 
 A *semantic pull request* is Concord IQ's governed definition-change record: the
 conflicting departmental definitions, the proposed canonical meaning, the governance
@@ -141,7 +141,7 @@ def build_semantic_pr(case: ReconciliationCase) -> dict[str, Any]:
     return content
 
 
-# Run-scoped identifiers are excluded so the signature is content-addressed: the same
+# Run-scoped identifiers are excluded so the hash is content-addressed: the same
 # governed definition change always produces the same hash. ``evidence_ids`` are uuid5
 # values derived from the per-run id, and ``run_id``/``timestamp_utc`` are per-run.
 _VOLATILE_HASH_FIELDS = frozenset({"timestamp_utc", "run_id", "evidence_ids"})
@@ -151,7 +151,7 @@ def _hash_content(content: dict[str, Any]) -> str:
     """Deterministic SHA-256 over the meaning content (excluding volatile fields).
 
     The timestamp, the per-run ``run_id``, and the run-scoped ``evidence_ids`` are
-    excluded so the same governed definition change always produces the same signature.
+    excluded so the same governed definition change always produces the same content hash.
     """
     hashable = {key: value for key, value in content.items() if key not in _VOLATILE_HASH_FIELDS}
     canonical = json.dumps(hashable, sort_keys=True, separators=(",", ":"))

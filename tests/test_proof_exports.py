@@ -31,7 +31,7 @@ def _no_cloud_settings() -> Settings:
 # --- semantic PR export ---------------------------------------------------
 
 
-def test_semantic_pr_export_writes_signed_artifact(
+def test_semantic_pr_export_writes_content_hashed_artifact(
     reconciliation_runner: ReconciliationRunner,
     isolated_canonical_registry: None,
     tmp_path: Path,

@@ -41,7 +41,7 @@ help:
 	@echo "  make foundry-hosted-smoke Foundry Agent Service hosted smoke"
 	@echo "  make fabric-proof         Fabric IQ sanitized replay proof"
 	@echo "  make work-iq-proof        Work IQ retrieval proof (honest status)"
-	@echo "  make semantic-pr-export   Signed semantic-PR export artifact"
+	@echo "  make semantic-pr-export   SHA-256 content-hashed semantic-PR export"
 	@echo ""
 	@echo "Maintenance"
 	@echo "  make seed          Reseed deterministic DuckDB data"

@@ -1,8 +1,8 @@
 # Concord IQ
 
-**Version control for business meaning.** Concord IQ detects when teams use the same
-metric name differently, executes every definition against data, quantifies the impact,
-and turns the resolution into an authority-gated semantic pull request.
+**Version control for business meaning.** 
+
+Concord IQ is governed semantic AI that proves and resolves business definition conflicts. It grounds business meaning through Microsoft Fabric IQ, Foundry IQ, or Microsoft 365 Work IQ; executes competing definitions against data; quantifies their operational impact; and routes the resolution through a Microsoft Agent Framework workflow that can run in-process or in Microsoft Foundry Agent Service.
 
 [![Hackathon](https://img.shields.io/badge/Hackathon-Microsoft_Agents_League_2026-5C2D91)](#7-microsoft-integration-truth-table)
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#7-microsoft-integration-truth-table)
@@ -24,6 +24,9 @@ and turns the resolution into an authority-gated semantic pull request.
 
 A naming match does not prove operational equivalence. A wording difference does not
 prove a real data conflict. Concord IQ settles both with executed SQL.
+
+**What is a semantic PR?**
+A semantic pull request is a reviewable, evidence-backed proposal to change a business definition. It contains the competing definitions, executed results, quantified impact, authority owner, verifier findings, and approval history.
 
 ![Concord IQ meaning fork showing three Active Customer definitions and their proven impact](docs/assets/meaning-fork.svg)
 
@@ -51,11 +54,17 @@ make judge-proof
 ```
 
 This runs the mandatory local proof — backend + frontend tests, lint/typecheck, the
-deterministic eval scorecard, replay verification, the signed semantic-PR export, and a
+deterministic eval scorecard, replay verification, the SHA-256 content-hashed semantic-PR export, and a
 local demo smoke — then reports optional cloud evidence honestly. It fails only when a
 mandatory local check fails; missing cloud credentials are reported as `skipped`, never
 as success. Output lands in [`docs/proofs/judge-proof-report.md`](docs/proofs/judge-proof-report.md)
 and [`artifacts/proof/latest.json`](artifacts/proof/latest.json).
+
+## Demo and evidence
+
+- [Watch the five-minute demo](VIDEO_URL)
+- [Read the judge proof report](docs/proofs/judge-proof-report.md)
+- [Inspect the reproducible proof bundle](artifacts/proof/latest.json)
 
 ## 4. Demo modes
 
@@ -81,31 +90,169 @@ volume and DuckDB), reseeds, and verifies the unresolved three-way conflict befo
 starting — so a recording always opens cold. It never touches Azure, Fabric, Foundry,
 SharePoint, or committed replay artifacts.
 
+
 ## 5. How Concord IQ works
 
-![Concord IQ architecture: experience, API and runtime, agent orchestration, grounding/data/governance, and governed outcomes](https://gist.githubusercontent.com/karimbaidar/13c0b4f161f4e894afcc39f6e3afbd5f/raw/architecture.png)
+![Concord IQ architecture](docs/assets/architecture.png)
 
-> Semantic grounding informs. Deterministic execution proves. Governance authorizes.
-> Humans approve. LLMs explain, but do not decide.
+>Ground the meaning. Prove the impact. Govern the resolution.
 
-Deterministic SQL owns the verdict. Configured governance owns authority. The Microsoft
-Agent Framework coordinates ten specialist nodes through a typed casefile; the LLM is
-optional narration that can never change a verdict, authority decision, or refusal. The
-skeptical verifier blocks unsupported cases, and ambiguous authority causes a refusal,
-not a guess.
+Semantic grounding informs the case. Deterministic SQL owns the verdict. Configured governance determines authority. Humans approve canonical promotion. Optional LLM narration explains the verified result but cannot change evidence, counts, verdicts, authority decisions, refusals, or approvals.
+
+Microsoft Agent Framework coordinates ten specialist nodes through a typed casefile. The skeptical verifier blocks unsupported cases, and ambiguous authority causes a governed refusal rather than a guess.
 
 ```text
-CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
--> ConflictHypothesisAgent -> DataExecutionAgent -> ImpactRankerAgent
--> AuthorityResolverAgent -> ReconciliationAgent
--> SkepticalVerifierAgent -> AuditAgent
+CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent -> ConflictHypothesisAgent -> DataExecutionAgent -> ImpactRankerAgent -> AuthorityResolverAgent -> ReconciliationAgent -> SkepticalVerifierAgent -> AuditAgent
 ```
 
-The reviewer workbench leads with the meaning-fork visual: real executed counts diverge,
-the deterministic what-if control moves the dollar impact live, authority refusal leaves
-the fork unresolved, and an approved canonical collapses it into one governed node. More
-detail lives in [architecture](docs/architecture.md) and
-[IQ integration](docs/iq-integration.md).
+The reviewer workbench leads with the meaning fork: executed definitions produce different customer populations, the deterministic what-if control updates the quantified business impact, authority refusal leaves the conflict unresolved, and an owner-approved canonical definition collapses it into one governed version.
+
+More detail is available in [architecture](docs/architecture.md) and [IQ integration](docs/iq-integration.md).
+
+### Concord IQ multi-agent orchestration
+
+Concord IQ uses Microsoft Agent Framework to coordinate a sequential workflow of ten
+specialist agents over a shared typed semantic casefile. Each stage performs one bounded
+responsibility: resolve the business meaning, execute deterministic proof, quantify the
+impact, resolve governance authority, verify the evidence, and produce an auditable
+business outcome.
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "flowchart": {
+    "curve": "basis",
+    "nodeSpacing": 48,
+    "rankSpacing": 62,
+    "htmlLabels": true,
+    "padding": 18
+  },
+  "themeVariables": {
+    "background": "#ffffff",
+    "mainBkg": "#ffffff",
+    "primaryColor": "#ffffff",
+    "primaryTextColor": "#172033",
+    "primaryBorderColor": "#cbd5e1",
+    "lineColor": "#64748b",
+    "clusterBkg": "#ffffff",
+    "clusterBorder": "#e2e8f0",
+    "fontFamily": "Inter, Segoe UI, Arial, sans-serif",
+    "fontSize": "15px"
+  }
+}}%%
+
+flowchart TB
+
+    INPUT(["Business Question<br/><br/>Why do teams report different results<br/>for the same business term?"])
+
+    ORCH["Concord IQ Orchestrator<br/><br/><b>Sequential Specialist Workflow</b><br/>Creates, routes, and validates the semantic case"]
+
+    INPUT -->|"Analyze disagreement"| ORCH
+
+    subgraph WORKFLOW["Microsoft Agent Framework · Specialist Workflow"]
+        direction LR
+
+        SEMANTIC["<b>1 · Resolve Meaning</b><br/><br/>CoordinatorAgent<br/>ConceptResolverAgent<br/>BindingInspectorAgent"]
+
+        PROOF["<b>2 · Prove the Conflict</b><br/><br/>ConflictHypothesisAgent<br/>DataExecutionAgent<br/>ImpactRankerAgent"]
+
+        GOVERN["<b>3 · Govern the Resolution</b><br/><br/>AuthorityResolverAgent<br/>ReconciliationAgent"]
+
+        ASSURE["<b>4 · Verify and Audit</b><br/><br/>SkepticalVerifierAgent<br/>AuditAgent"]
+
+        SEMANTIC -->|"Grounded definitions"| PROOF
+        PROOF -->|"Executed evidence<br/>and quantified impact"| GOVERN
+        GOVERN -->|"Proposal, refusal,<br/>or no action"| ASSURE
+    end
+
+    ORCH -->|"Create typed case"| SEMANTIC
+
+    CASEFILE[("Shared Typed Semantic Casefile<br/><br/>Concept · definitions · bindings<br/>evidence · impact · authority · verification")]
+
+    SEMANTIC -. "Add semantic context" .-> CASEFILE
+    PROOF -. "Add evidence and impact" .-> CASEFILE
+    GOVERN -. "Add authority and action" .-> CASEFILE
+    ASSURE -. "Add verification and audit" .-> CASEFILE
+
+    ASSURE --> CHECK{"Case verified?"}
+
+    CHECK -->|"Recoverable gap"| ORCH
+    CHECK -->|"Yes"| RESULT
+
+    RESULT(["Governed Business Outcome<br/><br/>Conflict proved · false conflict rejected<br/>governed refusal · semantic PR created"])
+
+    RESULT -->|"Canonical change proposed"| HUMAN["Authority Owner Review<br/><br/>Human-in-the-loop approval"]
+
+    HUMAN -->|"Approve"| APPROVED(["Canonical Definition Approved"])
+    HUMAN -->|"Reject"| UNMERGED(["Proposal Remains Unmerged"])
+
+    classDef input fill:#f8fafc,stroke:#94a3b8,stroke-width:1.8px,color:#0f172a;
+    classDef orchestrator fill:#2563eb,stroke:#1d4ed8,stroke-width:2.5px,color:#ffffff;
+    classDef semantic fill:#eef2ff,stroke:#6366f1,stroke-width:1.8px,color:#1e1b4b;
+    classDef proof fill:#ecfeff,stroke:#0891b2,stroke-width:1.8px,color:#164e63;
+    classDef governance fill:#fff7ed,stroke:#ea580c,stroke-width:1.8px,color:#7c2d12;
+    classDef assurance fill:#faf5ff,stroke:#9333ea,stroke-width:1.8px,color:#581c87;
+    classDef casefile fill:#ffffff,stroke:#64748b,stroke-width:1.6px,color:#334155,stroke-dasharray:6 4;
+    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f;
+    classDef result fill:#ecfdf5,stroke:#16a34a,stroke-width:2px,color:#14532d;
+    classDef human fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#172554;
+    classDef rejected fill:#fef2f2,stroke:#dc2626,stroke-width:1.8px,color:#7f1d1d;
+
+    class INPUT input;
+    class ORCH orchestrator;
+    class SEMANTIC semantic;
+    class PROOF proof;
+    class GOVERN governance;
+    class ASSURE assurance;
+    class CASEFILE casefile;
+    class CHECK decision;
+    class RESULT,APPROVED result;
+    class HUMAN human;
+    class UNMERGED rejected;
+
+    linkStyle default stroke:#64748b,stroke-width:1.6px;
+```
+
+The orchestrator creates and routes a typed semantic casefile through four functional
+agent groups. Semantic grounding informs the case, deterministic execution proves the
+result, configured governance identifies the accountable authority, and the skeptical
+verifier blocks unsupported outcomes. Canonical promotion remains subject to human
+approval.
+
+### Model support and extensibility
+
+Concord IQ separates model-generated explanation from deterministic decision-making.
+
+The current repository includes:
+
+* `disabled` mode for fully deterministic and reproducible runs
+* an optional local Ollama narration provider
+* a provider-neutral `LLMProvider` interface for future hosted-model integrations
+
+The provider interface is designed so Microsoft Foundry-hosted GPT, Claude, or other
+compatible models can be added without changing the reconciliation, evidence,
+governance, verification, or approval pipeline.
+
+Models may be used to:
+
+* explain verified conflicts in business language
+* summarize verifier findings
+* produce readable audit narratives
+* draft stakeholder communications from approved evidence
+
+Models cannot change:
+
+* executed SQL or result sets
+* conflict verdicts or quantified impact
+* governance authority
+* refusal decisions
+* semantic PR approval
+* canonical definition promotion
+
+> **Current implementation:** optional Ollama narration
+
+> **Planned extensibility:** GPT, Claude, and other hosted model providers through the existing provider interface
+
 
 ## 6. Getting started in depth
 
