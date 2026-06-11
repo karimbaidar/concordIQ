@@ -31,6 +31,98 @@ flowchart LR
     MAF -. "optional deployment" .-> HOST["Foundry Agent Service"]
 ```
 
+
+### Concord IQ end-to-end runtime sequence
+
+This sequence diagram shows how a business question moves through the Concord IQ
+workbench, API, Microsoft Agent Framework workflow, grounding providers, deterministic
+execution, verification, persistence, and human approval.
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor User as Business User
+    participant UI as Concord IQ Workbench
+    participant API as Concord IQ API<br/>FastAPI
+    participant ORCH as Concord IQ Orchestrator<br/>Microsoft Agent Framework
+    participant GROUND as Grounding Provider<br/>Fabric IQ / Foundry IQ / Work IQ / Replay / Local
+    participant SEM as Semantic Agents<br/>Coordinator / Concept Resolver / Binding Inspector
+    participant PROOF as Proof Agents<br/>Hypothesis / Data Execution / Impact Ranker
+    participant GOV as Governance Agents<br/>Authority Resolver / Reconciliation
+    participant VERIFY as Assurance Agents<br/>Skeptical Verifier / Audit
+    participant DB as Deterministic Services<br/>DuckDB / PostgreSQL / Semantic Registry
+    participant LLM as Optional Model<br/>GPT / Claude / Ollama
+    actor Owner as Authority Owner
+
+    User->>UI: Ask why a business term disagrees
+    UI->>API: Analyze disagreement
+    API->>ORCH: Create typed semantic casefile
+
+    ORCH->>GROUND: Select one grounding provider for this run
+    GROUND-->>ORCH: Governed concept, definitions, bindings, citations
+
+    ORCH->>SEM: Resolve meaning and inspect definitions
+    SEM->>DB: Read definitions, owners, and authority rules
+    DB-->>SEM: Registry metadata
+    SEM-->>ORCH: Grounded semantic context
+
+    ORCH->>PROOF: Test the competing definitions
+    PROOF->>DB: Execute trusted SQL and compare entity sets
+    DB-->>PROOF: Counts, result sets, and evidence
+    PROOF-->>ORCH: Conflict verdict and quantified impact
+
+    ORCH->>GOV: Resolve authority and determine action
+    GOV->>DB: Read governance rules
+    DB-->>GOV: Accountable owner and approval policy
+
+    opt Optional explanation only
+        GOV->>LLM: Explain verified evidence and proposed action
+        LLM-->>GOV: Text narration only
+    end
+
+    GOV-->>ORCH: Propose, refuse, or take no action
+
+    ORCH->>VERIFY: Verify evidence, authority, and decision
+    VERIFY->>DB: Persist case, evidence, proposal, and agent trace
+    DB-->>VERIFY: Persistence confirmed
+
+    alt Verified material conflict with clear authority
+        VERIFY-->>API: Semantic PR created
+        API-->>UI: Show evidence, impact, and accountable owner
+        UI-->>User: Present semantic PR for review
+
+        User->>Owner: Request canonical approval
+
+        alt Owner approves
+            Owner->>API: Approve semantic PR
+            API->>DB: Promote canonical definition in Concord IQ
+            DB-->>API: Canonical version stored
+            API-->>UI: Canonical definition approved
+            UI-->>User: Show governed resolution
+        else Owner rejects
+            Owner->>API: Reject semantic PR
+            API->>DB: Record rejection and audit history
+            API-->>UI: Proposal remains unmerged
+            UI-->>User: Show rejection outcome
+        end
+
+    else Definitions are operationally equivalent
+        VERIFY-->>API: False conflict rejected
+        API-->>UI: Show deterministic proof
+        UI-->>User: No semantic change required
+
+    else Evidence or authority is insufficient
+        VERIFY-->>API: Governed refusal
+        API-->>UI: Show blocking reason and missing evidence
+        UI-->>User: No unsupported decision made
+    end
+```
+
+The optional model can explain verified results, but it cannot change executed evidence,
+the conflict verdict, authority, refusal status, or human approval.
+
+
 ## Reconciliation flow
 
 The Agent Framework graph is:
