@@ -480,6 +480,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+cloud = [
+    { name = "msal" },
+]
 dev = [
     { name = "httpx" },
     { name = "pytest" },
@@ -498,6 +501,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28,<1" },
     { name = "mcp", marker = "extra == 'foundry-hosting'", specifier = ">=1.24,<2" },
+    { name = "msal", marker = "extra == 'cloud'", specifier = ">=1.31,<2" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
     { name = "pydantic-settings", specifier = ">=2.7,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3,<9" },
@@ -505,7 +509,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0,<3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.34,<1" },
 ]
-provides-extras = ["dev", "foundry-hosting"]
+provides-extras = ["dev", "foundry-hosting", "cloud"]
 
 [[package]]
 name = "cryptography"

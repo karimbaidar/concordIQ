@@ -98,7 +98,6 @@ def test_env_example_contains_required_bootstrap_keys() -> None:
         "FABRIC_LAKEHOUSE_ID",
         "FABRIC_ONTOLOGY_ID",
         "FABRIC_IQ_MCP_ENDPOINT",
-        "FABRIC_IQ_ACCESS_TOKEN",
         "FOUNDRY_IQ_ENDPOINT",
         "FOUNDRY_IQ_KNOWLEDGE_BASE",
         "FOUNDRY_PROJECT_ENDPOINT",
@@ -111,6 +110,8 @@ def test_env_example_contains_required_bootstrap_keys() -> None:
     }
     assert required <= keys
     assert "Bearer " not in text
+    # Access tokens are acquired at runtime, never stored in .env.example.
+    assert "FABRIC_IQ_ACCESS_TOKEN=" not in text.replace("# FABRIC_IQ_ACCESS_TOKEN=", "")
 
 
 def test_fabric_bootstrap_dry_run_never_calls_cloud(

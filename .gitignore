@@ -24,9 +24,14 @@ postgres-data/
 
 # Tokens and raw cloud payloads (never commit)
 *.token
+*token*.txt
 .env.local
 concord-work-iq-raw.json
 artifacts/proof/work-iq-status.json
+
+# MSAL token cache and launcher state (never commit)
+msal-token-cache.json
+.concord-dev/
 
 # Replay captures
 artifacts/replay/raw/*

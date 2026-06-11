@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     work_iq_access_token: SecretStr | None = None
     work_iq_data_source: str = "sharePoint"
     work_iq_api_version: str = "beta"
+    work_iq_client_id: str | None = None
+    work_iq_tenant_id: str | None = None
     foundry_hosted_endpoint: str | None = None
     foundry_hosted_agent_id: str | None = None
     foundry_access_token: SecretStr | None = None
