@@ -58,7 +58,7 @@ deterministic eval scorecard, replay verification, the SHA-256 content-hashed se
 
 ## Demo and evidence
 
-- [Watch the five-minute demo](VIDEO_URL)
+- [Watch the five-minute demo](https://youtu.be/RaSYFlbIH-Q)
 - [Read the judge proof report](docs/proofs/judge-proof-report.md)
 - [Inspect the reproducible proof bundle](artifacts/proof/latest.json)
 
