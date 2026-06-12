@@ -54,7 +54,9 @@ make judge-proof
 ```
 
 This runs the mandatory local proof, backend + frontend tests, lint/typecheck, the
-deterministic eval scorecard, replay verification, the SHA-256 content-hashed semantic-PR export, and a
+deterministic eval scorecard, replay verification, and the SHA-256 content-hashed
+semantic-PR export, then writes a reproducible proof bundle you can inspect under
+`artifacts/proof/`.
 
 ## Demo and evidence
 
@@ -66,8 +68,6 @@ When the app first opens, the **Workbench**, **Reasoning**, and **Evidence** nav
 links may not scroll anywhere because no analysis result exists yet. Select a scenario
 and click **Analyze disagreement**. Once the result is rendered, those links navigate to
 their corresponding sections.
-
-> Remove the video link until the final YouTube or Vimeo URL is available.
 
 ## 4. Demo modes
 
