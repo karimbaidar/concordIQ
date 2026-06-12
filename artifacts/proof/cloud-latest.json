@@ -1,5 +1,4 @@
 {
-  "commit": "bdc1d0e3670dbf490da776baa22bd333cfdbb782",
   "fabric_iq": {
     "live": "skipped",
     "mode": "sanitized_replay",
@@ -9,16 +8,7 @@
     "mode": "hosted_runtime",
     "status": "skipped"
   },
-  "local": {
-    "eval": "passed",
-    "frontend_tests": "passed",
-    "lint": "passed",
-    "replay": "passed",
-    "semantic_pr_export": "passed",
-    "tests": "passed"
-  },
-  "mandatory_passed": true,
-  "timestamp_utc": "2026-06-11T22:56:04Z",
+  "timestamp_utc": "2026-06-11T23:19:23Z",
   "work_iq": {
     "live_recheck": "skipped",
     "mode": "optional_m365_artifact_grounding",

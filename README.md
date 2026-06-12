@@ -53,12 +53,8 @@ Then:
 make judge-proof
 ```
 
-This runs the mandatory local proof — backend + frontend tests, lint/typecheck, the
+This runs the mandatory local proof, backend + frontend tests, lint/typecheck, the
 deterministic eval scorecard, replay verification, the SHA-256 content-hashed semantic-PR export, and a
-local demo smoke — then reports optional cloud evidence honestly. It fails only when a
-mandatory local check fails; missing cloud credentials are reported as `skipped`, never
-as success. Output lands in [`docs/proofs/judge-proof-report.md`](docs/proofs/judge-proof-report.md)
-and [`artifacts/proof/latest.json`](artifacts/proof/latest.json).
 
 ## Demo and evidence
 
@@ -66,29 +62,176 @@ and [`artifacts/proof/latest.json`](artifacts/proof/latest.json).
 - [Read the judge proof report](docs/proofs/judge-proof-report.md)
 - [Inspect the reproducible proof bundle](artifacts/proof/latest.json)
 
+When the app first opens, the **Workbench**, **Reasoning**, and **Evidence** navigation
+links may not scroll anywhere because no analysis result exists yet. Select a scenario
+and click **Analyze disagreement**. Once the result is rendered, those links navigate to
+their corresponding sections.
+
+> Remove the video link until the final YouTube or Vimeo URL is available.
+
 ## 4. Demo modes
+
+Only one Concord IQ development mode should run at a time. All modes use:
+
+- Backend: `http://127.0.0.1:8000`
+- Frontend: `http://127.0.0.1:5173`
+
+### Stop the current mode before switching
+
+```bash
+make stop
+```
+
+If startup reports `address already in use`, stop any remaining listeners on ports
+`8000` and `5173`:
+
+```bash
+for port in 8000 5173; do
+  pids="$(lsof -tiTCP:$port -sTCP:LISTEN)"
+  if [ -n "$pids" ]; then
+    echo "Stopping process(es) on port $port: $pids"
+    kill $pids
+  fi
+done
+```
+
+### Available modes
 
 | Command | Purpose |
 |---|---|
-| `make dev` | Safe local UI — cloud disabled, always local |
-| `make dev-fresh` | Reset synthetic demo state and start the cold-open UI |
-| `make dev-foundry` | Foundry-hosted UI with an automatically acquired token |
-| `make dev-fabric` | Live Fabric IQ mode with an automatically acquired token |
-| `make dev-work-iq` | Work IQ mode with MSAL device-code authentication |
-| `make judge-proof` | Reproducible mandatory judge proof |
-| `make cloud-proof` | All configured live cloud proofs |
-| `make stop` | Stop only the Concord IQ dev processes |
+| `make dev` | Safe local mode with cloud access disabled |
+| `make dev-fresh` | Reset synthetic demo state and start the cold-open local UI |
+| `make dev-foundry` | Run the workflow through Microsoft Foundry Agent Service |
+| `make dev-fabric` | Run with live Microsoft Fabric IQ semantic grounding |
+| `make judge-proof` | Run the reproducible mandatory judge proof |
+| `make cloud-proof` | Run all configured cloud proof checks |
+| `make stop` | Stop Concord IQ processes tracked by the launcher |
 
-`make dev` always forces safe local mode (`PROVIDER=local`, `ALLOW_CLOUD=false`,
-`MAX_CLOUD_CALLS=0`, strict workflow) and strips any inherited cloud tokens, so a stale
-shell or `.env` can never silently invoke a cloud provider. The cloud modes acquire a
-short-lived token at runtime — you never paste a bearer token. See
-[cloud runtime](docs/cloud-runtime.md).
+> `make dev-fresh` always starts local synthetic mode. It does not connect to Foundry
+> Agent Service or Fabric IQ.
 
-`make dev-fresh` resets **only** local synthetic Concord IQ state (the PostgreSQL Docker
-volume and DuckDB), reseeds, and verifies the unresolved three-way conflict before
-starting — so a recording always opens cold. It never touches Azure, Fabric, Foundry,
-SharePoint, or committed replay artifacts.
+Before running above commands, first check the details of each command below:
+
+### Local demo
+
+```bash
+make dev
+```
+
+Use `make dev-fresh` when you want to reset the local PostgreSQL and DuckDB demo state
+before recording:
+
+```bash
+make dev-fresh
+```
+
+### Foundry Agent Service
+
+Please refer first to [Foundry Agent Service](docs/foundry-agent-service.md) and [Cloud Runtime](docs/cloud-runtime.md) for important details.
+
+Stop any currently running Concord IQ mode:
+
+```bash
+make stop
+```
+Authenticate with Azure CLI and select the intended subscription:
+
+```bash
+az login
+az account set --subscription "<subscription-id-or-name>"
+```
+
+Start Concord IQ with Foundry Agent Service:
+
+```bash
+ALLOW_CLOUD=true \
+MAX_CLOUD_CALLS=20 \
+make dev-foundry
+```
+
+
+ALLOW_CLOUD=true explicitly enables cloud access. MAX_CLOUD_CALLS=20 sets a bounded
+cloud-call budget for the development session.
+
+
+After startup, verify the active provider:
+
+```bash
+curl -s http://127.0.0.1:8000/health | python -m json.tool
+```
+
+The response should identify Foundry Agent Service and show that cloud access is enabled.
+
+Then open:
+```bash
+http://127.0.0.1:5173
+```
+
+If Analyze disagreement returns:
+
+Foundry Agent Service is disabled
+
+restart the application using the full command above. This means ALLOW_CLOUD or MAX_CLOUD_CALLS was not passed to the backend process.
+
+### Fabric IQ
+
+Authenticate with Azure CLI and select the intended subscription:
+
+```bash
+az login
+az account set --subscription "<subscription-id-or-name>"
+```
+
+Then start live Fabric IQ grounding:
+
+```bash
+make dev-fabric
+```
+
+In Fabric IQ mode, the health endpoint may report:
+
+```json
+{
+  "provider": "FabricIQProvider",
+  "cloud_enabled": true,
+  "data_type": "synthetic"
+}
+```
+
+This is expected. Fabric IQ supplies the live semantic grounding, while the seeded local
+DuckDB dataset provides reproducible SQL execution and evidence.
+
+### Verify the active provider
+
+After starting any mode, run:
+
+```bash
+curl -s http://127.0.0.1:8000/health | python -m json.tool
+```
+
+Confirm that the response identifies the expected provider before opening:
+
+```text
+http://127.0.0.1:5173
+```
+
+If the browser still shows an earlier provider after the health check succeeds, perform a
+hard refresh.
+
+### Work IQ status
+
+Work IQ is implemented and permission-tested, but live retrieval is currently
+license-gated in the available tenant. It is therefore excluded from the standard demo
+commands above.
+
+The implementation and proof status remain documented in:
+
+- [Microsoft IQ integration](docs/iq-integration.md)
+- [Work IQ license-gate proof](docs/proofs/work-iq-license-gate.md)
+
+Run `make cloud-proof` to report the current Work IQ status without presenting
+`LICENSE-GATED` as a successful live integration.
+
 
 
 ## 5. How Concord IQ works
