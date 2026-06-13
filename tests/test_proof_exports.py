@@ -52,6 +52,8 @@ def test_semantic_pr_export_writes_content_hashed_artifact(
     assert document["governance"]["requires_human_approval"] is True
     assert len(document["sha256"]) == 64
     assert document["evidence_ids"]
+    assert "affected_entity_ids" not in document["impact"]
+    assert "false_positive_entity_ids" not in document["impact"]
 
     written = json.loads(artifact.read_text(encoding="utf-8"))
     assert written["sha256"] == document["sha256"]

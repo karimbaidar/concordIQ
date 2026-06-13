@@ -105,6 +105,22 @@ def build_semantic_pr(case: ReconciliationCase) -> dict[str, Any]:
         )
     authority = case.authority_assessment
     impact = case.impact_assessment
+    impact_document: dict[str, Any] = {
+        "severity": impact.severity if impact else None,
+        "customer_count_delta": impact.customer_count_delta if impact else None,
+        "arr_delta": impact.arr_delta if impact else None,
+    }
+    if impact and impact.false_positive_count is not None:
+        impact_document.update(
+            {
+                "entity_label": impact.entity_label,
+                "value_label": impact.value_label,
+                "affected_entity_ids": list(impact.affected_entity_ids),
+                "false_positive_count": impact.false_positive_count,
+                "false_positive_label": impact.false_positive_label,
+                "false_positive_entity_ids": list(impact.false_positive_entity_ids),
+            }
+        )
     content: dict[str, Any] = {
         "kind": "concord_iq.semantic_pull_request",
         "version": "1.0",
@@ -133,17 +149,7 @@ def build_semantic_pr(case: ReconciliationCase) -> dict[str, Any]:
             else 0,
             "checks_total": len(case.verifier_report.checks) if case.verifier_report else 0,
         },
-        "impact": {
-            "severity": impact.severity if impact else None,
-            "customer_count_delta": impact.customer_count_delta if impact else None,
-            "arr_delta": impact.arr_delta if impact else None,
-            "entity_label": impact.entity_label if impact else None,
-            "value_label": impact.value_label if impact else None,
-            "affected_entity_ids": list(impact.affected_entity_ids) if impact else [],
-            "false_positive_count": impact.false_positive_count if impact else None,
-            "false_positive_label": impact.false_positive_label if impact else None,
-            "false_positive_entity_ids": (list(impact.false_positive_entity_ids) if impact else []),
-        },
+        "impact": impact_document,
         "timestamp_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     return content
