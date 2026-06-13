@@ -1,0 +1,4 @@
+module_id,certification_id,module_name,required
+MOD-FOUNDATIONS,CERT-AZURE-001,Enterprise AI foundations,1
+MOD-GOVERNANCE,CERT-AZURE-001,Responsible AI and governance,1
+MOD-AGENTS,CERT-AZURE-001,Building governed agents,1

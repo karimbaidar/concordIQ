@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "concepts": [
+    {
+      "concept_id": "certification_ready",
+      "canonical_name": "Certification Ready",
+      "description": "A learner represented as ready for an enterprise certification exam.",
+      "aliases": [
+        "certification readiness",
+        "certification-ready",
+        "exam ready",
+        "ready for certification"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "certification_ready",
+      "node_type": "learning_concept",
+      "label": "Certification Ready"
+    },
+    {"node_id": "learner", "node_type": "entity_type", "label": "Learner"},
+    {"node_id": "certification", "node_type": "entity_type", "label": "Certification"},
+    {"node_id": "module_completion", "node_type": "evidence_type", "label": "Module Completion"},
+    {"node_id": "practice_assessment", "node_type": "evidence_type", "label": "Practice Assessment"},
+    {"node_id": "lab_completion", "node_type": "evidence_type", "label": "Lab Completion"},
+    {"node_id": "manager_approval", "node_type": "evidence_type", "label": "Manager Approval"}
+  ],
+  "relationships": [
+    {"source": "certification_ready", "target": "learner", "relationship_type": "selects"},
+    {"source": "certification_ready", "target": "certification", "relationship_type": "governs"},
+    {"source": "certification_ready", "target": "module_completion", "relationship_type": "derived_from"},
+    {"source": "certification_ready", "target": "practice_assessment", "relationship_type": "derived_from"},
+    {"source": "certification_ready", "target": "lab_completion", "relationship_type": "derived_from"},
+    {"source": "certification_ready", "target": "manager_approval", "relationship_type": "derived_from"}
+  ]
+}

@@ -1,0 +1,4 @@
+report_id,business_unit,report_name,business_term,decision_criticality
+LRN001,HR,Workforce Certification Dashboard,Certification Ready,high
+LRN002,Learning & Development,Certification Cohort Readiness,Certification Ready,high
+LRN003,Managers,Team Exam Approval Queue,Certification Ready,high

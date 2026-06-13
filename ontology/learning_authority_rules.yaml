@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "concept_id": "certification_ready",
+      "semantic_dimension": "required-module-completion",
+      "status": "clear",
+      "owner": "HR",
+      "rationale": "HR owns completion records used in workforce reporting."
+    },
+    {
+      "concept_id": "certification_ready",
+      "semantic_dimension": "latest-practice-score",
+      "status": "clear",
+      "owner": "Learning & Development",
+      "rationale": "Learning and Development owns assessment design and score thresholds."
+    },
+    {
+      "concept_id": "certification_ready",
+      "semantic_dimension": "manager-approval",
+      "status": "clear",
+      "owner": "Managers",
+      "rationale": "Managers own operational approval for learner readiness."
+    },
+    {
+      "concept_id": "certification_ready",
+      "semantic_dimension": "canonical-certification-ready",
+      "status": "clear",
+      "owner": "Learning Governance Council",
+      "rationale": "The Learning Governance Council owns the enterprise certification-readiness definition."
+    }
+  ]
+}

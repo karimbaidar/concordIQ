@@ -8,6 +8,7 @@ from typing import Any
 
 import duckdb
 
+from concord.config import ScenarioPack
 from concord.providers.base import (
     AuthorityGrounding,
     AuthorityRule,
@@ -33,6 +34,9 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ONTOLOGY_PATH = REPOSITORY_ROOT / "ontology" / "ontology.yaml"
 DEFAULT_DEFINITIONS_PATH = REPOSITORY_ROOT / "ontology" / "metric_definitions.yaml"
 DEFAULT_AUTHORITY_RULES_PATH = REPOSITORY_ROOT / "ontology" / "authority_rules.yaml"
+LEARNING_ONTOLOGY_PATH = REPOSITORY_ROOT / "ontology" / "learning_ontology.yaml"
+LEARNING_DEFINITIONS_PATH = REPOSITORY_ROOT / "ontology" / "learning_metric_definitions.yaml"
+LEARNING_AUTHORITY_RULES_PATH = REPOSITORY_ROOT / "ontology" / "learning_authority_rules.yaml"
 DEFAULT_DUCKDB_PATH = REPOSITORY_ROOT / "data" / "concord_iq.duckdb"
 TRAILING_WINDOW_PATTERN = re.compile(r"INTERVAL \d+ DAY")
 
@@ -62,6 +66,25 @@ class LocalProvider:
     definitions_path: Path = DEFAULT_DEFINITIONS_PATH
     authority_rules_path: Path = DEFAULT_AUTHORITY_RULES_PATH
     duckdb_path: Path = DEFAULT_DUCKDB_PATH
+    scenario_pack: ScenarioPack = ScenarioPack.BUSINESS
+
+    @classmethod
+    def for_scenario_pack(
+        cls,
+        scenario_pack: ScenarioPack,
+        *,
+        duckdb_path: Path = DEFAULT_DUCKDB_PATH,
+    ) -> "LocalProvider":
+        """Build a provider over one reviewed registry without moving legacy files."""
+        if scenario_pack is ScenarioPack.LEARNING:
+            return cls(
+                ontology_path=LEARNING_ONTOLOGY_PATH,
+                definitions_path=LEARNING_DEFINITIONS_PATH,
+                authority_rules_path=LEARNING_AUTHORITY_RULES_PATH,
+                duckdb_path=duckdb_path,
+                scenario_pack=scenario_pack,
+            )
+        return cls(duckdb_path=duckdb_path, scenario_pack=scenario_pack)
 
     def _ontology(self) -> dict[str, Any]:
         return _load_yaml_document(self.ontology_path)

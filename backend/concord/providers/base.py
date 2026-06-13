@@ -235,7 +235,7 @@ def _governing_owner(rules: Sequence[AuthorityRule]) -> str | None:
     real governance owner (e.g. the Data Governance Council), not a domain owner.
     """
     canonical = next(
-        (rule for rule in rules if rule.semantic_dimension == "canonical-active-customer"),
+        (rule for rule in rules if rule.semantic_dimension.startswith("canonical-")),
         None,
     )
     if canonical and canonical.status == "clear" and canonical.owner:

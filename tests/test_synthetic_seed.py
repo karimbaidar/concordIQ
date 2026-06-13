@@ -6,7 +6,7 @@ import duckdb
 from concord.seed.seed_duckdb import seed_duckdb
 from concord.seed.synthetic_data import TABLE_FIELDS
 
-EXPECTED_DIGEST = "6f7e11e519183bc990eb2daafc7ee8ee9d1ecee6164afcfbb5bc128696b0b602"
+EXPECTED_DIGEST = "67f030f7a2466730a9a0cb8459ed3f00a75a64450a36c90013743983d250026b"
 
 
 def _database_snapshot(database_path: Path) -> dict[str, list[tuple[object, ...]]]:

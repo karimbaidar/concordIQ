@@ -25,7 +25,7 @@ class AuthorityResolverAgent:
     @staticmethod
     def _decide(rules: tuple[AuthorityRule, ...]) -> AuthorityAssessment:
         canonical_rule = next(
-            (rule for rule in rules if rule.semantic_dimension == "canonical-active-customer"),
+            (rule for rule in rules if rule.semantic_dimension.startswith("canonical-")),
             None,
         )
         if canonical_rule and canonical_rule.status == "clear" and canonical_rule.owner:

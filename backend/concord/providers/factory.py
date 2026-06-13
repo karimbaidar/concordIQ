@@ -55,7 +55,10 @@ def create_provider(settings: Settings) -> GroundingProvider:
     except ValueError as error:
         raise ProviderNotConfigured(f"Unknown provider mode: {settings.provider}") from error
     if mode is ProviderMode.LOCAL:
-        return LocalProvider(duckdb_path=settings.duckdb_path)
+        return LocalProvider.for_scenario_pack(
+            settings.scenario_pack,
+            duckdb_path=settings.duckdb_path,
+        )
     if mode is ProviderMode.REPLAY:
         return ReplayProvider(
             settings.replay_artifact_path,

@@ -73,6 +73,13 @@ class ReconciliationAgent:
             )
         if concept_id == "active_customer":
             proposal = self._active_customer_proposal(bindings, impact, authority, evidence)
+        elif concept_id == "certification_ready":
+            proposal = self._certification_ready_proposal(
+                bindings,
+                impact,
+                authority,
+                evidence,
+            )
         else:
             proposal = self._generic_proposal(concept_id, bindings, impact, authority, evidence)
         decision = ReconciliationDecision(
@@ -181,6 +188,45 @@ class ReconciliationAgent:
             requires_human_approval=True,
             evidence_refs=tuple(item.evidence_id for item in evidence),
             canonical_source_definition_id=anchor.definition_id,
+        )
+
+    @staticmethod
+    def _certification_ready_proposal(
+        bindings: tuple[DefinitionBinding, ...],
+        impact: ImpactAssessment,
+        authority: AuthorityAssessment,
+        evidence: tuple[EvidenceRecord, ...],
+    ) -> ReconciliationProposal:
+        learning = next(
+            binding for binding in bindings if binding.owner == "Learning & Development"
+        )
+        false_ready_count = impact.false_positive_count or 0
+        return ReconciliationProposal(
+            canonical_definition=(
+                "Certification Ready means a learner has completed every required "
+                "learning module and scored at least 80 percent on the latest practice "
+                "assessment. Manager readiness remains a named operational view until "
+                "the Learning Governance Council approves a broader composition."
+            ),
+            rationale=(
+                f"HR marks {false_ready_count} learners ready who do not meet the "
+                f"Learning and Development practice threshold, exposing "
+                f"{impact.arr_delta:,.2f} in synthetic exam-voucher spend. "
+                f"{authority.owner} governs the enterprise readiness term."
+            ),
+            migration_notes=(
+                "Rename HR completion and manager approval measures as explicit domain views.",
+                "Publish the canonical readiness measure only after council approval.",
+                "Re-run all three SQL bindings before releasing exam vouchers.",
+            ),
+            expected_dashboard_impact=(
+                f"{false_ready_count} false-ready learners and "
+                f"{impact.arr_delta:,.2f} in synthetic exam spend are exposed."
+            ),
+            authority_owner=authority.owner or "",
+            requires_human_approval=True,
+            evidence_refs=tuple(item.evidence_id for item in evidence),
+            canonical_source_definition_id=learning.definition_id,
         )
 
     def _narrate(

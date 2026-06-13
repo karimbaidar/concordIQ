@@ -176,6 +176,7 @@ def test_api_health(
         "llm_provider": "DisabledLLMProvider",
         "llm_enabled": False,
         "llm_model": None,
+        "scenario_pack": "business",
     }
 
 

@@ -15,6 +15,8 @@ REFERENCE_DATE = date(2026, 6, 1)
 # Enterprise-scale synthetic book so demo numbers read like a real board metric
 # (≈1,600 / 1,500 / 1,333 Active Customers) while staying tiny for DuckDB/Fabric.
 CUSTOMER_COUNT = 2000
+LEARNER_COUNT = 120
+EXAM_VOUCHER_COST = 450
 
 type Scalar = str | int | float
 type Row = dict[str, Scalar]
@@ -66,6 +68,66 @@ TABLE_FIELDS: dict[str, tuple[str, ...]] = {
         "reason",
     ),
     "reports": (
+        "report_id",
+        "business_unit",
+        "report_name",
+        "business_term",
+        "decision_criticality",
+    ),
+    "learners": (
+        "learner_id",
+        "learner_name",
+        "team",
+        "role",
+        "certification_id",
+        "exam_voucher_cost",
+    ),
+    "certifications": (
+        "certification_id",
+        "certification_name",
+        "provider",
+        "level",
+    ),
+    "required_modules": (
+        "module_id",
+        "certification_id",
+        "module_name",
+        "required",
+    ),
+    "module_completions": (
+        "completion_id",
+        "learner_id",
+        "module_id",
+        "completed",
+        "completed_at",
+    ),
+    "practice_assessments": (
+        "assessment_id",
+        "learner_id",
+        "score",
+        "attempted_at",
+    ),
+    "required_labs": (
+        "lab_id",
+        "certification_id",
+        "lab_name",
+        "required",
+    ),
+    "lab_completions": (
+        "completion_id",
+        "learner_id",
+        "lab_id",
+        "completed",
+        "completed_at",
+    ),
+    "manager_approvals": (
+        "approval_id",
+        "learner_id",
+        "approved",
+        "approved_at",
+        "manager_name",
+    ),
+    "learning_reports": (
         "report_id",
         "business_unit",
         "report_name",
@@ -269,6 +331,128 @@ def generate_synthetic_data(seed: int = FIXED_SEED) -> SyntheticDataset:
             "report_name": "Demand Funnel",
             "business_term": "Qualified Lead",
             "decision_criticality": "medium",
+        },
+    ]
+
+    certification_id = "CERT-AZURE-001"
+    tables["certifications"] = [
+        {
+            "certification_id": certification_id,
+            "certification_name": "Azure Enterprise AI Practitioner",
+            "provider": "Microsoft",
+            "level": "Associate",
+        }
+    ]
+    modules = (
+        ("MOD-FOUNDATIONS", "Enterprise AI foundations"),
+        ("MOD-GOVERNANCE", "Responsible AI and governance"),
+        ("MOD-AGENTS", "Building governed agents"),
+    )
+    tables["required_modules"] = [
+        {
+            "module_id": module_id,
+            "certification_id": certification_id,
+            "module_name": module_name,
+            "required": 1,
+        }
+        for module_id, module_name in modules
+    ]
+    labs = (
+        ("LAB-AGENT", "Build a deterministic agent workflow"),
+        ("LAB-SAFETY", "Verify a governed refusal"),
+    )
+    tables["required_labs"] = [
+        {
+            "lab_id": lab_id,
+            "certification_id": certification_id,
+            "lab_name": lab_name,
+            "required": 1,
+        }
+        for lab_id, lab_name in labs
+    ]
+
+    teams = ("Platform", "Security", "Data", "Applications")
+    roles = ("Engineer", "Architect", "Analyst")
+    for index in range(1, LEARNER_COUNT + 1):
+        learner_id = f"L{index:03d}"
+        tables["learners"].append(
+            {
+                "learner_id": learner_id,
+                "learner_name": f"Contoso Learner {index:03d}",
+                "team": teams[(index - 1) % len(teams)],
+                "role": roles[(index - 1) % len(roles)],
+                "certification_id": certification_id,
+                "exam_voucher_cost": EXAM_VOUCHER_COST,
+            }
+        )
+
+        completed_module_count = len(modules) if index <= 80 else len(modules) - 1
+        for module_index, (module_id, _) in enumerate(modules[:completed_module_count], start=1):
+            tables["module_completions"].append(
+                {
+                    "completion_id": f"MC-{index:03d}-{module_index}",
+                    "learner_id": learner_id,
+                    "module_id": module_id,
+                    "completed": 1,
+                    "completed_at": _iso(REFERENCE_DATE - timedelta(days=20 + module_index)),
+                }
+            )
+
+        practice_score = 86 if index <= 56 else 72 if index <= 80 else 84
+        tables["practice_assessments"].append(
+            {
+                "assessment_id": f"PA-{index:03d}",
+                "learner_id": learner_id,
+                "score": practice_score,
+                "attempted_at": _iso(REFERENCE_DATE - timedelta(days=7)),
+            }
+        )
+
+        manager_ready = 41 <= index <= 96
+        completed_lab_count = len(labs) if manager_ready else len(labs) - 1
+        for lab_index, (lab_id, _) in enumerate(labs[:completed_lab_count], start=1):
+            tables["lab_completions"].append(
+                {
+                    "completion_id": f"LC-{index:03d}-{lab_index}",
+                    "learner_id": learner_id,
+                    "lab_id": lab_id,
+                    "completed": 1,
+                    "completed_at": _iso(REFERENCE_DATE - timedelta(days=10 + lab_index)),
+                }
+            )
+        tables["manager_approvals"].append(
+            {
+                "approval_id": f"MA-{index:03d}",
+                "learner_id": learner_id,
+                "approved": 1 if manager_ready else 0,
+                "approved_at": (
+                    _iso(REFERENCE_DATE - timedelta(days=3)) if manager_ready else ""
+                ),
+                "manager_name": f"Manager {(index - 1) // 10 + 1:02d}",
+            }
+        )
+
+    tables["learning_reports"] = [
+        {
+            "report_id": "LRN001",
+            "business_unit": "HR",
+            "report_name": "Workforce Certification Dashboard",
+            "business_term": "Certification Ready",
+            "decision_criticality": "high",
+        },
+        {
+            "report_id": "LRN002",
+            "business_unit": "Learning & Development",
+            "report_name": "Certification Cohort Readiness",
+            "business_term": "Certification Ready",
+            "decision_criticality": "high",
+        },
+        {
+            "report_id": "LRN003",
+            "business_unit": "Managers",
+            "report_name": "Team Exam Approval Queue",
+            "business_term": "Certification Ready",
+            "decision_criticality": "high",
         },
     ]
 

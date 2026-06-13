@@ -7,8 +7,12 @@ from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel
 
 from concord.agents.coordinator import CoordinatorAgent, UnsupportedScenario
-from concord.config import CloudAccessDisabled, Settings
-from concord.demo import DEMO_SCENARIOS, get_demo_scenario
+from concord.config import CloudAccessDisabled, ScenarioPack, Settings
+from concord.demo import (
+    demo_scenarios_for_pack,
+    demo_scenarios_for_provider,
+    get_demo_scenario,
+)
 from concord.ms_agent import ConcordAgentWorkflow
 from concord.orchestration.casefile import (
     AgentTraceStep,
@@ -103,6 +107,20 @@ def _hosted_runtime(request: Request) -> FoundryHostedProvider | None:
     return request.app.state.foundry_hosted_provider
 
 
+def _active_scenario_pack(request: Request) -> ScenarioPack:
+    runner = request.app.state.reconciliation_runner
+    if runner is not None:
+        return getattr(runner.provider, "scenario_pack", ScenarioPack.BUSINESS)
+    return ScenarioPack.BUSINESS
+
+
+def _active_demo_scenarios(request: Request):
+    runner = request.app.state.reconciliation_runner
+    if runner is not None:
+        return demo_scenarios_for_provider(runner.provider)
+    return demo_scenarios_for_pack(_active_scenario_pack(request))
+
+
 def _known_terms(request: Request) -> list[str]:
     """The governed terms Concord IQ can actually reconcile (never fabricated)."""
     runner = request.app.state.reconciliation_runner
@@ -145,6 +163,7 @@ def health(request: Request) -> dict[str, object]:
             "llm_provider": llm_provider.name,
             "llm_enabled": llm_provider.enabled,
             "llm_model": llm_provider.model,
+            "scenario_pack": _active_scenario_pack(request).value,
         }
     runner = _runner(request)
     return {
@@ -157,6 +176,7 @@ def health(request: Request) -> dict[str, object]:
         "llm_provider": runner.llm_provider.name,
         "llm_enabled": runner.llm_provider.enabled,
         "llm_model": runner.llm_provider.model,
+        "scenario_pack": _active_scenario_pack(request).value,
     }
 
 
@@ -335,8 +355,8 @@ def _decide(
 
 
 @router.get("/demo/scenarios")
-def demo_scenarios() -> list[dict[str, str]]:
-    return [scenario.as_dict() for scenario in DEMO_SCENARIOS]
+def demo_scenarios(request: Request) -> list[dict[str, str]]:
+    return [scenario.as_dict() for scenario in _active_demo_scenarios(request)]
 
 
 @router.post("/demo/run/{scenario_id}", response_model=ReconciliationCase)
@@ -345,7 +365,7 @@ async def run_demo_scenario(
     request: Request,
 ) -> ReconciliationCase:
     try:
-        scenario = get_demo_scenario(scenario_id)
+        scenario = get_demo_scenario(scenario_id, _active_demo_scenarios(request))
     except KeyError as error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

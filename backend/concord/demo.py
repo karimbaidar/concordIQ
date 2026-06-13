@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from concord.config import Settings
+from concord.config import ScenarioPack, Settings
 from concord.llm import create_llm_provider
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
@@ -31,7 +31,7 @@ class DemoScenario:
         }
 
 
-DEMO_SCENARIOS = (
+BUSINESS_DEMO_SCENARIOS = (
     DemoScenario(
         scenario_id="active-customer",
         term="Active Customer",
@@ -49,11 +49,41 @@ DEMO_SCENARIOS = (
     ),
 )
 
+LEARNING_DEMO_SCENARIOS = (
+    DemoScenario(
+        scenario_id="certification-ready",
+        term="Certification Ready",
+        question=(
+            "Do HR, Learning and Development, and managers agree on who is "
+            "Certification Ready?"
+        ),
+    ),
+)
 
-def get_demo_scenario(scenario_id: str) -> DemoScenario:
+# Existing Fabric/replay proof tooling captures the reviewed business scenarios.
+DEMO_SCENARIOS = BUSINESS_DEMO_SCENARIOS
+
+
+def demo_scenarios_for_pack(scenario_pack: ScenarioPack) -> tuple[DemoScenario, ...]:
+    """Return the stable scenarios exposed by one configured pack."""
+    if scenario_pack is ScenarioPack.LEARNING:
+        return LEARNING_DEMO_SCENARIOS
+    return BUSINESS_DEMO_SCENARIOS
+
+
+def demo_scenarios_for_provider(provider: object) -> tuple[DemoScenario, ...]:
+    """Infer the active pack, defaulting legacy/replay providers to business."""
+    scenario_pack = getattr(provider, "scenario_pack", ScenarioPack.BUSINESS)
+    return demo_scenarios_for_pack(ScenarioPack(scenario_pack))
+
+
+def get_demo_scenario(
+    scenario_id: str,
+    scenarios: tuple[DemoScenario, ...] = DEMO_SCENARIOS,
+) -> DemoScenario:
     """Return a scenario by its stable public identifier."""
     scenario = next(
-        (item for item in DEMO_SCENARIOS if item.scenario_id == scenario_id),
+        (item for item in scenarios if item.scenario_id == scenario_id),
         None,
     )
     if scenario is None:
@@ -76,7 +106,7 @@ def run_demo(
 ) -> tuple[ReconciliationCase, ...]:
     """Run all demo scenarios and print one evidence-backed verdict per case."""
     cases: list[ReconciliationCase] = []
-    for scenario in DEMO_SCENARIOS:
+    for scenario in demo_scenarios_for_provider(runner.provider):
         case = runner.run(scenario.request())
         counts = "/".join(str(result.entity_count) for result in case.execution_results)
         emit(f"{scenario.term}: {case.verdict.upper()} | counts={counts} | {_decision_label(case)}")

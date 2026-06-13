@@ -101,6 +101,7 @@ def build_runtime_environment(
             }
         )
         env.setdefault("LLM_PROVIDER", "disabled")
+        env.setdefault("CONCORD_SCENARIO_PACK", "learning")
         return env
 
     if mode not in MODES:
@@ -113,6 +114,7 @@ def build_runtime_environment(
             "ALLOW_CLOUD": "true",
             "AGENT_WORKFLOW_MODE": "strict",
             "CONCORD_WORKFLOW_MODE": "strict",
+            "CONCORD_SCENARIO_PACK": "business",
         }
     )
     if mode == FOUNDRY:

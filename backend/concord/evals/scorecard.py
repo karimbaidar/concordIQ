@@ -17,7 +17,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 
 from concord.agents.coordinator import UnsupportedScenario
-from concord.config import Settings
+from concord.config import ScenarioPack, Settings
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import GroundingProvider, create_provider
@@ -271,7 +271,7 @@ def eval_runner(
     A fresh registry guarantees the eval never inherits a prior canonical promotion,
     and the LLM is left disabled so the verdict can only come from executed SQL.
     """
-    settings = settings or Settings()
+    settings = settings or Settings(scenario_pack=ScenarioPack.BUSINESS)
     schema = f"concord_eval_{uuid4().hex}"
     admin_engine = create_engine(settings.database_url, isolation_level="AUTOCOMMIT")
     with admin_engine.connect() as connection:

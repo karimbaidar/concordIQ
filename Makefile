@@ -145,7 +145,7 @@ foundry-hosted-smoke:
 # Lower-level cloud tooling (used by the proofs above)
 # ---------------------------------------------------------------------------
 agent-smoke: postgres seed
-	PYTHONWARNINGS="ignore::FutureWarning" \
+	CONCORD_SCENARIO_PACK=business PYTHONWARNINGS="ignore::FutureWarning" \
 	$(PYTHON) -c "from concord.ms_agent.workflow import main; main()" \
 		--term "Active Customer" \
 		--period "2026-03-04/2026-06-01" \

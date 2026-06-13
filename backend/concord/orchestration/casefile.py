@@ -111,6 +111,12 @@ class ImpactAssessment(CaseModel):
     reports_affected: int
     business_units_affected: tuple[str, ...]
     decision_criticality: Literal["low", "medium", "high"]
+    entity_label: str = "customers"
+    value_label: str = "metric delta"
+    affected_entity_ids: tuple[str, ...] = ()
+    false_positive_count: int | None = None
+    false_positive_label: str | None = None
+    false_positive_entity_ids: tuple[str, ...] = ()
 
 
 class AuthorityAssessment(CaseModel):

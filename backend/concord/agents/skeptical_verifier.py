@@ -348,5 +348,37 @@ class SkepticalVerifierAgent:
                     ),
                 }
             )
+        elif concept_id == "certification_ready":
+            impact = case.impact_assessment
+            checks.update(
+                {
+                    "three_definitions_executed": len(case.execution_results) == 3,
+                    "conflict_has_divergent_sets": (
+                        case.verdict == "conflict" and len(entity_sets) > 1
+                    ),
+                    "false_ready_population_is_derived": (
+                        impact is not None
+                        and impact.false_positive_count is not None
+                        and impact.false_positive_count
+                        == len(impact.false_positive_entity_ids)
+                        and impact.false_positive_count > 0
+                    ),
+                    "exam_spend_risk_is_quantified": (
+                        impact is not None
+                        and impact.value_label == "exam spend at risk"
+                        and impact.arr_delta > 0
+                    ),
+                    "authority_is_configured": (
+                        case.authority_assessment is not None
+                        and case.authority_assessment.status == "clear"
+                        and case.authority_assessment.owner == "Learning Governance Council"
+                    ),
+                    "proposal_requires_human_approval": (
+                        case.requires_human_approval
+                        and case.reconciliation_proposal is not None
+                        and case.reconciliation_proposal.requires_human_approval
+                    ),
+                }
+            )
         else:
             checks["scenario_is_supported"] = False

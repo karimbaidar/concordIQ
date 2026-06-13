@@ -1,14 +1,22 @@
 """Runtime configuration with cloud access disabled by default."""
 
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
-from pydantic import AliasChoices, Field, SecretStr
+from pydantic import AliasChoices, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class CloudAccessDisabled(RuntimeError):
     """Raised when a cloud-capable path is requested without explicit permission."""
+
+
+class ScenarioPack(StrEnum):
+    """Reviewed deterministic scenario registries."""
+
+    LEARNING = "learning"
+    BUSINESS = "business"
 
 
 class Settings(BaseSettings):
@@ -17,6 +25,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", populate_by_name=True)
 
     provider: str = "local"
+    scenario_pack: ScenarioPack = Field(
+        default=ScenarioPack.LEARNING,
+        validation_alias="CONCORD_SCENARIO_PACK",
+    )
     agent_workflow_mode: Literal["fast", "strict"] = Field(
         default="fast",
         validation_alias=AliasChoices("CONCORD_WORKFLOW_MODE", "AGENT_WORKFLOW_MODE"),
@@ -55,6 +67,21 @@ class Settings(BaseSettings):
     fabric_workspace_id: str | None = None
     fabric_lakehouse_id: str | None = None
     fabric_ontology_id: str | None = None
+
+    @field_validator("scenario_pack", mode="before")
+    @classmethod
+    def validate_scenario_pack(cls, value: object) -> object:
+        """Return a normalized pack or an actionable configuration error."""
+        if isinstance(value, ScenarioPack):
+            return value
+        normalized = str(value).strip().casefold()
+        try:
+            return ScenarioPack(normalized)
+        except ValueError as error:
+            valid = ", ".join(pack.value for pack in ScenarioPack)
+            raise ValueError(
+                f"Invalid CONCORD_SCENARIO_PACK={value!r}. Valid values: {valid}."
+            ) from error
 
     def require_cloud_access(self, provider_name: str) -> None:
         """Fail closed unless cloud access and a positive call budget are explicit."""

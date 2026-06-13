@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Engine
 
-from concord.config import Settings
+from concord.config import ScenarioPack, Settings
 from concord.llm import create_llm_provider
 from concord.ms_agent.tools import DEFAULT_PERIOD, select_provider
 from concord.ms_agent.workflow import ConcordAgentWorkflow, normalize_workflow_mode
@@ -177,8 +177,18 @@ async def run_smoke(
     """Exercise readiness and `/responses` entirely in-process."""
     import httpx
 
+    active_settings = settings or Settings()
+    if provider == "local":
+        scenario_pack = (
+            ScenarioPack.LEARNING
+            if term.casefold() == "certification ready"
+            else ScenarioPack.BUSINESS
+        )
+        active_settings = active_settings.model_copy(
+            update={"scenario_pack": scenario_pack}
+        )
     agent = build_hosted_agent(
-        settings,
+        active_settings,
         provider=provider,
         workflow_mode=workflow_mode,
         initialize_storage=True,

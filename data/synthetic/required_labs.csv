@@ -1,0 +1,3 @@
+lab_id,certification_id,lab_name,required
+LAB-AGENT,CERT-AZURE-001,Build a deterministic agent workflow,1
+LAB-SAFETY,CERT-AZURE-001,Verify a governed refusal,1

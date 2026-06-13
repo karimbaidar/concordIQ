@@ -142,13 +142,22 @@ class WorkIQProvider(CloudSnapshotProvider):
 
     def _materialize_local_snapshot(self, term: str) -> ReplayScenarioSnapshot:
         """Build the deterministic LocalProvider snapshot for a proven term."""
-        from concord.demo import DEMO_SCENARIOS
+        from concord.demo import demo_scenarios_for_pack
         from concord.providers.local import LocalProvider
 
-        scenario = next((item for item in DEMO_SCENARIOS if item.term == term), None)
+        scenario_pack = (
+            self._local_provider.scenario_pack
+            if self._local_provider is not None
+            else self.settings.scenario_pack
+        )
+        scenarios = demo_scenarios_for_pack(scenario_pack)
+        scenario = next((item for item in scenarios if item.term == term), None)
         if scenario is None:
             raise ProviderNotConfigured(
                 f"No deterministic synthetic scenario is registered for {term!r}."
             )
-        provider = self._local_provider or LocalProvider()
+        provider = self._local_provider or LocalProvider.for_scenario_pack(
+            scenario_pack,
+            duckdb_path=self.settings.duckdb_path,
+        )
         return snapshot_provider_scenario(provider, scenario)

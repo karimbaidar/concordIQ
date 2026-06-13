@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "definitions": [
+    {
+      "definition_id": "certification_ready_hr",
+      "concept_id": "certification_ready",
+      "name": "HR Certification Ready",
+      "owner": "HR",
+      "rule_text": "Learner has completed every required learning module for the certification.",
+      "semantic_dimensions": ["required-module-completion", "learner-population"],
+      "binding": {
+        "binding_id": "certification_ready_hr_v1",
+        "source_tables": ["learners", "required_modules", "module_completions"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners with all required modules completed.",
+        "filters": ["every required module has a completed record"],
+        "exclusions": ["learners missing any required module"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "certification_ready_learning",
+      "concept_id": "certification_ready",
+      "name": "Learning and Development Certification Ready",
+      "owner": "Learning & Development",
+      "rule_text": "Learner has completed every required module and the latest practice assessment score is at least 80 percent.",
+      "semantic_dimensions": ["required-module-completion", "latest-practice-score", "readiness-threshold"],
+      "binding": {
+        "binding_id": "certification_ready_learning_v1",
+        "source_tables": ["learners", "required_modules", "module_completions", "practice_assessments"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Module-complete learners whose latest practice score is at least 80 percent.",
+        "filters": ["every required module completed", "latest practice score >= 80"],
+        "exclusions": ["superseded practice attempts", "scores below 80"],
+        "sql_template": "WITH latest_practice AS (SELECT learner_id, score, ROW_NUMBER() OVER (PARTITION BY learner_id ORDER BY CAST(attempted_at AS DATE) DESC, assessment_id DESC) AS recency_rank FROM practice_assessments) SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN latest_practice p ON p.learner_id = l.learner_id AND p.recency_rank = 1 WHERE p.score >= 80 AND NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "certification_ready_manager",
+      "concept_id": "certification_ready",
+      "name": "Manager Certification Ready",
+      "owner": "Managers",
+      "rule_text": "Learner has completed every required lab and has a recorded manager approval.",
+      "semantic_dimensions": ["required-lab-completion", "manager-approval", "operational-readiness"],
+      "binding": {
+        "binding_id": "certification_ready_manager_v1",
+        "source_tables": ["learners", "required_labs", "lab_completions", "manager_approvals"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners with all required labs completed and an approved manager record.",
+        "filters": ["every required lab completed", "manager approval = approved"],
+        "exclusions": ["missing labs", "missing or declined manager approval"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN manager_approvals ma ON ma.learner_id = l.learner_id AND ma.approved = 1 WHERE NOT EXISTS (SELECT 1 FROM required_labs rl WHERE rl.certification_id = l.certification_id AND rl.required = 1 AND NOT EXISTS (SELECT 1 FROM lab_completions lc WHERE lc.learner_id = l.learner_id AND lc.lab_id = rl.lab_id AND lc.completed = 1)) ORDER BY entity_id"
+      }
+    }
+  ]
+}

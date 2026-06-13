@@ -11,7 +11,13 @@ class CoordinatorAgent:
     """Limit execution to the reviewed synthetic scenarios."""
 
     supported_concepts = frozenset(
-        {"active_customer", "net_revenue", "churned_customer", "qualified_lead"}
+        {
+            "active_customer",
+            "net_revenue",
+            "churned_customer",
+            "qualified_lead",
+            "certification_ready",
+        }
     )
 
     def require_supported(self, concept: ConceptResolution) -> None:

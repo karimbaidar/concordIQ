@@ -7,9 +7,11 @@ SHA-256 content hash. This module exports it deterministically so a judge can au
 the governed fix without running the full reviewer workbench.
 
 If a live approved semantic PR exists in the local registry it is exported as-is;
-otherwise the deterministic ``Active Customer`` reconciliation is run over a fresh
-disposable schema (so it is never collapsed by a prior canonical promotion) and its
-drafted proposal is exported. The artifact contains no secrets and no tenant data.
+otherwise the requested deterministic scenario is run over a fresh disposable schema
+(so it is never collapsed by a prior canonical promotion) and its drafted proposal is
+exported. The command-line proof defaults to the business pack's ``Active Customer``;
+callers may explicitly export the learning pack's ``Certification Ready`` artifact.
+The artifact contains no secrets and no tenant data.
 """
 
 from __future__ import annotations
@@ -26,7 +28,7 @@ from uuid import uuid4
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 
-from concord.config import Settings
+from concord.config import ScenarioPack, Settings
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import create_provider
@@ -135,6 +137,12 @@ def build_semantic_pr(case: ReconciliationCase) -> dict[str, Any]:
             "severity": impact.severity if impact else None,
             "customer_count_delta": impact.customer_count_delta if impact else None,
             "arr_delta": impact.arr_delta if impact else None,
+            "entity_label": impact.entity_label if impact else None,
+            "value_label": impact.value_label if impact else None,
+            "affected_entity_ids": list(impact.affected_entity_ids) if impact else [],
+            "false_positive_count": impact.false_positive_count if impact else None,
+            "false_positive_label": impact.false_positive_label if impact else None,
+            "false_positive_entity_ids": (list(impact.false_positive_entity_ids) if impact else []),
         },
         "timestamp_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
@@ -161,13 +169,31 @@ def _hash_content(content: dict[str, Any]) -> str:
 def export_semantic_pr(
     *,
     settings: Settings | None = None,
+    term: str = DEFAULT_TERM,
+    question: str | None = None,
+    scenario_pack: ScenarioPack | None = None,
     artifact_path: Path = ARTIFACT_PATH,
     report_path: Path = REPORT_PATH,
 ) -> dict[str, Any]:
     """Run (or load) the governed semantic PR and write the JSON + Markdown proofs."""
-    active = settings or Settings()
+    selected_pack = scenario_pack
+    if selected_pack is None:
+        selected_pack = (
+            ScenarioPack.LEARNING
+            if term.casefold() == "certification ready"
+            else ScenarioPack.BUSINESS
+        )
+    active = (settings or Settings()).model_copy(update={"scenario_pack": selected_pack})
+    active_question = question or (
+        DEFAULT_QUESTION if term == DEFAULT_TERM else f"Why do our {term} definitions disagree?"
+    )
     with _fresh_runner(active) as runner:
-        case = runner.run(ReconciliationRequest(question=DEFAULT_QUESTION, term=DEFAULT_TERM))
+        case = runner.run(
+            ReconciliationRequest(
+                question=active_question,
+                term=term,
+            )
+        )
     content = build_semantic_pr(case)
     document = {**content, "sha256": _hash_content(content)}
 

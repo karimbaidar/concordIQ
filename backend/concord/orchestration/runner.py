@@ -229,7 +229,7 @@ class ReconciliationRunner:
             agent="ImpactRankerAgent",
             summary=(
                 f"Ranked impact {impact.severity} with "
-                f"{impact.customer_count_delta} customers of population delta."
+                f"{impact.customer_count_delta} {impact.entity_label} of population delta."
             ),
         )
         self._record_trace(
@@ -239,8 +239,8 @@ class ReconciliationRunner:
                 f"Rank materiality from {len(case.execution_results)} executed populations."
             ),
             output_summary=(
-                f"Ranked {impact.severity} impact: {impact.customer_count_delta} customers "
-                f"and {impact.arr_delta:,.0f} metric-value delta."
+                f"Ranked {impact.severity} impact: {impact.customer_count_delta} "
+                f"{impact.entity_label} and {impact.arr_delta:,.0f} {impact.value_label}."
             ),
             evidence_ids=self._evidence_ids(case),
             started=started,
