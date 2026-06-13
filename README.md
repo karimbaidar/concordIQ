@@ -2,7 +2,7 @@
 
 **Version control for business meaning.** 
 
-Concord IQ is governed semantic AI that proves and resolves business definition conflicts. It grounds business meaning through Microsoft Fabric IQ, Foundry IQ, or Microsoft 365 Work IQ; executes competing definitions against data; quantifies their operational impact; and routes the resolution through a Microsoft Agent Framework workflow that can run in-process or in Microsoft Foundry Agent Service.
+Concord IQ is governed semantic AI that proves and resolves business definition conflicts. It grounds business meaning through Microsoft Fabric IQ, Foundry IQ, or Microsoft 365 Work IQ support implemented and license-gated in the available tenant; executes competing definitions against data; quantifies their operational impact; and routes the resolution through a Microsoft Agent Framework workflow that can run in-process or in Microsoft Foundry Agent Service.
 
 [![Hackathon](https://img.shields.io/badge/Hackathon-Microsoft_Agents_League_2026-5C2D91)](#7-microsoft-integration-truth-table)
 [![Track](https://img.shields.io/badge/Track-Reasoning_Agents-0078D4)](#7-microsoft-integration-truth-table)
@@ -33,7 +33,7 @@ A semantic pull request is a reviewable, evidence-backed proposal to change a bu
 ## 2. 60-second quickstart
 
 ```bash
-git clone <repo>
+git clone https://github.com/karimbaidar/concordIQ.git
 cd concord-iq
 make setup
 make dev
@@ -60,7 +60,7 @@ semantic-PR export, then writes a reproducible proof bundle you can inspect unde
 
 ## Demo and evidence
 
-- [Watch the five-minute demo](https://youtu.be/RaSYFlbIH-Q)
+- [Watch the two-minute submission demo](https://youtu.be/RaSYFlbIH-Q)
 - [Read the judge proof report](docs/proofs/judge-proof-report.md)
 - [Inspect the reproducible proof bundle](artifacts/proof/latest.json)
 
@@ -110,7 +110,7 @@ done
 > `make dev-fresh` always starts local synthetic mode. It does not connect to Foundry
 > Agent Service or Fabric IQ.
 
-Before running above commands, first check the details of each command below:
+Before running the commands above, first check the details of each command below:
 
 ### Local demo
 
@@ -231,8 +231,6 @@ The implementation and proof status remain documented in:
 
 Run `make cloud-proof` to report the current Work IQ status without presenting
 `LICENSE-GATED` as a successful live integration.
-
-
 
 ## 5. How Concord IQ works
 
@@ -408,7 +406,7 @@ Prerequisites and the full local workflow (seed, scan, score, replay) are in
 | Capability | Role | Proof status |
 |---|---|---|
 | Microsoft Agent Framework | 10-step specialist workflow | Implemented and tested |
-| Foundry Agent Service | Hosted runtime | Real deployment/invocation recorded |
+| Foundry Agent Service | Hosted runtime | Real deployment recorded; invocation proof documented where available |
 | Fabric IQ | Semantic grounding | Verified sanitized capture + replay |
 | Foundry IQ | Advisory authority grounding | Integrated and transport-tested; no real-tenant capture |
 | Work IQ | M365 artifact grounding | Implemented and permission-tested; live retrieval currently license-gated |
