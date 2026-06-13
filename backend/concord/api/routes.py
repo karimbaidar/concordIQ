@@ -8,6 +8,11 @@ from pydantic import BaseModel
 
 from concord.agents.coordinator import CoordinatorAgent, UnsupportedScenario
 from concord.config import CloudAccessDisabled, ScenarioPack, Settings
+from concord.court import (
+    CourtNotReady,
+    DeliberationTranscript,
+    SemanticCourt,
+)
 from concord.demo import (
     demo_scenarios_for_pack,
     demo_scenarios_for_provider,
@@ -424,3 +429,29 @@ async def run_demo_scenario(
             detail=f"Unknown demo scenario: {scenario_id}",
         ) from error
     return await _run_case(scenario.request(), request)
+
+
+@router.post("/court/run/{scenario_id}", response_model=DeliberationTranscript)
+async def run_court(scenario_id: str, request: Request) -> DeliberationTranscript:
+    """Convene the Semantic Court for one scenario and return the debate transcript.
+
+    The agents argue over the case the active runtime produced; the transcript reports
+    the engine's verdict and outcome unchanged. Online (replay) runtimes voice the debate
+    deterministically; a live model produces live turns, both labeled by provenance.
+    """
+    try:
+        scenario = get_demo_scenario(scenario_id, _active_demo_scenarios(request))
+    except KeyError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unknown demo scenario: {scenario_id}",
+        ) from error
+    runner = _runner(request)
+    case = await asyncio.to_thread(runner.run, scenario.request())
+    try:
+        return SemanticCourt(runner.llm_provider).deliberate(case)
+    except CourtNotReady as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error

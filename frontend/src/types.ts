@@ -375,3 +375,47 @@ export interface ReconciliationCase {
   agent_trace: AgentTraceStep[];
   audit_log: TimelineEntry[];
 }
+
+export type CourtRole =
+  | "orchestrator"
+  | "steward"
+  | "investigator"
+  | "skeptic"
+  | "authority";
+
+export type TranscriptMode =
+  | "live_captured"
+  | "replayed"
+  | "deterministic_fallback";
+
+export interface TurnProvenance {
+  generated: boolean;
+  provider_name: string;
+  model: string | null;
+  fallback_reason: string | null;
+}
+
+export interface DeliberationTurn {
+  turn_no: number;
+  round_no: number;
+  agent_id: string;
+  role: CourtRole;
+  speaking_for: string | null;
+  content: string;
+  tool_calls: string[];
+  cited_evidence_ids: string[];
+  provenance: TurnProvenance;
+}
+
+export interface DeliberationTranscript {
+  schema_version: string;
+  term: string;
+  concept_id: string;
+  verdict: Verdict;
+  outcome: "proposal" | "refusal" | "no_action";
+  rounds: number;
+  turns: DeliberationTurn[];
+  mode: TranscriptMode;
+  captured_at: string;
+  content_digest: string;
+}

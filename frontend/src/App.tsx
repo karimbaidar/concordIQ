@@ -7,10 +7,12 @@ import {
   isUngovernedRefusal,
   reconcileTerm,
   reconcileWhatIf,
+  runCourt,
   runDemoScenario,
   selectRuntime,
 } from "./api";
 import { AskConcord } from "./components/AskConcord";
+import { CourtTimeline } from "./components/CourtTimeline";
 import { DashboardDisagreement } from "./components/DashboardDisagreement";
 import { DecoyRuledOut } from "./components/DecoyRuledOut";
 import { PortfolioBoard } from "./components/PortfolioBoard";
@@ -27,6 +29,7 @@ import { TermSearch } from "./components/TermSearch";
 import { RuntimeSwitcher } from "./components/RuntimeSwitcher";
 import { UngovernedRefusalCard } from "./components/UngovernedRefusalCard";
 import type {
+  DeliberationTranscript,
   DemoScenario,
   HealthStatus,
   ImpactAssessment,
@@ -129,6 +132,9 @@ export default function App() {
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [result, setResult] = useState<ReconciliationCase | null>(null);
+  const [court, setCourt] = useState<DeliberationTranscript | null>(null);
+  const [courtBusy, setCourtBusy] = useState(false);
+  const [courtError, setCourtError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refusal, setRefusal] = useState<UngovernedTermRefusal | null>(null);
@@ -245,6 +251,8 @@ export default function App() {
     setError(null);
     setRefusal(null);
     setMergedDecision(null);
+    setCourt(null);
+    setCourtError(null);
     resetWhatIf();
     try {
       const caseResult = await runDemoScenario(selectedScenario.scenario_id);
@@ -263,6 +271,25 @@ export default function App() {
       );
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleConvene() {
+    if (!selectedScenario) {
+      return;
+    }
+    setCourtBusy(true);
+    setCourtError(null);
+    try {
+      setCourt(await runCourt(selectedScenario.scenario_id));
+    } catch (requestError) {
+      setCourtError(
+        requestError instanceof Error
+          ? requestError.message
+          : "The Semantic Court could not convene.",
+      );
+    } finally {
+      setCourtBusy(false);
     }
   }
 
@@ -577,6 +604,30 @@ export default function App() {
                 </section>
               </div>
             </div>
+
+            <section className="surface court-convene">
+              <div className="section-heading">
+                <div>
+                  <span className="section-kicker">Multi-agent reasoning</span>
+                  <h2>Convene the Semantic Court</h2>
+                </div>
+                <button
+                  type="button"
+                  className="court-button"
+                  onClick={handleConvene}
+                  disabled={courtBusy}
+                >
+                  {courtBusy ? "Convening…" : "Convene the court"}
+                </button>
+              </div>
+              <p className="court-blurb">
+                Autonomous agents argue, investigate, and cross-examine this case. The verdict
+                stays engine-computed — the agents can be wrong out loud, but the system cannot
+                publish a fabricated result.
+              </p>
+              {courtError && <p className="error-text">{courtError}</p>}
+            </section>
+            {court && <CourtTimeline transcript={court} />}
 
             {result.reconciliation_proposal && (
               <SemanticPullRequest

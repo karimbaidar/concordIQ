@@ -1,5 +1,6 @@
 import type {
   AskResponse,
+  DeliberationTranscript,
   DemoScenario,
   HealthStatus,
   PortfolioScan,
@@ -56,6 +57,12 @@ export function fetchDemoScenarios(): Promise<DemoScenario[]> {
 
 export function runDemoScenario(scenarioId: string): Promise<ReconciliationCase> {
   return requestJson<ReconciliationCase>(`/demo/run/${scenarioId}`, {
+    method: "POST",
+  });
+}
+
+export function runCourt(scenarioId: string): Promise<DeliberationTranscript> {
+  return requestJson<DeliberationTranscript>(`/court/run/${scenarioId}`, {
     method: "POST",
   });
 }

@@ -215,6 +215,28 @@ def test_learning_pack_is_the_api_default(
     assert result.json()["verdict"] == "conflict"
 
 
+def test_court_endpoint_returns_a_debate_transcript(
+    postgres_engine: Engine,
+    learning_provider: LocalProvider,
+) -> None:
+    app = create_app(
+        Settings(_env_file=None),
+        provider=learning_provider,
+        engine=postgres_engine,
+    )
+    with TestClient(app) as client:
+        response = client.post("/court/run/certification-ready")
+
+    assert response.status_code == 200
+    transcript = response.json()
+    assert transcript["term"] == "Certification Ready"
+    assert transcript["verdict"] == "conflict"
+    assert transcript["outcome"] == "proposal"
+    assert transcript["mode"] == "deterministic_fallback"
+    roles = {turn["role"] for turn in transcript["turns"]}
+    assert roles == {"orchestrator", "steward", "investigator", "skeptic", "authority"}
+
+
 def test_certification_ready_semantic_pr_can_be_exported(
     learning_runner: ReconciliationRunner,
     isolated_canonical_registry: None,

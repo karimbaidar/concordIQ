@@ -3243,3 +3243,153 @@ summary:focus-visible,
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* ---- Semantic Court ---- */
+.court-convene .section-heading {
+  align-items: center;
+}
+.court-button {
+  border: 1px solid var(--violet);
+  background: var(--violet);
+  color: #fff;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.court-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.court-blurb {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.court-mode {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.court-mode.mode-live_captured {
+  border-color: var(--green);
+  color: var(--green);
+}
+.court-mode.mode-replayed {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.court-summary {
+  color: var(--muted);
+  margin: 4px 0 14px;
+}
+.court-turns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.court-turn {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.court-round {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  padding-top: 4px;
+}
+.court-turn-body {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.court-turn.role-steward .court-turn-body {
+  border-left-color: var(--blue);
+}
+.court-turn.role-investigator .court-turn-body {
+  border-left-color: var(--violet);
+}
+.court-turn.role-skeptic .court-turn-body {
+  border-left-color: var(--amber);
+}
+.court-turn.role-authority .court-turn-body {
+  border-left-color: var(--green);
+}
+.court-turn-body header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.court-role-chip {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.court-speaking-for {
+  font-size: 12px;
+  color: var(--muted);
+}
+.court-provenance {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.court-provenance.is-live {
+  background: rgba(21, 134, 99, 0.12);
+  color: var(--green);
+}
+.court-provenance.is-fallback {
+  background: rgba(84, 96, 122, 0.12);
+  color: var(--muted);
+}
+.court-content {
+  margin: 0;
+  color: var(--ink);
+}
+.court-tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+.court-tool {
+  font-size: 11px;
+  background: rgba(47, 103, 246, 0.08);
+  color: var(--blue);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.court-evidence {
+  font-size: 11px;
+  color: var(--muted);
+}
+.court-ruling {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.court-ruling.outcome-proposal {
+  border-color: var(--blue);
+}
+.court-ruling.outcome-refusal {
+  border-color: var(--amber);
+}
+.court-ruling.outcome-no_action {
+  border-color: var(--green);
+}
