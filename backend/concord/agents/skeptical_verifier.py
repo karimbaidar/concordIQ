@@ -359,8 +359,7 @@ class SkepticalVerifierAgent:
                     "false_ready_population_is_derived": (
                         impact is not None
                         and impact.false_positive_count is not None
-                        and impact.false_positive_count
-                        == len(impact.false_positive_entity_ids)
+                        and impact.false_positive_count == len(impact.false_positive_entity_ids)
                         and impact.false_positive_count > 0
                     ),
                     "exam_spend_risk_is_quantified": (

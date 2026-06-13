@@ -425,9 +425,7 @@ def generate_synthetic_data(seed: int = FIXED_SEED) -> SyntheticDataset:
                 "approval_id": f"MA-{index:03d}",
                 "learner_id": learner_id,
                 "approved": 1 if manager_ready else 0,
-                "approved_at": (
-                    _iso(REFERENCE_DATE - timedelta(days=3)) if manager_ready else ""
-                ),
+                "approved_at": (_iso(REFERENCE_DATE - timedelta(days=3)) if manager_ready else ""),
                 "manager_name": f"Manager {(index - 1) // 10 + 1:02d}",
             }
         )

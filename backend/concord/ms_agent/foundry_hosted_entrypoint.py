@@ -184,9 +184,7 @@ async def run_smoke(
             if term.casefold() == "certification ready"
             else ScenarioPack.BUSINESS
         )
-        active_settings = active_settings.model_copy(
-            update={"scenario_pack": scenario_pack}
-        )
+        active_settings = active_settings.model_copy(update={"scenario_pack": scenario_pack})
     agent = build_hosted_agent(
         active_settings,
         provider=provider,

@@ -54,8 +54,7 @@ LEARNING_DEMO_SCENARIOS = (
         scenario_id="certification-ready",
         term="Certification Ready",
         question=(
-            "Do HR, Learning and Development, and managers agree on who is "
-            "Certification Ready?"
+            "Do HR, Learning and Development, and managers agree on who is Certification Ready?"
         ),
     ),
 )

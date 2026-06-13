@@ -42,9 +42,7 @@ class ImpactRankerAgent:
             hr = evaluation_by_owner["HR"]
             learning = evaluation_by_owner["Learning & Development"]
             learning_ids = set(learning.entity_ids)
-            false_ready_rows = tuple(
-                row for row in hr.rows if row.entity_id not in learning_ids
-            )
+            false_ready_rows = tuple(row for row in hr.rows if row.entity_id not in learning_ids)
             false_ready_ids = tuple(row.entity_id for row in false_ready_rows)
             exam_spend_at_risk = round(
                 sum(row.metric_value for row in false_ready_rows),

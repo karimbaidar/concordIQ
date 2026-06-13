@@ -13,9 +13,7 @@ def test_missing_scenario_pack_defaults_to_learning() -> None:
     settings = Settings(_env_file=None)
 
     assert settings.scenario_pack is ScenarioPack.LEARNING
-    assert [scenario.term for scenario in LEARNING_DEMO_SCENARIOS] == [
-        "Certification Ready"
-    ]
+    assert [scenario.term for scenario in LEARNING_DEMO_SCENARIOS] == ["Certification Ready"]
 
 
 def test_business_pack_preserves_existing_registry_and_scenarios(tmp_path: Path) -> None:
