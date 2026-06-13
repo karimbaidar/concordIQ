@@ -15,10 +15,14 @@ from dataclasses import dataclass, field
 from concord.court.roles import (
     CourtClerk,
     authority_turn,
-    investigator_turn,
+    challengeable_bindings,
+    investigator_turns,
     orchestrator_closing,
     orchestrator_opening,
-    skeptic_turn,
+    reflection_turn,
+    skeptic_consensus_turn,
+    skeptic_cross_examination_turns,
+    steward_response_turns,
     steward_turns,
 )
 from concord.court.transcript import (
@@ -50,8 +54,16 @@ class SemanticCourt:
 
         turns: list[DeliberationTurn] = [orchestrator_opening(clerk, case)]
         turns.extend(steward_turns(clerk, case))
-        turns.append(investigator_turn(clerk, case))
-        turns.append(skeptic_turn(clerk, case))
+        turns.extend(investigator_turns(clerk, case))
+        # The cross-examination rounds emerge from the evidence: the Skeptic challenges only
+        # the stewards who claim members outside the set every definition agrees on.
+        challengeable = challengeable_bindings(case) if case.verdict == "conflict" else ()
+        if challengeable:
+            turns.extend(skeptic_cross_examination_turns(clerk, case, challengeable))
+            turns.extend(steward_response_turns(clerk, case, challengeable))
+            turns.append(reflection_turn(clerk, case, len(challengeable)))
+        else:
+            turns.append(skeptic_consensus_turn(clerk, case))
         turns.append(authority_turn(clerk, case))
         turns.append(orchestrator_closing(clerk, case, outcome))
         frozen_turns = tuple(turns)

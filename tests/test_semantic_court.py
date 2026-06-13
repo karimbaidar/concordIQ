@@ -80,9 +80,10 @@ def test_court_voices_the_conflict_without_changing_it(
     real_ids = {record.evidence_id for record in case.evidence}
     cited = {eid for turn in transcript.turns for eid in turn.cited_evidence_ids}
     assert cited and cited <= real_ids
-    # The investigator quantifies the divergence from real impact evidence.
-    investigator = next(t for t in transcript.turns if t.role is CourtRole.INVESTIGATOR)
-    assert "24" in investigator.content
+    # The investigator runs a plan -> execute -> replan loop and quantifies the divergence.
+    investigators = [t for t in transcript.turns if t.role is CourtRole.INVESTIGATOR]
+    assert len(investigators) == 3
+    assert any("24" in turn.content for turn in investigators)
 
 
 def test_court_dismisses_the_decoy(court_runner: ReconciliationRunner) -> None:
@@ -138,3 +139,82 @@ def test_court_refuses_an_incomplete_case() -> None:
     )
     with pytest.raises(CourtNotReady):
         SemanticCourt().deliberate(empty)
+
+
+# --- Tier 2: the debate is dynamic and adaptive to the evidence -------------------------
+
+
+def _by_round(transcript, role, round_no):
+    return [t for t in transcript.turns if t.role is role and t.round_no == round_no]
+
+
+def test_conflict_drives_a_multi_round_cross_examination(
+    court_runner: ReconciliationRunner,
+) -> None:
+    from concord.court.roles import (
+        ROUND_CHALLENGE,
+        ROUND_INVESTIGATE,
+        ROUND_REFLECT,
+        ROUND_RESPOND,
+    )
+
+    case = _run(
+        court_runner,
+        "Certification Ready",
+        "Do HR, Learning and Development, and managers agree on who is Certification Ready?",
+    )
+    transcript = SemanticCourt().deliberate(case)
+
+    # Three stewards each claim members outside the consensus core, so all three are challenged
+    # and all three respond — the shape emerged from the executed sets, not a script.
+    challenges = _by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)
+    responses = _by_round(transcript, CourtRole.STEWARD, ROUND_RESPOND)
+    reflections = _by_round(transcript, CourtRole.SKEPTIC, ROUND_REFLECT)
+    investigations = _by_round(transcript, CourtRole.INVESTIGATOR, ROUND_INVESTIGATE)
+    assert len(challenges) == 3
+    assert len(responses) == 3
+    assert len(reflections) == 1
+    assert len(investigations) == 3  # plan -> execute -> replan
+    assert all("concede" in turn.content.lower() for turn in responses)
+    # Turn order is well-formed: rounds never go backwards.
+    rounds = [turn.round_no for turn in transcript.turns]
+    assert rounds == sorted(rounds)
+    # The dynamic debate still cannot change the engine's verdict.
+    assert transcript.verdict == "conflict"
+    assert transcript.outcome == "proposal"
+
+
+def test_decoy_skips_cross_examination(court_runner: ReconciliationRunner) -> None:
+    from concord.court.roles import ROUND_CHALLENGE, ROUND_RESPOND
+
+    case = _run(
+        court_runner,
+        "Required Training Complete",
+        "Are our Required Training Complete definitions operationally equivalent?",
+    )
+    transcript = SemanticCourt().deliberate(case)
+
+    # Identical result sets => nobody is challengeable => a single consensus turn, no responses.
+    skeptic_challenge_round = _by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)
+    responses = _by_round(transcript, CourtRole.STEWARD, ROUND_RESPOND)
+    assert len(skeptic_challenge_round) == 1
+    assert "nothing to contest" in skeptic_challenge_round[0].content.lower()
+    assert responses == []
+    assert transcript.outcome == "no_action"
+
+
+def test_refusal_still_cross_examines_but_publishes_nothing(
+    court_runner: ReconciliationRunner,
+) -> None:
+    from concord.court.roles import ROUND_CHALLENGE
+
+    case = _run(
+        court_runner,
+        "Exam Eligible",
+        "Can we choose one enterprise Exam Eligible definition?",
+    )
+    transcript = SemanticCourt().deliberate(case)
+
+    assert len(_by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)) == 2
+    assert transcript.outcome == "refusal"
+    assert case.reconciliation_proposal is None
