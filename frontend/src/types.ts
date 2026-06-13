@@ -1,5 +1,11 @@
 export type Verdict = "conflict" | "consistent" | "incomplete";
 export type Severity = "low" | "medium" | "high";
+export type ScenarioPack = "learning" | "business";
+export type RuntimeProfile =
+  | "fabric_live"
+  | "fabric_replay"
+  | "foundry_live"
+  | "local";
 
 export interface HealthStatus {
   status: string;
@@ -12,7 +18,32 @@ export interface HealthStatus {
   llm_provider: string;
   llm_enabled: boolean;
   llm_model: string | null;
-  scenario_pack?: "learning" | "business";
+  scenario_pack?: ScenarioPack;
+  runtime_profile?: RuntimeProfile;
+}
+
+export interface ScenarioPackOption {
+  id: ScenarioPack;
+  label: string;
+  enabled: boolean;
+  detail: string;
+}
+
+export interface RuntimeProfileOption {
+  id: RuntimeProfile;
+  label: string;
+  available: boolean;
+  cloud: boolean;
+  detail: string;
+  supported_packs: ScenarioPack[];
+}
+
+export interface RuntimeState {
+  scenario_pack: ScenarioPack;
+  runtime_profile: RuntimeProfile;
+  switching_enabled: boolean;
+  scenario_packs: ScenarioPackOption[];
+  runtime_profiles: RuntimeProfileOption[];
 }
 
 export interface DemoScenario {

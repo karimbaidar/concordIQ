@@ -32,6 +32,7 @@ class CloudSnapshotProvider(ABC):
 
     def __init__(self, settings: Settings, *, transport: JsonTransport | None = None) -> None:
         self.settings = settings
+        self.scenario_pack = settings.scenario_pack
         self.client = GuardedCloudClient(
             settings,
             provider_name=self.name,

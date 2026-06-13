@@ -67,7 +67,9 @@ export function AskConcord({
 
   return (
     <section className="ask-concord surface" aria-labelledby="ask-title">
-      <span className="section-kicker">Ask in business terms</span>
+      <span className="section-kicker">
+        {scenarioPack === "learning" ? "Ask in operational terms" : "Ask in business terms"}
+      </span>
       <h2 id="ask-title">Ask Concord IQ</h2>
       <p>Ask a question; Concord IQ grounds it in the ontology, then reconciles it on data.</p>
       <form className="ask-form" onSubmit={handleSubmit}>
@@ -75,7 +77,9 @@ export function AskConcord({
           type="text"
           value={question}
           placeholder={placeholder}
-          aria-label="Business question"
+          aria-label={
+            scenarioPack === "learning" ? "Operational question" : "Business question"
+          }
           onChange={(event) => setQuestion(event.target.value)}
         />
         <button type="submit" className="primary-button" disabled={busy}>

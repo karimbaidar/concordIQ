@@ -3,15 +3,18 @@ PNPM ?= pnpm
 PYTHON := .venv/bin/python
 
 .PHONY: help setup postgres seed test test-backend test-frontend lint \
-	dev dev-fresh dev-foundry dev-fabric dev-work-iq stop frontend \
+	dev dev-local dev-fresh dev-foundry dev-fabric dev-work-iq stop frontend \
 	demo scan eval judge-proof cloud-proof semantic-pr-export work-iq-proof \
-	fabric-proof foundry-hosted-smoke agent-smoke \
+	fabric-proof foundry-hosted-deploy foundry-hosted-smoke agent-smoke \
 	foundry-agent-dry-run foundry-agent-smoke foundry-hosted-dry-run \
 	foundry-hosted-package capture fabric-mcp-diagnose \
 	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
 
 FOUNDRY_AGENT_PROVIDER ?= local
 FOUNDRY_AGENT_WORKFLOW_MODE ?= strict
+FOUNDRY_AGENT_SERVICE ?= concord-iq-2
+FOUNDRY_AGENT_IMAGE ?= concord-iq-agent:learning
+FOUNDRY_MODEL_DEPLOYMENT ?= Llama-3.3-70B-Instruct
 LAUNCH := $(PYTHON) -m concord.dev_launcher
 
 # ---------------------------------------------------------------------------
@@ -22,7 +25,8 @@ help:
 	@echo ""
 	@echo "Start the application"
 	@echo "  make setup         One-time local setup (deps, Postgres, schema, seed)"
-	@echo "  make dev           Safe local UI (cloud disabled, always local)"
+	@echo "  make dev           Learning demo: Fabric live + replay + Foundry live"
+	@echo "  make dev-local     Safe local UI (cloud disabled)"
 	@echo "  make dev-fresh     Reset synthetic demo state and start the cold-open UI"
 	@echo "  make dev-foundry   Foundry-hosted UI (token acquired automatically)"
 	@echo "  make dev-fabric    Live Fabric IQ UI (token acquired automatically)"
@@ -37,6 +41,7 @@ help:
 	@echo "  make eval          Deterministic safety scorecard"
 	@echo ""
 	@echo "Cloud proofs"
+	@echo "  make foundry-hosted-deploy Build, deploy, and smoke the learning agent"
 	@echo "  make cloud-proof          All configured live cloud proofs"
 	@echo "  make foundry-hosted-smoke Foundry Agent Service hosted smoke"
 	@echo "  make fabric-proof         Fabric IQ sanitized replay proof"
@@ -69,6 +74,9 @@ seed:
 	$(PYTHON) -m concord.seed.seed_duckdb
 
 dev: postgres seed
+	$(LAUNCH) --mode demo
+
+dev-local: postgres seed
 	$(LAUNCH) --mode local
 
 dev-fresh:
@@ -127,6 +135,12 @@ judge-proof: postgres seed
 # ---------------------------------------------------------------------------
 # Cloud proofs
 # ---------------------------------------------------------------------------
+foundry-hosted-deploy:
+	azd env set AZURE_AI_MODEL_DEPLOYMENT_NAME $(FOUNDRY_MODEL_DEPLOYMENT)
+	docker buildx build --platform linux/amd64 --load -t $(FOUNDRY_AGENT_IMAGE) .
+	azd deploy $(FOUNDRY_AGENT_SERVICE) --from-package $(FOUNDRY_AGENT_IMAGE)
+	$(MAKE) foundry-hosted-smoke
+
 cloud-proof:
 	$(PYTHON) -m concord.cloud_proof
 

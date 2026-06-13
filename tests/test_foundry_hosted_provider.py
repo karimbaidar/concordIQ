@@ -52,6 +52,7 @@ def _settings(**overrides: Any) -> Settings:
     values = {
         "_env_file": None,
         "provider": "foundry_hosted",
+        "scenario_pack": "business",
         "allow_cloud": True,
         "max_cloud_calls": 2,
         "foundry_hosted_endpoint": (

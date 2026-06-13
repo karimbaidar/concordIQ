@@ -37,6 +37,12 @@ from concord.providers import (
 )
 from concord.providers.base import ConceptNotFound
 from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
+from concord.runtime import (
+    RuntimeManager,
+    RuntimeProfile,
+    RuntimeSelectionError,
+    RuntimeState,
+)
 from concord.storage.repositories import (
     ProposalAlreadyDecided,
     ProposalDecisionResult,
@@ -66,6 +72,13 @@ class AskResponse(BaseModel):
     case: ReconciliationCase | None = None
 
 
+class RuntimeSelectionRequest(BaseModel):
+    """Ephemeral reviewer selection of a semantic system and proof runtime."""
+
+    scenario_pack: ScenarioPack
+    runtime_profile: RuntimeProfile
+
+
 class UngovernedTermRefusal(BaseModel):
     """A graceful, typed refusal when a term has no governed definition.
 
@@ -79,8 +92,12 @@ class UngovernedTermRefusal(BaseModel):
     known_terms: list[str]
 
 
+def _runtime_manager(request: Request) -> RuntimeManager:
+    return request.app.state.runtime_manager
+
+
 def _runner(request: Request) -> ReconciliationRunner:
-    runner = request.app.state.reconciliation_runner
+    runner = _runtime_manager(request).context.runner
     if runner is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -90,7 +107,7 @@ def _runner(request: Request) -> ReconciliationRunner:
 
 
 def _workflow(request: Request) -> ConcordAgentWorkflow:
-    workflow = request.app.state.agent_workflow
+    workflow = _runtime_manager(request).context.workflow
     if workflow is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -100,30 +117,35 @@ def _workflow(request: Request) -> ConcordAgentWorkflow:
 
 
 def _settings(request: Request) -> Settings:
-    return request.app.state.settings
+    return _runtime_manager(request).context.settings
 
 
 def _hosted_runtime(request: Request) -> FoundryHostedProvider | None:
-    return request.app.state.foundry_hosted_provider
+    return _runtime_manager(request).context.hosted
 
 
 def _active_scenario_pack(request: Request) -> ScenarioPack:
-    runner = request.app.state.reconciliation_runner
-    if runner is not None:
-        return getattr(runner.provider, "scenario_pack", ScenarioPack.BUSINESS)
-    return ScenarioPack.BUSINESS
+    return _runtime_manager(request).scenario_pack
 
 
 def _active_demo_scenarios(request: Request):
-    runner = request.app.state.reconciliation_runner
+    runner = _runtime_manager(request).context.runner
     if runner is not None:
         return demo_scenarios_for_provider(runner.provider)
     return demo_scenarios_for_pack(_active_scenario_pack(request))
 
 
+def _portfolio_provider(request: Request) -> LocalProvider:
+    """Build the read-only deterministic registry view for the active system."""
+    return LocalProvider.for_scenario_pack(
+        _active_scenario_pack(request),
+        duckdb_path=_runtime_manager(request).base_settings.duckdb_path,
+    )
+
+
 def _known_terms(request: Request) -> list[str]:
     """The governed terms Concord IQ can actually reconcile (never fabricated)."""
-    runner = request.app.state.reconciliation_runner
+    runner = _runtime_manager(request).context.runner
     provider = getattr(runner, "provider", None)
     if isinstance(provider, LocalProvider):
         return [
@@ -148,6 +170,7 @@ def _ungoverned_refusal(request: Request, term: str) -> UngovernedTermRefusal:
 
 @router.get("/health")
 def health(request: Request) -> dict[str, object]:
+    runtime = _runtime_manager(request)
     hosted = _hosted_runtime(request)
     if hosted is not None:
         llm_provider = request.app.state.llm_provider
@@ -164,6 +187,7 @@ def health(request: Request) -> dict[str, object]:
             "llm_enabled": llm_provider.enabled,
             "llm_model": llm_provider.model,
             "scenario_pack": _active_scenario_pack(request).value,
+            "runtime_profile": runtime.runtime_profile.value,
         }
     runner = _runner(request)
     return {
@@ -171,19 +195,49 @@ def health(request: Request) -> dict[str, object]:
         "orchestration": "Microsoft Agent Framework",
         "workflow_mode": _workflow(request).mode,
         "provider": runner.provider.name,
+        "provider_mode": runner.provider.mode.value,
         "cloud_enabled": runner.settings.allow_cloud,
         "data_type": getattr(runner.provider, "data_type", "synthetic"),
         "llm_provider": runner.llm_provider.name,
         "llm_enabled": runner.llm_provider.enabled,
         "llm_model": runner.llm_provider.model,
         "scenario_pack": _active_scenario_pack(request).value,
+        "runtime_profile": runtime.runtime_profile.value,
     }
+
+
+@router.get("/runtime", response_model=RuntimeState)
+def runtime_state(request: Request) -> RuntimeState:
+    """Return the current demo runtime and all honestly available choices."""
+    return _runtime_manager(request).state()
+
+
+@router.post("/runtime/select", response_model=RuntimeState)
+def select_runtime(
+    payload: RuntimeSelectionRequest,
+    request: Request,
+) -> RuntimeState:
+    """Switch the single-user demo process without persisting governance state."""
+    manager = _runtime_manager(request)
+    try:
+        selected = manager.activate(payload.runtime_profile, payload.scenario_pack)
+    except RuntimeSelectionError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+    context = manager.context
+    request.app.state.settings = context.settings
+    request.app.state.reconciliation_runner = context.runner
+    request.app.state.agent_workflow = context.workflow
+    request.app.state.foundry_hosted_provider = context.hosted
+    return selected
 
 
 @router.get("/providers")
 def providers(request: Request) -> list[dict[str, object]]:
     """Expose readiness without probing any cloud endpoint."""
-    return provider_statuses(_settings(request))
+    return provider_statuses(_runtime_manager(request).base_settings)
 
 
 async def _run_case(payload: ReconciliationRequest, request: Request) -> ReconciliationCase:
@@ -274,9 +328,8 @@ async def ask(payload: AskRequest, request: Request) -> AskResponse:
 @router.get("/scan", response_model=PortfolioScan)
 def scan(request: Request) -> PortfolioScan:
     """Autonomous portfolio sweep across every concept (read-only, cloud-free)."""
-    runner = _runner(request)
     try:
-        return scan_portfolio(runner.provider)
+        return scan_portfolio(_portfolio_provider(request))
     except TypeError as error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -287,9 +340,8 @@ def scan(request: Request) -> PortfolioScan:
 @router.get("/score", response_model=ConcordScore)
 def score(request: Request) -> ConcordScore:
     """The single Concord Score plus per-business-unit breakdown."""
-    runner = _runner(request)
     try:
-        return scan_portfolio(runner.provider).score
+        return scan_portfolio(_portfolio_provider(request)).score
     except TypeError as error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

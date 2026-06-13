@@ -29,6 +29,23 @@ class Settings(BaseSettings):
         default=ScenarioPack.LEARNING,
         validation_alias="CONCORD_SCENARIO_PACK",
     )
+    enable_business: bool = Field(
+        default=False,
+        validation_alias="CONCORD_ENABLE_BUSINESS",
+    )
+    runtime_switching: bool = Field(
+        default=False,
+        validation_alias="CONCORD_RUNTIME_SWITCHING",
+    )
+    default_runtime_profile: Literal[
+        "fabric_live",
+        "fabric_replay",
+        "foundry_live",
+        "local",
+    ] = Field(
+        default="local",
+        validation_alias="CONCORD_DEFAULT_RUNTIME",
+    )
     agent_workflow_mode: Literal["fast", "strict"] = Field(
         default="fast",
         validation_alias=AliasChoices("CONCORD_WORKFLOW_MODE", "AGENT_WORKFLOW_MODE"),
@@ -41,6 +58,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://concord:concord-local-only@localhost:5432/concord_iq"
     duckdb_path: Path = Path("data/concord_iq.duckdb")
     replay_artifact_path: Path = Path("artifacts/replay/sanitized/latest.json")
+    learning_replay_artifact_path: Path = Path(
+        "artifacts/replay/sanitized/certification-ready.latest.json"
+    )
+    business_replay_artifact_path: Path = Path("artifacts/replay/sanitized/latest.json")
     replay_require_verified_capture: bool = True
     capture_raw_dir: Path = Path("artifacts/replay/raw")
     capture_sanitized_path: Path = Path("artifacts/replay/sanitized/latest.json")

@@ -81,6 +81,37 @@ def test_work_iq_mode_sets_only_work_iq_token() -> None:
     assert env["WORK_IQ_ACCESS_TOKEN"] == SECRET
 
 
+def test_demo_mode_starts_learning_fabric_with_switchable_foundry() -> None:
+    env = build_runtime_environment(
+        "demo",
+        base_env={
+            "PATH": "/x",
+            "CONCORD_SCENARIO_PACK": "learning",
+            "CONCORD_ENABLE_BUSINESS": "false",
+        },
+        tokens={
+            "FABRIC_IQ_ACCESS_TOKEN": "fabric-token",
+            "FOUNDRY_ACCESS_TOKEN": "foundry-token",
+        },
+    )
+
+    assert env["PROVIDER"] == "fabric_iq"
+    assert env["CONCORD_SCENARIO_PACK"] == "learning"
+    assert env["CONCORD_RUNTIME_SWITCHING"] == "true"
+    assert env["CONCORD_DEFAULT_RUNTIME"] == "fabric_live"
+    assert env["FABRIC_IQ_ACCESS_TOKEN"] == "fabric-token"
+    assert env["FOUNDRY_ACCESS_TOKEN"] == "foundry-token"
+
+
+def test_demo_mode_requires_both_runtime_tokens() -> None:
+    with pytest.raises(ValueError, match="Fabric IQ and Foundry"):
+        build_runtime_environment(
+            "demo",
+            base_env={},
+            tokens={"FABRIC_IQ_ACCESS_TOKEN": "fabric-token"},
+        )
+
+
 def test_cloud_mode_requires_token() -> None:
     with pytest.raises(ValueError):
         build_runtime_environment("foundry", base_env={}, token=None)
@@ -100,6 +131,7 @@ def test_banner_has_no_token() -> None:
     assert "Cloud:    enabled" in banner
     assert SECRET not in banner
     assert render_banner("local").endswith("Cloud:    disabled")
+    assert "fabric_iq + foundry_hosted + replay" in render_banner("demo")
 
 
 # --------------------------------------------------------------------------- #

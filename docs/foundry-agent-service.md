@@ -43,7 +43,7 @@ capture gate. It does not contact Fabric or Foundry.
 Each request creates an independent reconciliation casefile, so the host builds a
 fresh Agent Framework workflow per Responses request. The hosted smoke uses an
 ephemeral SQLite database at
-`sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db`; production deployments can
+`sqlite+pysqlite:////tmp/concord_iq_foundry_learning.db`; production deployments can
 replace it with a durable SQLAlchemy URL when persistent approval history is
 required.
 
@@ -83,7 +83,8 @@ Developer CLI:
 
    Install the `foundry-hosting` extra and include `backend/concord/`,
    `pyproject.toml`, `uv.lock`, `ontology/`, `data/synthetic/`, and
-   `artifacts/replay/sanitized/latest.json`. Do not include `.env`, access tokens,
+   `artifacts/replay/sanitized/certification-ready.latest.json`. Do not include
+   `.env`, access tokens,
    `.venv/`, `node_modules/`, `artifacts/replay/raw/`, diagnostics, or planning
    files.
 
@@ -91,32 +92,31 @@ Developer CLI:
 
    ```text
    PROVIDER=replay
+   CONCORD_SCENARIO_PACK=learning
    CONCORD_WORKFLOW_MODE=strict
    ALLOW_CLOUD=false
    MAX_CLOUD_CALLS=0
-   DATABASE_URL=sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db
-   REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/latest.json
+   DATABASE_URL=sqlite+pysqlite:////tmp/concord_iq_foundry_learning.db
+   REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/certification-ready.latest.json
    ```
 
    Use `CONCORD_WORKFLOW_MODE`, not `AGENT_WORKFLOW_MODE`; Foundry reserves the
    `AGENT_*` namespace.
 
-5. If ACR Tasks are blocked by policy, set `docker.remoteBuild: false` in
-   `azure.yaml`. The manual ACR fallback is:
+5. Build and deploy the verified Linux AMD64 image:
 
    ```bash
-   docker build --platform linux/amd64 -t <acr>.azurecr.io/concord-iq-foundry:smoke .
-   docker push <acr>.azurecr.io/concord-iq-foundry:smoke
+   make foundry-hosted-deploy
    ```
 
-6. Deploy and verify:
+   The target uses `azd deploy --from-package`, which falls back to a local Docker
+   publish when ACR Tasks are disabled by tenant policy.
+
+6. Inspect and verify:
 
    ```bash
-   azd deploy
-   azd ai agent show
-   azd ai agent invoke "Active Customer"
-   # Some extension versions use the explicit flag:
-   azd ai agent invoke --message "Active Customer"
+   azd ai agent show concord-iq-2
+   make foundry-hosted-smoke
    ```
 
    The verified Concord IQ response reports `provider_mode=replay`,
@@ -129,15 +129,13 @@ The application-side `FoundryHostedProvider` calls the full Foundry Responses
 endpoint and never calls Fabric IQ. Put only local, gitignored values in `.env`:
 
 ```text
-PROVIDER=foundry_hosted
-ALLOW_CLOUD=true
-MAX_CLOUD_CALLS=20
 FOUNDRY_HOSTED_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>/agents/<agent>/endpoint/protocols/openai/responses?api-version=v1
 FOUNDRY_HOSTED_AGENT_ID=
-FOUNDRY_ACCESS_TOKEN=<short-lived bearer token>
+FOUNDRY_ACCESS_TOKEN=
 ```
 
-`FOUNDRY_HOSTED_AGENT_ID` is optional for an agent-specific endpoint. Run:
+`FOUNDRY_HOSTED_AGENT_ID` is optional for an agent-specific endpoint. Tokens are
+acquired automatically and must remain empty in `.env`. Run:
 
 ```bash
 make dev
@@ -148,10 +146,10 @@ Open `http://127.0.0.1:5173`, choose a scenario, and confirm the badge reads
 `/ask`, and `/demo/run/{scenario_id}` all render the returned remote case through
 the existing workbench.
 
-The one-call proof check remains available:
+The one-call proof check is:
 
 ```bash
-ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 make foundry-hosted-smoke
+make foundry-hosted-smoke
 ```
 
 It validates the proof envelope and writes only a secret-free report under the

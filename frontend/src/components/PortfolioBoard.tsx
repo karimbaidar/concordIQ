@@ -55,10 +55,11 @@ export function PortfolioBoard({ onInvestigate, busy }: PortfolioBoardProps) {
       <div className="portfolio-head">
         <div>
           <span className="section-kicker">Autonomous semantic scan</span>
-          <h2 id="portfolio-title">Where the business silently disagrees</h2>
+          <h2 id="portfolio-title">Where the organization silently disagrees</h2>
           <p>
-            Concord IQ swept {score.concepts_scanned} governed concepts and ranked every
-            conflict by business impact — including the ones it checked and cleared.
+            Concord IQ swept {score.concepts_scanned} governed concepts in the selected
+            system and ranked every conflict by impact, including the ones it checked
+            and cleared.
           </p>
         </div>
         <div className={`score-dial grade-${score.grade}`} aria-label="Concord Score">

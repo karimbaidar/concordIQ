@@ -3,10 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchDemoScenarios,
   fetchHealth,
+  fetchRuntimeState,
   isUngovernedRefusal,
   reconcileTerm,
   reconcileWhatIf,
   runDemoScenario,
+  selectRuntime,
 } from "./api";
 import { AskConcord } from "./components/AskConcord";
 import { DashboardDisagreement } from "./components/DashboardDisagreement";
@@ -22,6 +24,7 @@ import { ReasoningTimeline } from "./components/ReasoningTimeline";
 import { RefusalCard } from "./components/RefusalCard";
 import { SemanticPullRequest } from "./components/SemanticPullRequest";
 import { TermSearch } from "./components/TermSearch";
+import { RuntimeSwitcher } from "./components/RuntimeSwitcher";
 import { UngovernedRefusalCard } from "./components/UngovernedRefusalCard";
 import type {
   DemoScenario,
@@ -29,6 +32,9 @@ import type {
   ImpactAssessment,
   ProposalDecisionResult,
   ReconciliationCase,
+  RuntimeProfile,
+  RuntimeState,
+  ScenarioPack,
   UngovernedTermRefusal,
   WhatIfResult,
 } from "./types";
@@ -119,6 +125,7 @@ function rederiveImpact(
 
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [runtime, setRuntime] = useState<RuntimeState | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [result, setResult] = useState<ReconciliationCase | null>(null);
@@ -134,11 +141,12 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([fetchHealth(), fetchDemoScenarios()])
-      .then(([healthResponse, scenarioResponse]) => {
+    Promise.all([fetchRuntimeState(), fetchHealth(), fetchDemoScenarios()])
+      .then(([runtimeResponse, healthResponse, scenarioResponse]) => {
         if (!active) {
           return;
         }
+        setRuntime(runtimeResponse);
         setHealth(healthResponse);
         setScenarios(scenarioResponse);
         setSelectedId((currentId) =>
@@ -169,9 +177,18 @@ export default function App() {
     health?.provider_mode === "foundry_hosted" ||
     result?.context_packet?.provider_metadata.mode === "foundry_hosted";
   const learningMode =
+    runtime?.scenario_pack === "learning" ||
     health?.scenario_pack === "learning" ||
     scenarios[0]?.scenario_id === "certification-ready";
   const stories = learningMode ? LEARNING_STORIES : BUSINESS_STORIES;
+  const runtimeSummary =
+    runtime?.runtime_profile === "foundry_live"
+      ? "Foundry Agent Service live · verified Fabric replay · cloud enabled"
+      : runtime?.runtime_profile === "fabric_live"
+        ? "Fabric IQ live grounding · deterministic verdict · cloud enabled"
+        : runtime?.runtime_profile === "fabric_replay"
+          ? "Verified Fabric IQ replay · deterministic verdict · no cloud call"
+          : "Local deterministic reviewer mode · synthetic data · no cloud call";
   const whatIfEnabled = result?.context_packet?.provider_metadata.mode === "local";
   const displayedImpact = useMemo(
     () => (result ? rederiveImpact(result, whatIf) : null),
@@ -243,6 +260,37 @@ export default function App() {
         requestError instanceof Error
           ? requestError.message
           : "The deterministic reconciliation run failed.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRuntimeSelect(
+    scenarioPack: ScenarioPack,
+    runtimeProfile: RuntimeProfile,
+  ) {
+    setBusy(true);
+    setError(null);
+    setResult(null);
+    setRefusal(null);
+    setMergedDecision(null);
+    resetWhatIf();
+    try {
+      const selected = await selectRuntime(scenarioPack, runtimeProfile);
+      const [healthResponse, scenarioResponse] = await Promise.all([
+        fetchHealth(),
+        fetchDemoScenarios(),
+      ]);
+      setRuntime(selected);
+      setHealth(healthResponse);
+      setScenarios(scenarioResponse);
+      setSelectedId(scenarioResponse[0]?.scenario_id ?? "");
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to switch the Concord IQ runtime.",
       );
     } finally {
       setBusy(false);
@@ -351,6 +399,12 @@ export default function App() {
         <ProviderBadge health={health} result={result} />
       </header>
 
+      <RuntimeSwitcher
+        runtime={runtime}
+        busy={busy}
+        onSelect={handleRuntimeSelect}
+      />
+
       <main id="top">
         <section className="hero" id="workbench">
           <div className="hero-copy">
@@ -395,7 +449,7 @@ export default function App() {
             scenarios={scenarios}
             selectedId={selectedId}
             busy={busy}
-            hostedRuntime={foundryHosted}
+            runtimeProfile={runtime?.runtime_profile}
             onSelect={(scenarioId) => {
               setSelectedId(scenarioId);
               setResult(null);
@@ -410,7 +464,7 @@ export default function App() {
 
         {error && (
           <div className="error-banner" role="alert">
-            <strong>Local demo unavailable.</strong>
+            <strong>Concord IQ request unavailable.</strong>
             <span>{error}</span>
           </div>
         )}
@@ -447,7 +501,13 @@ export default function App() {
             scenarioPack={learningMode ? "learning" : "business"}
           />
         )}
-        {!result && <PortfolioBoard onInvestigate={handleInvestigate} busy={busy} />}
+        {!result && (
+          <PortfolioBoard
+            key={`${runtime?.scenario_pack}:${runtime?.runtime_profile}`}
+            onInvestigate={handleInvestigate}
+            busy={busy}
+          />
+        )}
 
         {result && (
           <div className="result-area" id="case-result">
@@ -551,11 +611,7 @@ export default function App() {
 
       <footer className="site-footer">
         <span>Concord IQ</span>
-        <p>
-          {foundryHosted
-            ? "Foundry Agent Service runtime · replay-grounded proof · cloud enabled"
-            : "Deterministic reviewer mode · synthetic data · cloud disabled by default"}
-        </p>
+        <p>{runtimeSummary}</p>
         <span>Microsoft Agents League 2026</span>
       </footer>
     </div>

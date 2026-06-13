@@ -189,7 +189,15 @@ def export_semantic_pr(
             if term.casefold() == "certification ready"
             else ScenarioPack.BUSINESS
         )
-    active = (settings or Settings()).model_copy(update={"scenario_pack": selected_pack})
+    active = (settings or Settings()).model_copy(
+        update={
+            "scenario_pack": selected_pack,
+            "provider": "local",
+            "allow_cloud": False,
+            "max_cloud_calls": 0,
+            "llm_provider": "disabled",
+        }
+    )
     active_question = question or (
         DEFAULT_QUESTION if term == DEFAULT_TERM else f"Why do our {term} definitions disagree?"
     )

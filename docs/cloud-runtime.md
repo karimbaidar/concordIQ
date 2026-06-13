@@ -9,6 +9,17 @@ and [`backend/concord/dev_launcher.py`](../backend/concord/dev_launcher.py).
 Stable, non-secret configuration (endpoints, workspace IDs, client/tenant IDs) lives in a
 local `.env` copied from [`.env.example`](../.env.example). Access tokens never go there.
 
+## Switchable reviewer UI
+
+```bash
+make dev
+```
+
+This explicit presenter command acquires both Fabric and Foundry tokens, starts Learning
+with Fabric IQ Live selected, and enables the UI runtime selector. Fabric Replay and
+Local make no cloud calls. Foundry Agent Service Live calls the deployed hosted runtime
+over the verified learning replay.
+
 ## Foundry-hosted UI
 
 ```bash
@@ -75,7 +86,9 @@ tokens, Authorization headers, or tenant URLs.
 
 ## Safety guarantees
 
-- `make dev` forces safe local mode and strips inherited cloud tokens.
+- `make dev-local` forces safe local mode and strips inherited cloud tokens.
+- `make dev` is the explicit cloud-enabled reviewer command and keeps tokens only in the
+  backend child environment.
 - Cloud providers fail closed without explicit permission, a positive budget, an
   endpoint, and authentication.
 - Automated tests inject token runners/transports and never call Microsoft services.

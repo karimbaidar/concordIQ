@@ -236,6 +236,37 @@ describe("learning-first Concord IQ experience", () => {
       "fetch",
       vi.fn((input: string | URL | Request) => {
         const url = String(input);
+        if (url.endsWith("/runtime")) {
+          return mockJson({
+            scenario_pack: "learning",
+            runtime_profile: "local",
+            switching_enabled: true,
+            scenario_packs: [
+              {
+                id: "learning",
+                label: "Learning",
+                enabled: true,
+                detail: "Learning pack.",
+              },
+              {
+                id: "business",
+                label: "Business",
+                enabled: false,
+                detail: "Disabled by configuration.",
+              },
+            ],
+            runtime_profiles: [
+              {
+                id: "local",
+                label: "Local Deterministic",
+                available: true,
+                cloud: false,
+                detail: "Cloud-free synthetic fallback.",
+                supported_packs: ["learning", "business"],
+              },
+            ],
+          });
+        }
         if (url.endsWith("/health")) {
           return mockJson({
             status: "ok",
@@ -281,6 +312,7 @@ describe("learning-first Concord IQ experience", () => {
       name: /Certification Ready/i,
     });
     expect(option).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTitle("Disabled by configuration.")).toBeDisabled();
 
     await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
 

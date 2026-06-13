@@ -171,12 +171,14 @@ def test_api_health(
         "orchestration": "Microsoft Agent Framework",
         "workflow_mode": "fast",
         "provider": "LocalProvider",
+        "provider_mode": "local",
         "cloud_enabled": False,
         "data_type": "synthetic",
         "llm_provider": "DisabledLLMProvider",
         "llm_enabled": False,
         "llm_model": None,
         "scenario_pack": "business",
+        "runtime_profile": "local",
     }
 
 

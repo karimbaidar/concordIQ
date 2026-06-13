@@ -15,6 +15,11 @@ azure.yaml
 .env.*
 .azure/
 .git/
+.claude/
+.codex/
+.concord-dev/
+.checkpoints/
+.function_approvals/
 
 # Python
 __pycache__/
@@ -34,7 +39,15 @@ obj/
 
 # Node
 node_modules/
+frontend/
 
-# Docker (not used in code deploy)
-Dockerfile
-.dockerignore
+# Local-only build, proof, and bulk Fabric loading material
+tests/
+docs/
+infra/
+scripts/
+fabric_seed/learning_cli/
+fabric_seed/learning_delta/
+fabric_seed/ontology_backups/
+artifacts/replay/raw/
+artifacts/foundry/

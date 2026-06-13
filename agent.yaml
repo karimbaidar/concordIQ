@@ -6,3 +6,19 @@ protocols:
 environment_variables:
     - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
       value: ${AZURE_AI_MODEL_DEPLOYMENT_NAME}
+    - name: PROVIDER
+      value: replay
+    - name: CONCORD_SCENARIO_PACK
+      value: learning
+    - name: CONCORD_WORKFLOW_MODE
+      value: strict
+    - name: ALLOW_CLOUD
+      value: "false"
+    - name: MAX_CLOUD_CALLS
+      value: "0"
+    - name: LLM_PROVIDER
+      value: disabled
+    - name: DATABASE_URL
+      value: sqlite+pysqlite:////tmp/concord_iq_foundry_learning.db
+    - name: REPLAY_ARTIFACT_PATH
+      value: artifacts/replay/sanitized/certification-ready.latest.json

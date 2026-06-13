@@ -1,7 +1,8 @@
 # Getting started
 
-Concord IQ runs fully locally with no cloud credentials. The default mode is safe:
-`PROVIDER=local`, `ALLOW_CLOUD=false`, `MAX_CLOUD_CALLS=0`, LLM disabled.
+Concord IQ supports a cloud-enabled presenter stack and a fully local fallback.
+Repository defaults remain fail-closed: `PROVIDER=local`, `ALLOW_CLOUD=false`,
+`MAX_CLOUD_CALLS=0`, LLM disabled.
 
 ## Prerequisites
 
@@ -25,17 +26,26 @@ and verifies required tooling. It never calls a cloud provider.
 make dev
 ```
 
-`make dev` always starts safe local mode regardless of stale shell variables or `.env`
-values. It prints the backend and frontend URLs and stops both child processes cleanly on
-Ctrl+C. Use `make stop` to stop a stack started in another shell.
+`make dev` is the reviewer command. It reads stable configuration from `.env`, acquires
+short-lived Fabric and Foundry tokens in memory, and starts Learning with Fabric IQ Live
+selected. The UI can switch to Fabric Replay, Foundry Agent Service Live, or Local.
 
 ```text
-Concord IQ local mode
+Concord IQ demo mode
 Backend:  http://127.0.0.1:8000
 Frontend: http://127.0.0.1:5173
-Provider: local
-Cloud:    disabled
+Provider: fabric_iq + foundry_hosted + replay
+Cloud:    enabled
 ```
+
+For a credential-free stack:
+
+```bash
+make dev-local
+```
+
+Both commands stop their child processes cleanly on Ctrl+C. Use `make stop` for a stack
+started in another shell.
 
 ## Reset the demo cold open
 
@@ -47,9 +57,8 @@ make dev-fresh
 ```
 
 This resets only local synthetic state (the PostgreSQL Docker volume and DuckDB),
-reseeds, and verifies the Active Customer conflict (1600/1500/1334, $33.2M, approval
-required) before starting. It never touches Azure, Fabric, Foundry, SharePoint, or
-committed replay artifacts.
+reseeds, and verifies the Certification Ready conflict before starting local Learning.
+It never touches Azure, Fabric, Foundry, SharePoint, or committed replay artifacts.
 
 ## Explore the rest of the system
 

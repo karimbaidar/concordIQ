@@ -5,6 +5,9 @@ import type {
   PortfolioScan,
   ProposalDecisionResult,
   ReconciliationCase,
+  RuntimeProfile,
+  RuntimeState,
+  ScenarioPack,
   UngovernedTermRefusal,
   WhatIfResult,
 } from "./types";
@@ -28,6 +31,23 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function fetchHealth(): Promise<HealthStatus> {
   return requestJson<HealthStatus>("/health");
+}
+
+export function fetchRuntimeState(): Promise<RuntimeState> {
+  return requestJson<RuntimeState>("/runtime");
+}
+
+export function selectRuntime(
+  scenarioPack: ScenarioPack,
+  runtimeProfile: RuntimeProfile,
+): Promise<RuntimeState> {
+  return requestJson<RuntimeState>("/runtime/select", {
+    method: "POST",
+    body: JSON.stringify({
+      scenario_pack: scenarioPack,
+      runtime_profile: runtimeProfile,
+    }),
+  });
 }
 
 export function fetchDemoScenarios(): Promise<DemoScenario[]> {

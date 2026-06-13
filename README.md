@@ -1,180 +1,270 @@
 # Concord IQ
 
-**The false-readiness firewall for enterprise certification programs.**
+**Version control for the meaning behind enterprise metrics and decisions.**
 
-Concord IQ is a multi-agent semantic reconciliation engine. It proves whether HR,
-Learning & Development, and managers agree on what **Certification Ready** means
-before an enterprise trusts readiness dashboards, spends exam budget, or reports
-team readiness.
+Concord IQ proves when teams use the same term differently, executes each definition
+over the same population, and proposes a governed canonical definition only when the
+configured owner is allowed to approve it.
 
-[![Hackathon](https://img.shields.io/badge/Microsoft_Agents_League_2026-Reasoning_Agents-5C2D91)](#challenge-alignment)
-[![Challenge](https://img.shields.io/badge/Challenge_A-Enterprise_Learning_System-0078D4)](#challenge-alignment)
+The challenge-facing default is the **Learning** system and its **Certification Ready**
+scenario. The same engine also contains a preserved Business system. The UI and API are
+pack-driven so additional governed semantic systems can be registered without changing
+the deterministic verdict contract.
+
+[![Hackathon](https://img.shields.io/badge/Microsoft_Agents_League_2026-Reasoning_Agents-5C2D91)](#why-concord-iq)
+[![Challenge](https://img.shields.io/badge/Challenge_A-Enterprise_Learning_System-0078D4)](#default-learning-demo)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-## What it does
+## Why Concord IQ
 
-- Runs ten typed specialist stages through Microsoft Agent Framework.
-- Executes competing definitions as deterministic SQL over fixed-seed synthetic data.
-- Compares learner result sets; an LLM never decides the verdict.
-- Shows false-ready learner IDs and synthetic exam-voucher spend at risk.
-- Resolves authority from configured governance rules.
-- Blocks unsupported cases through a skeptical verifier.
-- Produces an evidence-backed Semantic PR that only the configured owner can approve.
+Enterprises built a single source of truth for data, but not for meaning. Concord IQ:
 
-## Challenge alignment
+- runs ten typed specialist stages through Microsoft Agent Framework;
+- grounds definitions in Fabric IQ live or a verified sanitized capture;
+- executes competing definitions as deterministic SQL over fixed-seed synthetic data;
+- compares result sets, not wording, to decide conflict versus consistency;
+- resolves authority from configured governance rules;
+- refuses unsupported or ambiguously owned reconciliations;
+- creates an evidence-backed Semantic PR gated to the configured human owner.
 
-**Track:** Reasoning Agents
-**Challenge A:** Enterprise Learning System
+An LLM can narrate a result, but it cannot change the verdict, authority decision,
+refusal, evidence, or stored canonical definition.
 
-Most learning agents generate plans, quizzes, or recommendations. Concord IQ governs
-the meaning behind the readiness signals those systems depend on. If teams define
-readiness differently, every downstream score is unsafe.
+## Current Verified State
 
-The same engine also supports a secondary business-metrics scenario pack, demonstrating
-that semantic reconciliation generalizes beyond learning.
+Verified on **June 13, 2026**:
 
-## Demo scenario
+| Surface | Status | What actually happens |
+|---|---|---|
+| Fabric IQ Live | Verified | Live ontology grounding for Certification Ready; deterministic SQL computes counts and verdict |
+| Fabric IQ Replay | Verified | Sanitized real Fabric capture replays locally with no cloud call |
+| Foundry Agent Service | Verified live | Existing `concord-iq-2` agent, version 4, runs the strict Agent Framework workflow over the verified learning replay |
+| Local Deterministic | Verified | Cloud-free learning or business pack over synthetic DuckDB data |
+| Foundry IQ | Advisory only | Transport-tested authority grounding; no real-tenant capture claimed |
+| Work IQ | Implemented, license-gated | Authentication path exists; no completed live retrieval is claimed |
 
-The default learning pack proves three governance behaviours over the same synthetic
-learner data — a real conflict, a rejected decoy, and a governed refusal.
+Foundry Agent Service does **not** make a hidden Fabric call. Its hosted workflow uses
+the verified Fabric replay. Select **Fabric IQ Live** in the UI when the demo must show a
+fresh Fabric semantic grounding call.
 
-### 1. Certification Ready — proven conflict
+## One-Command Demo
 
-| Owner | Executed definition | Ready learners |
-|---|---|---:|
-| HR | All required modules complete | 80 |
-| Learning & Development | Required modules complete and latest practice score >= 80% | 56 |
-| Managers | Required labs complete and manager approval recorded | 56 |
+Prerequisites:
 
-The two 56-learner populations are not the same set. Concord IQ executes all three
-definitions, proves the conflict, identifies **24 false-ready learners** in the HR claim,
-and quantifies **$10,800 of synthetic exam-voucher spend at risk**. Authority is clear
-(Learning Governance Council), so the engine drafts a Semantic PR that only that owner can
-approve.
+- Python 3.12+, [`uv`](https://docs.astral.sh/uv/), Node.js, `pnpm`, and GNU Make
+- Docker Desktop with Docker Compose v2
+- Azure CLI authenticated with `az login`
+- stable Fabric and Foundry endpoints/IDs in the local, gitignored `.env`
+- the Foundry learning agent deployed once, as described below
 
-### 2. Required Training Complete — rejected decoy
-
-Two differently-worded definitions — "all required modules completed" (HR) and "100%
-required course completion" (Learning & Development) — execute to the **same 80 learners**.
-Concord IQ rules the decoy out as wording-only: verdict `consistent`, low impact, **no
-proposal and no refusal**.
-
-### 3. Exam Eligible — governed refusal
-
-Module-completion (HR, 80 learners) and lab-plus-manager-approval (Managers, 56 learners)
-produce **materially different** sets, but enterprise authority over exam eligibility is
-**ambiguous** — no configured owner can approve a canonical definition. Concord IQ refuses
-automatic reconciliation, routes the decision to a human, and **promotes nothing**.
-
-Every run includes the agent trace, exact SQL, evidence IDs, skeptical verification, the
-resolved authority decision, and (for the conflict) a Semantic PR with owner-gated promotion
-inside the Concord IQ registry.
-
-[Screenshot placeholder: Certification Ready meaning fork and readiness outcome]
-
-[Video placeholder: 2-3 minute Challenge A demo]
-
-## Run locally
-
-Prerequisites: Python 3.12+, `uv`, `pnpm`, Docker.
+One-time local setup:
 
 ```bash
 make setup
+```
+
+Start the presenter stack:
+
+```bash
 make dev
 ```
 
-Open the frontend URL printed by `make dev` (normally
-`http://127.0.0.1:5173`). No environment variable is required: missing
-`CONCORD_SCENARIO_PACK` defaults to `learning`.
+`make dev` automatically:
 
-To reset local synthetic state before a recording:
+1. reads `.env`;
+2. acquires fresh Fabric and Foundry bearer tokens in memory;
+3. starts PostgreSQL and seeds deterministic learning data;
+4. starts the FastAPI backend and React/Vite UI;
+5. selects **Learning + Fabric IQ Live** by default;
+6. exposes UI buttons for Fabric Live, Fabric Replay, Foundry Live, and Local.
 
-```bash
-make dev-fresh
+Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
+
+Expected startup banner:
+
+```text
+Concord IQ demo mode
+Backend:  http://127.0.0.1:8000
+Frontend: http://127.0.0.1:5173
+Provider: fabric_iq + foundry_hosted + replay
+Cloud:    enabled
 ```
 
-Stop only the processes started by Concord IQ:
+Stop only the processes recorded by the Concord launcher:
 
 ```bash
 make stop
 ```
 
-## Scenario packs
+## UI Runtime Controls
 
-Learning is the challenge-facing default:
+The top runtime bar contains two independent selectors.
 
-```bash
-make dev
+### System
+
+- **Learning** is selected by default.
+- **Business** is visible but disabled by default.
+- Set `CONCORD_ENABLE_BUSINESS=true` in `.env` and restart to enable Business.
+
+Business currently supports Local and Fabric Replay. The live Fabric ontology and hosted
+Foundry deployment are intentionally learning-specific, so those buttons remain
+unavailable for Business.
+
+### Proof Runtime
+
+| Button | Cloud call | Meaning |
+|---|---:|---|
+| Fabric IQ Live | Yes | Fresh Fabric semantic grounding; SQL still owns the verdict |
+| Fabric IQ Replay | No | Verified sanitized Fabric capture |
+| Foundry Agent Service Live | Yes | Live hosted strict workflow over verified replay |
+| Local Deterministic | No | Synthetic fallback for development and tests |
+
+Runtime selection is process-local and ephemeral. Switching does not create a proposal,
+change governance state, or persist credentials.
+
+## Default Learning Demo
+
+### Certification Ready: proven conflict
+
+| Owner | Executed definition | Ready learners |
+|---|---|---:|
+| HR | All required modules complete | 80 |
+| Learning & Development | Modules complete and latest practice score at least 80% | 56 |
+| Managers | Required labs complete and manager approval recorded | 56 |
+
+The two 56-learner populations are different sets. Concord IQ proves the conflict,
+identifies 24 false-ready learners, and reports $10,800 of synthetic exam-voucher spend
+at risk. The Learning Governance Council is the configured owner, so Concord drafts a
+Semantic PR for human approval.
+
+### Required Training Complete: wording decoy
+
+Two differently worded definitions execute to the same 80 learners. The deterministic
+verdict is `consistent`; no proposal or refusal is created.
+
+### Exam Eligible: governed refusal
+
+The definitions diverge, but authority is ambiguous. Concord IQ refuses automatic
+reconciliation and promotes nothing.
+
+## Environment
+
+Copy `.env.example` to `.env` and keep access-token values empty. Tokens are acquired at
+runtime and never written to the file.
+
+Important flags:
+
+```dotenv
+CONCORD_SCENARIO_PACK=learning
+CONCORD_ENABLE_BUSINESS=false
+CONCORD_RUNTIME_SWITCHING=false
+CONCORD_DEFAULT_RUNTIME=fabric_live
+
+LEARNING_REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/certification-ready.latest.json
+BUSINESS_REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/latest.json
 ```
 
-Run the preserved business-metrics pack:
+`make dev` explicitly enables runtime switching and live cloud access for that child
+process. The repository defaults remain fail-closed. Use this for an offline stack:
 
 ```bash
-CONCORD_SCENARIO_PACK=business make dev
+make dev-local
 ```
 
-Valid values are `learning` and `business`. Invalid values fail with an actionable
-configuration error.
+`make dev-local` forces `PROVIDER=local`, `ALLOW_CLOUD=false`, and
+`MAX_CLOUD_CALLS=0`, and strips inherited cloud tokens.
 
-## Microsoft IQ usage
+## Foundry Learning Agent
 
-**Default reviewer mode runs locally with deterministic synthetic data and no cloud calls.
-Fabric IQ and Foundry Agent Service proofs are included as sanitized replay captures.**
-
-The IQ integration applies to the **learning** default. Fabric IQ grounds the governed
-**Certification Ready** concept and its semantic graph — learner, role, certification,
-required module, practice assessment, lab completion, manager approval, and the readiness
-rule. Concord IQ's deterministic engine then executes and verifies the competing definitions
-against synthetic learner data. **Fabric IQ does not compute the readiness counts**; the
-counts come only from executed SQL.
-
-- **Microsoft Agent Framework:** implemented ten-stage typed workflow used by both packs.
-- **Foundry Agent Service:** a real hosted deployment and invocation are recorded as a
-  sanitized capture in
-  [`docs/proofs/foundry-agent-service-smoke.md`](docs/proofs/foundry-agent-service-smoke.md).
-- **Fabric IQ:** semantic grounding is proven through a verified, sanitized replay capture.
-  The committed live/replay capture is currently anchored to the business pack; a learning
-  **Certification Ready** live capture is the planned strongest artifact and is scaffolded in
-  [`docs/proofs/`](docs/proofs/) and [`artifacts/replay/sanitized/`](artifacts/replay/sanitized/).
-- **Foundry IQ:** advisory authority grounding is transport-tested; no real-tenant Foundry IQ
-  capture is claimed.
-- **Work IQ:** the guarded adapter is implemented, but live retrieval is license-gated in the
-  available tenant — never reported as a live retrieval.
-
-The Certification Ready scenario uses deterministic local synthetic data. It is
-representative of enterprise learning artifacts and is **not** presented as a live Work
-IQ retrieval.
-
-## Tests
-
-Run the complete reproducible judge gate:
+Authenticate Azure Developer CLI once:
 
 ```bash
-make judge-proof
+azd auth login
 ```
 
-Or run the main gates separately:
+Build the Linux AMD64 image, update the existing `concord-iq-2` agent, and run the live
+proof check:
+
+```bash
+make foundry-hosted-deploy
+```
+
+This command ends by requiring the hosted response to report:
+
+```text
+provider_mode=replay
+workflow_mode=strict
+term=Certification Ready
+verdict=conflict
+verification_status=passed
+specialist_steps=10
+```
+
+To check the already deployed agent without redeploying:
+
+```bash
+make foundry-hosted-smoke
+```
+
+The smoke command reads the endpoint from `.env`, acquires a short-lived Foundry token
+via Azure CLI, permits exactly one cloud call, and writes only a secret-free report.
+
+## Other Run Modes
+
+```bash
+make dev-local       # Learning, local deterministic, no cloud
+make dev-fabric      # Learning, direct live Fabric IQ
+make dev-foundry     # Learning, direct Foundry Agent Service
+make dev-fresh       # Reset only local synthetic state, then start local Learning
+make replay-check    # Verify the configured sanitized replay
+make cloud-proof     # Report configured cloud proofs honestly
+make help            # Show all supported commands
+```
+
+Work IQ is separate and may remain tenant-license-gated:
+
+```bash
+make dev-work-iq
+```
+
+## Architecture
+
+![Concord IQ architecture](docs/assets/architecture.png)
+
+The selected provider supplies governed semantic definitions. Microsoft Agent Framework
+coordinates the typed casefile. Deterministic execution compares population IDs and
+produces evidence. Authority rules and the skeptical verifier gate any proposal.
+Authorized approval promotes a version only inside the Concord IQ registry; it does not
+write back to Fabric IQ, Foundry IQ, or Work IQ.
+
+## Verify
+
+Run the complete project gates:
 
 ```bash
 make test
 make lint
+make judge-proof
 ```
 
-`make judge-proof` keeps the established Fabric replay, eval scorecard, and
-content-hashed Active Customer Semantic-PR proof anchored to the business pack while
-the full backend/frontend suites cover the learning default.
+Useful focused proofs:
 
-## Safety and reliability
+```bash
+make eval
+make replay-check
+make foundry-hosted-smoke
+```
 
-- Deterministic SQL result-set equality owns conflict versus consistency.
-- Configured rules own authority decisions.
-- The skeptical verifier blocks unsupported or incomplete cases.
-- Ambiguous authority causes refusal, never an invented owner.
-- Canonical promotion requires the configured human authority owner.
-- Cloud access is disabled by default and fails closed without permission and budget.
-- All local demo data is synthetic, fixed-seed, and dated to a fixed reference date.
-- Canonical promotion changes only the Concord IQ registry; it does not write back to
-  Fabric IQ, Foundry IQ, or Work IQ.
+## Safety Contract
+
+- SQL result-set equality owns conflict versus consistency.
+- Configured rules own authority.
+- The skeptical verifier blocks incomplete evidence.
+- Ambiguous authority causes refusal.
+- Cloud providers fail closed without permission, budget, endpoint, and authentication.
+- Local data is synthetic with seed `20260606` and reference date `2026-06-01`.
+- Tokens are never logged, persisted in `.env`, or passed on a command line.
+- Tests inject transports and do not call Microsoft services.
 
 ## License
 

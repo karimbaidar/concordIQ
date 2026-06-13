@@ -72,8 +72,8 @@ class StatelessHostedWorkflowAgent:
             .as_agent(
                 name="Concord IQ",
                 description=(
-                    "Reconciles conflicting business definitions using governed "
-                    "grounding and deterministic evidence."
+                    "Reconciles conflicting definitions across governed semantic "
+                    "systems using deterministic evidence."
                 ),
             )
         )
@@ -242,7 +242,7 @@ def main() -> None:
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--dry-run", action="store_true")
     action.add_argument("--smoke", action="store_true")
-    parser.add_argument("--provider", default="auto")
+    parser.add_argument("--provider", default=os.environ.get("PROVIDER", "auto"))
     parser.add_argument("--workflow-mode", choices=("fast", "strict"), default="strict")
     parser.add_argument("--term", default="Certification Ready")
     parser.add_argument("--period", default=DEFAULT_PERIOD)

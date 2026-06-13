@@ -149,6 +149,7 @@ class FoundryHostedProvider:
 
     def __init__(self, settings: Settings, *, transport: JsonTransport | None = None) -> None:
         self.settings = settings
+        self.scenario_pack = settings.scenario_pack
         self.client = GuardedCloudClient(
             settings,
             provider_name=self.name,
@@ -206,7 +207,10 @@ class FoundryHostedProvider:
         """Resolve a question locally to a term before one hosted runtime call."""
         from concord.providers.local import LocalProvider
 
-        result = LocalProvider(duckdb_path=self.settings.duckdb_path).nl_query(question)
+        result = LocalProvider.for_scenario_pack(
+            self.settings.scenario_pack,
+            duckdb_path=self.settings.duckdb_path,
+        ).nl_query(question)
         return result.model_copy(
             update={"grounding_provider": "Foundry Agent Service (local ontology routing)"}
         )

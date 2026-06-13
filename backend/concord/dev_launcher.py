@@ -2,9 +2,9 @@
 
 Guarantees:
 
-* ``make dev`` always starts safe local mode. Stale shell variables or ``.env``
-  cloud tokens are stripped and the safe defaults are forced (see
-  :func:`build_runtime_environment`).
+* ``make dev`` starts the explicit reviewer demo profile: learning + live Fabric
+  by default, with verified replay and Foundry Agent Service available in the UI.
+* ``make dev-local`` preserves the safe cloud-free development path.
 * Cloud modes acquire a short-lived token at runtime via
   :mod:`concord.cloud_auth` and pass it to the child backend through the
   environment only — never on a command line, never printed, never written.
@@ -29,10 +29,11 @@ from pathlib import Path
 from concord import cloud_auth
 
 LOCAL = "local"
+DEMO = "demo"
 FOUNDRY = "foundry"
 FABRIC = "fabric"
 WORK_IQ = "work-iq"
-MODES = (LOCAL, FOUNDRY, FABRIC, WORK_IQ)
+MODES = (LOCAL, DEMO, FOUNDRY, FABRIC, WORK_IQ)
 
 # Cloud bearer-token variables that must never leak into a local-mode child and
 # must be replaced (not inherited) for cloud modes.
@@ -95,6 +96,7 @@ def build_runtime_environment(
     *,
     base_env: dict[str, str] | None = None,
     token: str | None = None,
+    tokens: dict[str, str] | None = None,
 ) -> dict[str, str]:
     """Build the child-process environment for ``mode``.
 
@@ -126,6 +128,27 @@ def build_runtime_environment(
 
     if mode not in MODES:
         raise ValueError(f"Unknown dev mode: {mode!r}. Expected one of {MODES}.")
+    if mode == DEMO:
+        supplied = tokens or {}
+        fabric_token = supplied.get("FABRIC_IQ_ACCESS_TOKEN")
+        foundry_token = supplied.get("FOUNDRY_ACCESS_TOKEN")
+        if not fabric_token or not foundry_token:
+            raise ValueError("Demo mode requires fresh Fabric IQ and Foundry access tokens.")
+        env.update(
+            {
+                "PROVIDER": "fabric_iq",
+                "ALLOW_CLOUD": "true",
+                "MAX_CLOUD_CALLS": env.get("MAX_CLOUD_CALLS", "20"),
+                "AGENT_WORKFLOW_MODE": "strict",
+                "CONCORD_WORKFLOW_MODE": "strict",
+                "CONCORD_SCENARIO_PACK": scenario_pack,
+                "CONCORD_RUNTIME_SWITCHING": "true",
+                "CONCORD_DEFAULT_RUNTIME": "fabric_live",
+                "FABRIC_IQ_ACCESS_TOKEN": fabric_token,
+                "FOUNDRY_ACCESS_TOKEN": foundry_token,
+            }
+        )
+        return env
     if not token:
         raise ValueError(f"Cloud mode {mode!r} requires a non-empty access token.")
 
@@ -178,11 +201,20 @@ def _acquire_token(mode: str, env: dict[str, str]) -> str:
     raise ValueError(f"{mode!r} is not a cloud mode.")
 
 
+def _acquire_demo_tokens(env: dict[str, str]) -> dict[str, str]:
+    """Acquire both tokens needed by the switchable reviewer demo."""
+    return {
+        "FABRIC_IQ_ACCESS_TOKEN": _acquire_token(FABRIC, env),
+        "FOUNDRY_ACCESS_TOKEN": _acquire_token(FOUNDRY, env),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Banner (never prints token values)
 # --------------------------------------------------------------------------- #
 _MODE_LABELS = {
     LOCAL: ("local", "disabled"),
+    DEMO: ("fabric_iq + foundry_hosted + replay", "enabled"),
     FOUNDRY: ("foundry_hosted", "enabled"),
     FABRIC: ("fabric_iq", "enabled"),
     WORK_IQ: ("work_iq", "enabled"),
@@ -392,8 +424,14 @@ def run_dev_stack(
             raise SystemExit(detail)
         emit(detail)
 
-    token = None if mode == LOCAL else _acquire_token(mode, source_env)
-    env = build_runtime_environment(mode, base_env=source_env, token=token)
+    demo_tokens = _acquire_demo_tokens(source_env) if mode == DEMO else None
+    token = None if mode in {LOCAL, DEMO} else _acquire_token(mode, source_env)
+    env = build_runtime_environment(
+        mode,
+        base_env=source_env,
+        token=token,
+        tokens=demo_tokens,
+    )
 
     stack = DevStack(mode=mode, env=env, spawn=spawn)
     stack.start()

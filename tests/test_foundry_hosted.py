@@ -9,6 +9,7 @@ from concord.config import CloudAccessDisabled, Settings
 from concord.ms_agent.foundry_hosted import (
     HostedSmokeError,
     HostedSmokeProof,
+    cli_smoke_settings,
     extract_hosted_proof,
     hosted_dry_run,
     hosted_package,
@@ -54,7 +55,7 @@ def _hosted_settings(tmp_path: Path, **overrides: Any) -> Settings:
 def test_hosted_dry_run_validates_entrypoint_and_artifact(tmp_path: Path) -> None:
     artifact = tmp_path / "latest.json"
     artifact.write_text("{}", encoding="utf-8")
-    report = hosted_dry_run(Settings(_env_file=None, replay_artifact_path=artifact))
+    report = hosted_dry_run(Settings(_env_file=None, learning_replay_artifact_path=artifact))
 
     assert report["status"] == "ready"
     assert report["intended_runtime"] == "Foundry Agent Service"
@@ -68,7 +69,12 @@ def test_hosted_dry_run_validates_entrypoint_and_artifact(tmp_path: Path) -> Non
 
 def test_hosted_dry_run_requires_committed_artifact(tmp_path: Path) -> None:
     with pytest.raises(HostedSmokeError, match="replay artifact is missing"):
-        hosted_dry_run(Settings(_env_file=None, replay_artifact_path=tmp_path / "missing.json"))
+        hosted_dry_run(
+            Settings(
+                _env_file=None,
+                learning_replay_artifact_path=tmp_path / "missing.json",
+            )
+        )
 
 
 # ---- package (no secrets / raw) ----
@@ -78,7 +84,7 @@ def test_hosted_package_excludes_secrets_and_raw(tmp_path: Path) -> None:
     artifact = tmp_path / "latest.json"
     artifact.write_text("{}", encoding="utf-8")
     report_path = hosted_package(
-        Settings(_env_file=None, replay_artifact_path=artifact),
+        Settings(_env_file=None, learning_replay_artifact_path=artifact),
         output_dir=tmp_path / "foundry",
     )
     text = report_path.read_text(encoding="utf-8")
@@ -150,6 +156,28 @@ def test_hosted_smoke_passes_with_valid_response(tmp_path: Path) -> None:
     report = (tmp_path / "foundry" / "hosted-smoke-report.md").read_text(encoding="utf-8")
     assert "PASSED" in report
     assert "super-secret-token" not in report
+
+
+def test_cli_smoke_settings_acquires_one_short_lived_token(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "concord.ms_agent.foundry_hosted.get_foundry_access_token",
+        lambda: "fresh-token",
+    )
+
+    settings = cli_smoke_settings(
+        Settings(
+            _env_file=None,
+            foundry_hosted_endpoint="https://concord-agent.example.com",
+            foundry_access_token="",
+        )
+    )
+
+    assert settings.allow_cloud is True
+    assert settings.max_cloud_calls == 1
+    assert settings.foundry_access_token is not None
+    assert settings.foundry_access_token.get_secret_value() == "fresh-token"
 
 
 def test_hosted_smoke_refuses_without_cloud_permission(tmp_path: Path) -> None:

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 
-import type { DemoScenario } from "../types";
+import type { DemoScenario, RuntimeProfile } from "../types";
 
 interface TermSearchProps {
   scenarios: DemoScenario[];
   selectedId: string;
   busy: boolean;
-  hostedRuntime?: boolean;
+  runtimeProfile?: RuntimeProfile;
   onSelect: (scenarioId: string) => void;
   onRun: () => void;
   onInvestigate?: (term: string) => void;
@@ -23,7 +23,7 @@ export function TermSearch({
   scenarios,
   selectedId,
   busy,
-  hostedRuntime = false,
+  runtimeProfile = "local",
   onSelect,
   onRun,
   onInvestigate,
@@ -103,9 +103,13 @@ export function TermSearch({
         </svg>
       </button>
       <p className="run-note">
-        {hostedRuntime
-          ? "Calls the deployed Agent Framework runtime; deterministic tools still own the verdict."
-          : "Executes trusted SQL locally. No LLM or cloud call participates in the verdict."}
+        {runtimeProfile === "foundry_live"
+          ? "Calls the deployed Agent Framework runtime over verified replay; deterministic tools still own the verdict."
+          : runtimeProfile === "fabric_live"
+            ? "Grounds definitions in Fabric IQ live; deterministic SQL still owns the verdict."
+            : runtimeProfile === "fabric_replay"
+              ? "Uses the verified sanitized Fabric IQ capture; no cloud call is made."
+              : "Executes trusted SQL locally. No LLM or cloud call participates in the verdict."}
       </p>
     </section>
   );

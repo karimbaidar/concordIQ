@@ -24,8 +24,9 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, SecretStr
 
+from concord.cloud_auth import get_foundry_access_token
 from concord.config import CloudAccessDisabled, Settings
 from concord.providers.foundry_hosted import foundry_responses_url
 
@@ -48,7 +49,8 @@ PACKAGE_INCLUDES = (
     f"{HOSTED_START_COMMAND}  (hosted entrypoint)",
     "backend/concord/  (application package)",
     "pyproject.toml + uv.lock  (dependencies, incl. the foundry-hosting extra)",
-    "artifacts/replay/sanitized/latest.json  (verified Fabric IQ replay artifact)",
+    "artifacts/replay/sanitized/certification-ready.latest.json  "
+    "(verified Fabric IQ learning replay)",
     "ontology/  and  data/synthetic/  (deterministic grounding + analytics)",
 )
 PACKAGE_EXCLUDES = (
@@ -83,9 +85,10 @@ def required_hosted_env() -> dict[str, str]:
     return {
         # Inside the hosted app (no cloud grounding needed — replay is self-contained):
         "PROVIDER": "replay",
+        "CONCORD_SCENARIO_PACK": "learning",
         "CONCORD_WORKFLOW_MODE": "strict",
-        "DATABASE_URL": "sqlite+pysqlite:////tmp/concord_iq_foundry_smoke.db",
-        "REPLAY_ARTIFACT_PATH": "artifacts/replay/sanitized/latest.json",
+        "DATABASE_URL": "sqlite+pysqlite:////tmp/concord_iq_foundry_learning.db",
+        "REPLAY_ARTIFACT_PATH": ("artifacts/replay/sanitized/certification-ready.latest.json"),
         "ALLOW_CLOUD": "false",
         "MAX_CLOUD_CALLS": "0",
         # For the local smoke caller that reaches the deployed endpoint:
@@ -158,7 +161,7 @@ def hosted_dry_run(settings: Settings | None = None) -> dict[str, object]:
     """Validate the hosted runtime locally without any cloud call."""
     active = settings or Settings()
     entrypoint_available = importlib.util.find_spec(HOSTED_ENTRYPOINT_MODULE) is not None
-    artifact = Path(active.replay_artifact_path)
+    artifact = Path(active.learning_replay_artifact_path)
     if not entrypoint_available:
         raise HostedSmokeError(f"Hosted entrypoint module {HOSTED_ENTRYPOINT_MODULE} is missing.")
     if not artifact.exists():
@@ -187,7 +190,7 @@ def hosted_package(
 ) -> Path:
     """Write a minimal, secret-free deployment report for Foundry Agent Service."""
     active = settings or Settings()
-    artifact = Path(active.replay_artifact_path)
+    artifact = Path(active.learning_replay_artifact_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     env_lines = "\n".join(f"- `{key}={value}`" for key, value in required_hosted_env().items())
     includes = "\n".join(f"- {item}" for item in PACKAGE_INCLUDES)
@@ -280,7 +283,7 @@ def hosted_smoke(
         )
     endpoint = active.foundry_hosted_endpoint
     token = active.foundry_access_token
-    if not endpoint or not token:
+    if not endpoint or token is None or not token.get_secret_value().strip():
         raise HostedSmokeError(
             "Hosted smoke requires FOUNDRY_HOSTED_ENDPOINT and FOUNDRY_ACCESS_TOKEN."
         )
@@ -293,7 +296,7 @@ def hosted_smoke(
         "Content-Type": "application/json",
         "Accept": "application/json, text/event-stream",
     }
-    # Send the business question with the resolvable term so the deployed agent
+    # Send the learning question with the governed term so the deployed agent
     # reconciles Certification Ready through the strict workflow by default.
     inner = json.dumps({"term": EXPECTED_TERM, "question": HOSTED_QUESTION})
     body = json.dumps({"input": inner}).encode("utf-8")
@@ -323,6 +326,21 @@ no Fabric IQ call was made.
     return proof
 
 
+def cli_smoke_settings(settings: Settings | None = None) -> Settings:
+    """Build the explicit one-call smoke configuration without persisting a token."""
+    active = settings or Settings()
+    token = active.foundry_access_token
+    if token is None or not token.get_secret_value().strip():
+        token = SecretStr(get_foundry_access_token())
+    return active.model_copy(
+        update={
+            "allow_cloud": True,
+            "max_cloud_calls": 1,
+            "foundry_access_token": token,
+        }
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Concord IQ Foundry Agent Service hosted tooling.")
     action = parser.add_mutually_exclusive_group(required=True)
@@ -338,7 +356,7 @@ def main() -> None:
             path = hosted_package()
             print(f"Wrote Foundry deployment report to {path}")
         else:
-            proof = hosted_smoke()
+            proof = hosted_smoke(cli_smoke_settings())
             print("Foundry Agent Service cloud runtime smoke verified.")
             print(proof.model_dump_json())
     except (HostedSmokeError, CloudAccessDisabled) as error:

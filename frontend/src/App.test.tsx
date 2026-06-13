@@ -329,12 +329,45 @@ function mockJson(body: unknown) {
   } as Response);
 }
 
+const businessRuntime = {
+  scenario_pack: "business",
+  runtime_profile: "local",
+  switching_enabled: false,
+  scenario_packs: [
+    {
+      id: "learning",
+      label: "Learning",
+      enabled: true,
+      detail: "Learning pack.",
+    },
+    {
+      id: "business",
+      label: "Business",
+      enabled: true,
+      detail: "Business pack.",
+    },
+  ],
+  runtime_profiles: [
+    {
+      id: "local",
+      label: "Local Deterministic",
+      available: true,
+      cloud: false,
+      detail: "Cloud-free synthetic fallback.",
+      supported_packs: ["learning", "business"],
+    },
+  ],
+};
+
 describe("Concord IQ demo", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: string | URL | Request) => {
         const url = String(input);
+        if (url.endsWith("/runtime")) {
+          return mockJson(businessRuntime);
+        }
         if (url.endsWith("/health")) {
           return mockJson({
             status: "ok",
@@ -462,6 +495,12 @@ describe("Concord IQ demo", () => {
       "fetch",
       vi.fn((input: string | URL | Request) => {
         const url = String(input);
+        if (url.endsWith("/runtime")) {
+          return mockJson({
+            ...businessRuntime,
+            runtime_profile: "foundry_live",
+          });
+        }
         if (url.endsWith("/health")) {
           return mockJson({
             status: "ok",
@@ -493,12 +532,12 @@ describe("Concord IQ demo", () => {
     expect(screen.getByText("Cloud enabled")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Calls the deployed Agent Framework runtime; deterministic tools still own the verdict.",
+        "Calls the deployed Agent Framework runtime over verified replay; deterministic tools still own the verdict.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Foundry Agent Service runtime · replay-grounded proof · cloud enabled",
+        "Foundry Agent Service live · verified Fabric replay · cloud enabled",
       ),
     ).toBeInTheDocument();
 
@@ -548,6 +587,9 @@ describe("Concord IQ demo", () => {
       "fetch",
       vi.fn((input: string | URL | Request) => {
         const url = String(input);
+        if (url.endsWith("/runtime")) {
+          return mockJson(businessRuntime);
+        }
         if (url.endsWith("/health")) {
           return mockJson({
             status: "ok",
@@ -631,6 +673,9 @@ describe("Concord IQ demo", () => {
       "fetch",
       vi.fn((input: string | URL | Request) => {
         const url = String(input);
+        if (url.endsWith("/runtime")) {
+          return mockJson(businessRuntime);
+        }
         if (url.endsWith("/health")) {
           return mockJson({
             status: "ok",

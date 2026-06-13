@@ -1,0 +1,15 @@
+**
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!README.md
+!backend/
+!backend/**
+!data/
+!data/**
+!ontology/
+!ontology/**
+!artifacts/
+!artifacts/replay/
+!artifacts/replay/sanitized/
+!artifacts/replay/sanitized/**
