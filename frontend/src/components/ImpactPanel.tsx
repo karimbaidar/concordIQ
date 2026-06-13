@@ -14,6 +14,9 @@ function formatCurrency(value: number) {
 }
 
 export function ImpactPanel({ impact, exploring = false }: ImpactPanelProps) {
+  const entityLabel = impact.entity_label ?? "customers";
+  const valueLabel = impact.value_label ?? "metric delta";
+  const falsePositiveIds = impact.false_positive_entity_ids ?? [];
   return (
     <section
       className={`surface impact-panel${exploring ? " is-exploring" : ""}`}
@@ -36,13 +39,13 @@ export function ImpactPanel({ impact, exploring = false }: ImpactPanelProps) {
           <strong className="rederived-value" key={impact.customer_count_delta}>
             {impact.customer_count_delta}
           </strong>
-          <span>customer delta</span>
+          <span>{entityLabel} delta</span>
         </div>
         <div>
           <strong className="rederived-value" key={impact.arr_delta}>
             {formatCurrency(impact.arr_delta)}
           </strong>
-          <span>metric delta</span>
+          <span>{valueLabel}</span>
         </div>
       </div>
       <div className="impact-details">
@@ -64,6 +67,12 @@ export function ImpactPanel({ impact, exploring = false }: ImpactPanelProps) {
           <span key={unit}>{unit}</span>
         ))}
       </div>
+      {falsePositiveIds.length > 0 && (
+        <div className="affected-entities">
+          <span>{impact.false_positive_label ?? "Affected entities"}</span>
+          <p>{falsePositiveIds.join(", ")}</p>
+        </div>
+      )}
     </section>
   );
 }

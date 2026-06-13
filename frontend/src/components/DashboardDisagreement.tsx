@@ -8,6 +8,9 @@ const OWNER_COLORS: Record<string, string> = {
   Finance: "blue",
   Sales: "violet",
   "Customer Success": "teal",
+  HR: "blue",
+  "Learning & Development": "violet",
+  Managers: "teal",
 };
 
 function formatMetric(value: number) {
@@ -25,6 +28,17 @@ export function DashboardDisagreement({ result }: DashboardDisagreementProps) {
   );
 
   const governed = result.governed_canonical;
+  const learning = result.resolved_concept?.concept_id === "certification_ready";
+  const impact = result.impact_assessment;
+  const evaluationByOwner = new Map(
+    result.execution_results.map((evaluation) => [
+      bindings.get(evaluation.binding_id)?.owner,
+      evaluation,
+    ]),
+  );
+  const claimedReady = evaluationByOwner.get("HR")?.entity_count;
+  const verifiedReady =
+    evaluationByOwner.get("Learning & Development")?.entity_count;
 
   return (
     <section className="dashboard-disagreement" aria-labelledby="dashboard-title">
@@ -58,16 +72,40 @@ export function DashboardDisagreement({ result }: DashboardDisagreementProps) {
               <div>
                 <span>{owner}</span>
                 <strong>{evaluation.entity_count}</strong>
-                <small>selected entities</small>
+                <small>{learning ? "learners marked ready" : "selected entities"}</small>
               </div>
               <div className="metric-total">
-                <span>Metric value</span>
+                <span>{learning ? "Exam vouchers represented" : "Metric value"}</span>
                 <strong>{formatMetric(evaluation.metric_total)}</strong>
               </div>
             </article>
           );
         })}
       </div>
+      {learning && impact && (
+        <div className="readiness-summary" aria-label="Certification readiness outcome">
+          <div>
+            <span>Claimed ready</span>
+            <strong>{claimedReady ?? 0}</strong>
+            <small>HR module-completion view</small>
+          </div>
+          <div>
+            <span>Verified ready</span>
+            <strong>{verifiedReady ?? 0}</strong>
+            <small>L&amp;D modules + latest score</small>
+          </div>
+          <div className="readiness-risk">
+            <span>False-ready learners</span>
+            <strong>{impact.false_positive_count ?? 0}</strong>
+            <small>Claimed ready but below the verified threshold</small>
+          </div>
+          <div className="readiness-risk">
+            <span>Exam spend at risk</span>
+            <strong>{formatMetric(impact.arr_delta)}</strong>
+            <small>Synthetic voucher cost</small>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

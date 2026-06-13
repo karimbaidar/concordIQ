@@ -7,18 +7,36 @@ interface AskConcordProps {
   onAnswer: (caseResult: ReconciliationCase) => void;
   busy: boolean;
   setBusy: (busy: boolean) => void;
+  scenarioPack?: "learning" | "business";
 }
 
-const SUGGESTIONS = [
+const BUSINESS_SUGGESTIONS = [
   "Why do our active customer numbers disagree?",
   "Are our net revenue definitions equivalent?",
   "Do Sales and Marketing agree on a qualified lead?",
 ];
 
-export function AskConcord({ onAnswer, busy, setBusy }: AskConcordProps) {
+const LEARNING_SUGGESTIONS = [
+  "Who is Certification Ready?",
+  "Why do our certification readiness counts disagree?",
+  "Which readiness definition is governed?",
+];
+
+export function AskConcord({
+  onAnswer,
+  busy,
+  setBusy,
+  scenarioPack = "business",
+}: AskConcordProps) {
   const [question, setQuestion] = useState("");
   const [grounded, setGrounded] = useState<QueryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const suggestions =
+    scenarioPack === "learning" ? LEARNING_SUGGESTIONS : BUSINESS_SUGGESTIONS;
+  const placeholder =
+    scenarioPack === "learning"
+      ? "Why do our certification readiness counts disagree?"
+      : "Why do our active customer numbers disagree?";
 
   async function submit(value: string) {
     const trimmed = value.trim();
@@ -56,7 +74,7 @@ export function AskConcord({ onAnswer, busy, setBusy }: AskConcordProps) {
         <input
           type="text"
           value={question}
-          placeholder="Why do our active customer numbers disagree?"
+          placeholder={placeholder}
           aria-label="Business question"
           onChange={(event) => setQuestion(event.target.value)}
         />
@@ -65,7 +83,7 @@ export function AskConcord({ onAnswer, busy, setBusy }: AskConcordProps) {
         </button>
       </form>
       <div className="ask-suggestions">
-        {SUGGESTIONS.map((suggestion) => (
+        {suggestions.map((suggestion) => (
           <button
             key={suggestion}
             type="button"

@@ -13,6 +13,7 @@ interface TermSearchProps {
 }
 
 const SCENARIO_LABELS: Record<string, string> = {
+  "certification-ready": "False readiness firewall",
   "active-customer": "Material conflict",
   "net-revenue": "Wording decoy",
   "churned-customer": "Governed refusal",

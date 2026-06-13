@@ -153,6 +153,10 @@ export function MeaningGraph({
     canonical?.domain_views.length ?? result.binding_semantics.length;
   const impactCount = impact?.customer_count_delta ?? 0;
   const impactValue = impact?.arr_delta ?? 0;
+  const entityLabel = impact?.entity_label ?? "entities";
+  const singularEntityLabel = entityLabel === "learners" ? "learner" : "entity";
+  const valueLabel = impact?.value_label ?? "metric delta";
+  const valueSummary = valueLabel === "metric delta" ? "" : ` ${valueLabel}`;
   const statusLabel = {
     diverged: "Conflict proven by SQL",
     exploring: "Exploration - not governed",
@@ -163,7 +167,7 @@ export function MeaningGraph({
   const nodeSummary = nodes
     .map(
       ({ binding, count, windowDays, explored }) =>
-        `${binding.owner} selects ${formatCount(count)} entities${
+        `${binding.owner} selects ${formatCount(count)} ${entityLabel}${
           windowDays ? ` with a ${windowDays}-day ${explored ? "what-if" : "window"}` : ""
         }`,
     )
@@ -175,7 +179,7 @@ export function MeaningGraph({
         ? `${term} remains forked: ${nodeSummary}. Concord IQ refused an automatic merge because no single authority can approve it.`
         : state === "aligned"
           ? `${term} has ${nodes.length} definitions that execute to equivalent populations. No operational conflict was found.`
-          : `${term} is ${state === "exploring" ? "being explored ephemerally" : "operationally forked"}: ${nodeSummary}. The current spread is ${formatCount(impactCount)} entities and ${compactCurrency(impactValue)}.`;
+          : `${term} is ${state === "exploring" ? "being explored ephemerally" : "operationally forked"}: ${nodeSummary}. The current spread is ${formatCount(impactCount)} ${entityLabel} and ${compactCurrency(impactValue)}${valueSummary}.`;
 
   return (
     <section
@@ -190,7 +194,7 @@ export function MeaningGraph({
         <div>
           <span className="section-kicker">Meaning fork</span>
           <h2 id={`${accessibleId}-heading`}>
-            One business term.{" "}
+            One governed term.{" "}
             {state === "converged"
               ? "One governed meaning."
               : "Different operational truths."}
@@ -245,7 +249,7 @@ export function MeaningGraph({
                     {formatCount(canonicalEvaluation?.entity_count ?? 0)}
                   </text>
                   <text className="meaning-node-unit" x="150" y="126">
-                    entities
+                    {entityLabel}
                   </text>
                   <text className="meaning-node-meta" x="28" y="158">
                     {canonicalBinding?.time_window_days
@@ -300,7 +304,7 @@ export function MeaningGraph({
                           {formatCount(node.count)}
                         </text>
                         <text className="meaning-node-unit" x="112" y="69">
-                          entities
+                          {entityLabel}
                         </text>
                         <text className="meaning-node-meta" x="20" y="91">
                           {node.windowDays
@@ -324,7 +328,7 @@ export function MeaningGraph({
                     {formatCount(impactCount)}
                   </text>
                   <text className="meaning-impact-unit" x="94" y="69">
-                    entity spread
+                    {singularEntityLabel} spread
                   </text>
                   <text className="meaning-impact-money" x="22" y="96">
                     {compactCurrency(impactValue)}

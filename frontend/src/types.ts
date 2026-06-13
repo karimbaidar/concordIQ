@@ -12,6 +12,7 @@ export interface HealthStatus {
   llm_provider: string;
   llm_enabled: boolean;
   llm_model: string | null;
+  scenario_pack?: "learning" | "business";
 }
 
 export interface DemoScenario {
@@ -113,6 +114,12 @@ export interface ImpactAssessment {
   reports_affected: number;
   business_units_affected: string[];
   decision_criticality: Severity;
+  entity_label?: string;
+  value_label?: string;
+  affected_entity_ids?: string[];
+  false_positive_count?: number | null;
+  false_positive_label?: string | null;
+  false_positive_entity_ids?: string[];
 }
 
 export interface AuthorityRule {

@@ -57,6 +57,7 @@ export function DefinitionDiff({
   const governedDays = selectedBinding?.time_window_days ?? 30;
   const [timeWindowDays, setTimeWindowDays] = useState(governedDays);
   const governedCanonical = result.governed_canonical;
+  const entityLabel = result.impact_assessment?.entity_label ?? "entities";
 
   useEffect(() => {
     const firstBinding = editableBindings[0];
@@ -152,7 +153,7 @@ export function DefinitionDiff({
                 >
                   {explored?.entity_count ?? evaluation?.entity_count ?? 0}
                 </strong>
-                <span>entities after execution</span>
+                <span>{entityLabel} after execution</span>
               </footer>
             </article>
           );

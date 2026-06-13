@@ -33,7 +33,7 @@ import type {
   WhatIfResult,
 } from "./types";
 
-const SCENARIO_STORIES = [
+const BUSINESS_STORIES = [
   {
     number: "01",
     title: "Detect a real conflict",
@@ -48,6 +48,24 @@ const SCENARIO_STORIES = [
     number: "03",
     title: "Respect governance",
     copy: "Refuse a canonical choice when authority is unresolved.",
+  },
+];
+
+const LEARNING_STORIES = [
+  {
+    number: "01",
+    title: "Detect false readiness",
+    copy: "Execute HR, L&D, and manager definitions over the same learner cohort.",
+  },
+  {
+    number: "02",
+    title: "Prove the exposure",
+    copy: "Identify false-ready learner IDs and quantify synthetic exam spend at risk.",
+  },
+  {
+    number: "03",
+    title: "Gate the definition",
+    copy: "Route one evidence-backed readiness definition to the real authority owner.",
   },
 ];
 
@@ -102,7 +120,7 @@ function rederiveImpact(
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
-  const [selectedId, setSelectedId] = useState("active-customer");
+  const [selectedId, setSelectedId] = useState("");
   const [result, setResult] = useState<ReconciliationCase | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -150,6 +168,10 @@ export default function App() {
   const foundryHosted =
     health?.provider_mode === "foundry_hosted" ||
     result?.context_packet?.provider_metadata.mode === "foundry_hosted";
+  const learningMode =
+    health?.scenario_pack === "learning" ||
+    scenarios[0]?.scenario_id === "certification-ready";
+  const stories = learningMode ? LEARNING_STORIES : BUSINESS_STORIES;
   const whatIfEnabled = result?.context_packet?.provider_metadata.mode === "local";
   const displayedImpact = useMemo(
     () => (result ? rederiveImpact(result, whatIf) : null),
@@ -337,15 +359,32 @@ export default function App() {
             )}
             <span className="eyebrow">
               <i aria-hidden="true" />
-              Semantic reconciliation agent
+              {learningMode
+                ? "Enterprise learning reconciliation"
+                : "Semantic reconciliation agent"}
             </span>
-            <h1>
-              Settle what the business <em>means</em> before the board meeting.
-            </h1>
-            <p>
-              Concord IQ finds when teams use the same term differently, tests each
-              meaning against data, and proposes a governed resolution or refuses one.
-            </p>
+            {learningMode ? (
+              <>
+                <h1>
+                  The <em>False Readiness Firewall</em> for enterprise certification.
+                </h1>
+                <p>
+                  HR, Learning &amp; Development, and managers define readiness
+                  differently. Concord IQ proves the disagreement before dashboards,
+                  exam budget, or team readiness are trusted.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1>
+                  Settle what the business <em>means</em> before the board meeting.
+                </h1>
+                <p>
+                  Concord IQ finds when teams use the same term differently, tests each
+                  meaning against data, and proposes a governed resolution or refuses one.
+                </p>
+              </>
+            )}
             <div className="trust-row">
               <span>Deterministic SQL</span>
               <span>Typed evidence</span>
@@ -388,7 +427,7 @@ export default function App() {
 
         {!result && (
           <section className="story-strip" aria-label="Demo flow">
-            {SCENARIO_STORIES.map((story) => (
+            {stories.map((story) => (
               <article key={story.number}>
                 <span>{story.number}</span>
                 <div>
@@ -401,7 +440,12 @@ export default function App() {
         )}
 
         {!result && (
-          <AskConcord onAnswer={handleAskAnswer} busy={busy} setBusy={setBusy} />
+          <AskConcord
+            onAnswer={handleAskAnswer}
+            busy={busy}
+            setBusy={setBusy}
+            scenarioPack={learningMode ? "learning" : "business"}
+          />
         )}
         {!result && <PortfolioBoard onInvestigate={handleInvestigate} busy={busy} />}
 
