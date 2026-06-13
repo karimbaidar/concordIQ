@@ -39,7 +39,7 @@ def foundry_hosted_is_configured(settings: Settings) -> bool:
 def create_preferred_cloud_provider(settings: Settings) -> GroundingProvider:
     """Prefer Fabric IQ, using Foundry IQ only when Fabric is not configured."""
     if fabric_iq_is_configured(settings):
-        return FabricIQProvider(settings)
+        return FabricIQProvider(settings, allow_local_fallback=True)
     if foundry_iq_is_configured(settings):
         return FoundryIQProvider(settings)
     raise ProviderNotConfigured(
@@ -67,7 +67,7 @@ def create_provider(settings: Settings) -> GroundingProvider:
     if mode is ProviderMode.FOUNDRY_IQ:
         return FoundryIQProvider(settings)
     if mode is ProviderMode.FABRIC_IQ:
-        return FabricIQProvider(settings)
+        return FabricIQProvider(settings, allow_local_fallback=True)
     if mode is ProviderMode.WORK_IQ:
         return WorkIQProvider(settings)
     if mode is ProviderMode.FOUNDRY_HOSTED:

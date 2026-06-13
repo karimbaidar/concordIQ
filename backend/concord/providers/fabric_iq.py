@@ -46,12 +46,17 @@ class FabricIQProvider(CloudSnapshotProvider):
         *,
         transport: JsonTransport | None = None,
         local_provider: "LocalProvider | None" = None,
+        allow_local_fallback: bool = False,
     ) -> None:
         super().__init__(settings, transport=transport)
         self._session_id: str | None = None
         self._tools: tuple[dict[str, Any], ...] = ()
         self._request_id = 0
         self._local_provider = local_provider
+        # When set (the live interactive runtime), a governed scenario the Fabric ontology does
+        # not register degrades to the deterministic LocalProvider snapshot instead of erroring.
+        # Capture and diagnostics leave this False so they still reject ungrounded responses.
+        self._allow_local_fallback = allow_local_fallback
         self._semantic_proofs: dict[str, dict[str, str]] = {}
 
     @property
@@ -192,11 +197,27 @@ class FabricIQProvider(CloudSnapshotProvider):
         # Mode 2: the governed entity type was matched (semantic grounding proof).
         if find_semantic_match(called, expected):
             return self._record_semantic_proof(term, expected, str(tool["name"]), called)
+        # Mode 3 (live runtime only): the Fabric ontology grounds the hero concept; a supporting
+        # demo scenario it does not register degrades to the deterministic LocalProvider snapshot.
+        # No Fabric semantic proof is recorded for it, so nothing claims Fabric grounded a concept
+        # it did not. Capture and diagnostics keep this off and still reject ungrounded responses.
+        if self._allow_local_fallback and self._is_local_scenario(term):
+            return self._materialize_local_snapshot(term)
         raise ProviderNotConfigured(
             f"Fabric IQ returned no full snapshot and did not match the {expected!r} entity "
             f"type for {term!r}. Connectivity-only responses are rejected — run "
             "`make fabric-mcp-diagnose` to inspect the live response."
         )
+
+    def _is_local_scenario(self, term: str) -> bool:
+        from concord.demo import demo_scenarios_for_pack
+
+        scenario_pack = (
+            self._local_provider.scenario_pack
+            if self._local_provider is not None
+            else self.settings.scenario_pack
+        )
+        return any(scenario.term == term for scenario in demo_scenarios_for_pack(scenario_pack))
 
     def _materialize_local_snapshot(self, term: str) -> ReplayScenarioSnapshot:
         """Build the deterministic LocalProvider snapshot for a proven term."""

@@ -275,3 +275,62 @@ def test_replay_check_rejects_semantic_proof_with_secret(
     path.write_text(leaked, encoding="utf-8")
     with pytest.raises(ReplayCheckError, match="forbidden secret-shaped"):
         validate_replay_artifact(path)
+
+
+def test_fabric_falls_back_to_local_for_a_concept_not_in_the_ontology(tmp_path: Path) -> None:
+    """A supporting scenario the live ontology does not register degrades to local grounding.
+
+    The ontology is reachable (it lists the hero CertificationReady entity), but Exam Eligible
+    is not a Fabric entity type, so it uses the deterministic LocalProvider snapshot — and no
+    Fabric semantic proof is recorded for it. A connectivity-only response is still rejected.
+    """
+    from concord.config import ScenarioPack
+    from concord.seed.seed_duckdb import seed_duckdb
+
+    database_path = tmp_path / "concord-iq.duckdb"
+    seed_duckdb(database_path=database_path, data_dir=tmp_path / "csv")
+    local = LocalProvider.for_scenario_pack(ScenarioPack.LEARNING, duckdb_path=database_path)
+    settings = Settings(
+        _env_file=None,
+        provider="fabric_iq",
+        scenario_pack="learning",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint="https://api.fabric.microsoft.com/v1/mcp/dataPlane/test",
+        fabric_iq_access_token="secret",
+        duckdb_path=database_path,
+    )
+    transport = QueueTransport(_handshake() + [_semantic_text("CertificationReady")])
+    provider = FabricIQProvider(
+        settings, transport=transport, local_provider=local, allow_local_fallback=True
+    )
+
+    concept = provider.resolve_concept("Exam Eligible")
+
+    assert concept.concept_id == "exam_eligible"
+    assert "Exam Eligible" not in provider.semantic_proofs
+
+
+def test_fabric_without_fallback_still_rejects_an_ungrounded_concept(tmp_path: Path) -> None:
+    """Capture/diagnostics keep the strict path: an unmatched concept is rejected, not local."""
+    from concord.config import ScenarioPack
+    from concord.seed.seed_duckdb import seed_duckdb
+
+    database_path = tmp_path / "concord-iq.duckdb"
+    seed_duckdb(database_path=database_path, data_dir=tmp_path / "csv")
+    local = LocalProvider.for_scenario_pack(ScenarioPack.LEARNING, duckdb_path=database_path)
+    settings = Settings(
+        _env_file=None,
+        provider="fabric_iq",
+        scenario_pack="learning",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint="https://api.fabric.microsoft.com/v1/mcp/dataPlane/test",
+        fabric_iq_access_token="secret",
+        duckdb_path=database_path,
+    )
+    transport = QueueTransport(_handshake() + [_semantic_text("CertificationReady")])
+    provider = FabricIQProvider(settings, transport=transport, local_provider=local)
+
+    with pytest.raises(ProviderNotConfigured, match="Connectivity-only"):
+        provider.resolve_concept("Exam Eligible")
