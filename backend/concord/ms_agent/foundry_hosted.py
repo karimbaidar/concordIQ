@@ -8,7 +8,7 @@ in-process protocol smoke in `foundry_hosted_entrypoint.py`):
   and prints the required environment.
 * `hosted_package` — no cloud; writes a deployment report describing what to ship.
 * `hosted_smoke` — one real call to an already-deployed Foundry endpoint, asserting
-  the response proves ReplayProvider + strict workflow + the Active Customer
+  the response proves ReplayProvider + strict workflow + the Certification Ready
   conflict. ReplayProvider is used so the hosted agent needs no Fabric credentials.
 """
 
@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -30,12 +31,15 @@ from concord.providers.foundry_hosted import foundry_responses_url
 
 HOSTED_ENTRYPOINT_MODULE = "concord.ms_agent.foundry_hosted_entrypoint"
 HOSTED_START_COMMAND = "python -m concord.ms_agent.foundry_hosted_entrypoint"
-HOSTED_QUESTION = "Why do our Active Customer dashboards disagree?"
+HOSTED_QUESTION = os.environ.get(
+    "FOUNDRY_SMOKE_QUESTION",
+    "Do HR, Learning and Development, and managers agree on who is Certification Ready?",
+)
 DEFAULT_OUTPUT_DIR = Path("artifacts/foundry")
 
 EXPECTED_PROVIDER_MODE = "replay"
 EXPECTED_WORKFLOW_MODE = "strict"
-EXPECTED_TERM = "Active Customer"
+EXPECTED_TERM = os.environ.get("FOUNDRY_SMOKE_TERM", "Certification Ready")
 EXPECTED_VERDICT = "conflict"
 EXPECTED_VERIFICATION = "passed"
 EXPECTED_STEPS = 10
@@ -139,7 +143,7 @@ def validate_hosted_proof(proof: HostedSmokeProof) -> None:
     if proof.workflow_mode != EXPECTED_WORKFLOW_MODE:
         failures.append(f"workflow_mode is {proof.workflow_mode!r}, expected 'strict'")
     if proof.term != EXPECTED_TERM:
-        failures.append(f"term is {proof.term!r}, expected 'Active Customer'")
+        failures.append(f"term is {proof.term!r}, expected {EXPECTED_TERM!r}")
     if proof.verdict != EXPECTED_VERDICT:
         failures.append(f"verdict is {proof.verdict!r}, expected 'conflict'")
     if proof.verification_status != EXPECTED_VERIFICATION:
@@ -290,7 +294,7 @@ def hosted_smoke(
         "Accept": "application/json, text/event-stream",
     }
     # Send the business question with the resolvable term so the deployed agent
-    # reconciles Active Customer through the strict workflow.
+    # reconciles Certification Ready through the strict workflow by default.
     inner = json.dumps({"term": EXPECTED_TERM, "question": HOSTED_QUESTION})
     body = json.dumps({"input": inner}).encode("utf-8")
 

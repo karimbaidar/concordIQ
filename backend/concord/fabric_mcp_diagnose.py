@@ -14,6 +14,7 @@ never writes `sanitized/latest.json`.
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,7 @@ from concord.providers.base import ProviderNotConfigured
 from concord.providers.cloud import CloudCallBudgetExceeded, CloudTransportError
 from concord.providers.replay_schema import SnapshotNotFound, response_shape
 
-DEFAULT_DIAGNOSTIC_TERM = "Active Customer"
+DEFAULT_DIAGNOSTIC_TERM = os.environ.get("FABRIC_MCP_DIAGNOSE_TERM", "Certification Ready")
 
 
 def diagnose(

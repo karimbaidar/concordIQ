@@ -171,7 +171,7 @@ async def run_smoke(
     *,
     provider: str = "local",
     workflow_mode: str = "strict",
-    term: str = "Active Customer",
+    term: str = "Certification Ready",
     period: str = DEFAULT_PERIOD,
 ) -> HostedSmokeResult:
     """Exercise readiness and `/responses` entirely in-process."""
@@ -244,7 +244,7 @@ def main() -> None:
     action.add_argument("--smoke", action="store_true")
     parser.add_argument("--provider", default="auto")
     parser.add_argument("--workflow-mode", choices=("fast", "strict"), default="strict")
-    parser.add_argument("--term", default="Active Customer")
+    parser.add_argument("--term", default="Certification Ready")
     parser.add_argument("--period", default=DEFAULT_PERIOD)
     parser.add_argument("--host", default=os.environ.get("HOST", "0.0.0.0"))
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8088")))
