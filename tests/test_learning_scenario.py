@@ -51,6 +51,67 @@ def _run_certification_ready(runner: ReconciliationRunner) -> ReconciliationCase
     )
 
 
+def _run_required_training_complete(runner: ReconciliationRunner) -> ReconciliationCase:
+    return runner.run(
+        ReconciliationRequest(
+            question="Are our Required Training Complete definitions operationally equivalent?",
+            term="Required Training Complete",
+        )
+    )
+
+
+def _run_exam_eligible(runner: ReconciliationRunner) -> ReconciliationCase:
+    return runner.run(
+        ReconciliationRequest(
+            question="Can we choose one enterprise Exam Eligible definition?",
+            term="Exam Eligible",
+        )
+    )
+
+
+def test_required_training_complete_decoy_ruled_out(
+    learning_runner: ReconciliationRunner,
+) -> None:
+    case = _run_required_training_complete(learning_runner)
+    evaluations = case.execution_results
+
+    assert case.state == ReconciliationState.COMPLETE
+    assert case.verdict == "consistent"
+    assert [result.entity_count for result in evaluations] == [80, 80]
+    assert evaluations[0].entity_ids == evaluations[1].entity_ids
+    assert evaluations[0].rows == evaluations[1].rows
+    assert evaluations[0].metric_total == evaluations[1].metric_total
+    assert case.reconciliation_proposal is None
+    assert case.refusal_reason is None
+    assert case.requires_human_approval is False
+    assert case.impact_assessment
+    assert case.impact_assessment.severity == "low"
+    assert case.impact_assessment.customer_count_delta == 0
+    assert case.verifier_report and case.verifier_report.passed
+    assert len(case.agent_trace) == 10
+
+
+def test_exam_eligible_refusal_routes_to_human(
+    learning_runner: ReconciliationRunner,
+) -> None:
+    case = _run_exam_eligible(learning_runner)
+    authority = case.authority_assessment
+
+    assert case.state == ReconciliationState.COMPLETE
+    assert case.verdict == "conflict"
+    assert [result.entity_count for result in case.execution_results] == [80, 56]
+    assert authority
+    assert authority.status == "ambiguous"
+    assert authority.owner is None
+    assert {rule.status for rule in authority.rules} == {"shared", "ambiguous"}
+    assert case.reconciliation_proposal is None
+    assert case.requires_human_approval is True
+    assert case.refusal_reason
+    assert "human approval is required" in case.refusal_reason.lower()
+    assert case.verifier_report and case.verifier_report.passed
+    assert len(case.agent_trace) == 10
+
+
 def test_learning_registry_executes_three_divergent_definitions(
     learning_provider: LocalProvider,
 ) -> None:

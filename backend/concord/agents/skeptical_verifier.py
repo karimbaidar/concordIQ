@@ -379,5 +379,44 @@ class SkepticalVerifierAgent:
                     ),
                 }
             )
+        elif concept_id == "required_training_complete":
+            rows = {evaluation.rows for evaluation in case.execution_results}
+            totals = {evaluation.metric_total for evaluation in case.execution_results}
+            checks.update(
+                {
+                    "two_definitions_executed": len(case.execution_results) == 2,
+                    "decoy_has_equal_entity_sets": (
+                        case.verdict == "consistent" and len(entity_sets) == 1
+                    ),
+                    "decoy_has_equal_rows_and_totals": (len(rows) == 1 and len(totals) == 1),
+                    "consistent_case_has_low_impact": (
+                        case.impact_assessment is not None
+                        and case.impact_assessment.severity == "low"
+                        and case.impact_assessment.customer_count_delta == 0
+                        and case.impact_assessment.arr_delta == 0
+                    ),
+                }
+            )
+        elif concept_id == "exam_eligible":
+            checks.update(
+                {
+                    "two_definitions_executed": len(case.execution_results) == 2,
+                    "conflict_has_divergent_sets": (
+                        case.verdict == "conflict" and len(entity_sets) > 1
+                    ),
+                    "authority_requires_escalation": (
+                        case.authority_assessment is not None
+                        and case.authority_assessment.status in {"shared", "ambiguous", "missing"}
+                        and case.authority_assessment.owner is None
+                    ),
+                    "refusal_does_not_invent_proposal": (
+                        case.reconciliation_proposal is None and bool(case.refusal_reason)
+                    ),
+                    "refusal_requires_human_approval": (
+                        case.requires_human_approval
+                        and "human approval is required" in (case.refusal_reason or "").lower()
+                    ),
+                }
+            )
         else:
             checks["scenario_is_supported"] = False

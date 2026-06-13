@@ -28,6 +28,34 @@
       "status": "clear",
       "owner": "Learning Governance Council",
       "rationale": "The Learning Governance Council owns the enterprise certification-readiness definition."
+    },
+    {
+      "concept_id": "required_training_complete",
+      "semantic_dimension": "required-module-completion",
+      "status": "clear",
+      "owner": "HR",
+      "rationale": "HR owns the required-module completion records used in workforce reporting."
+    },
+    {
+      "concept_id": "required_training_complete",
+      "semantic_dimension": "canonical-required-training-complete",
+      "status": "clear",
+      "owner": "Learning Governance Council",
+      "rationale": "The Learning Governance Council owns the enterprise required-training-complete definition."
+    },
+    {
+      "concept_id": "exam_eligible",
+      "semantic_dimension": "exam-eligibility-window",
+      "status": "ambiguous",
+      "owner": null,
+      "rationale": "No approved enterprise owner or precedence rule decides exam eligibility."
+    },
+    {
+      "concept_id": "exam_eligible",
+      "semantic_dimension": "module-vs-lab-precedence",
+      "status": "shared",
+      "owner": null,
+      "rationale": "HR and Managers gate eligibility on different signals with no agreed precedence."
     }
   ]
 }

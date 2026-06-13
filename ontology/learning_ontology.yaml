@@ -11,6 +11,28 @@
         "exam ready",
         "ready for certification"
       ]
+    },
+    {
+      "concept_id": "required_training_complete",
+      "canonical_name": "Required Training Complete",
+      "description": "A learner who has completed all required training for the certification.",
+      "aliases": [
+        "required training completed",
+        "required-training-complete",
+        "training complete",
+        "required course completion"
+      ]
+    },
+    {
+      "concept_id": "exam_eligible",
+      "canonical_name": "Exam Eligible",
+      "description": "A learner represented as eligible to register for the certification exam.",
+      "aliases": [
+        "exam eligibility",
+        "exam-eligible",
+        "eligible for exam",
+        "exam registration eligible"
+      ]
     }
   ],
   "nodes": [
@@ -18,6 +40,16 @@
       "node_id": "certification_ready",
       "node_type": "learning_concept",
       "label": "Certification Ready"
+    },
+    {
+      "node_id": "required_training_complete",
+      "node_type": "learning_concept",
+      "label": "Required Training Complete"
+    },
+    {
+      "node_id": "exam_eligible",
+      "node_type": "learning_concept",
+      "label": "Exam Eligible"
     },
     {"node_id": "learner", "node_type": "entity_type", "label": "Learner"},
     {"node_id": "certification", "node_type": "entity_type", "label": "Certification"},
@@ -32,6 +64,14 @@
     {"source": "certification_ready", "target": "module_completion", "relationship_type": "derived_from"},
     {"source": "certification_ready", "target": "practice_assessment", "relationship_type": "derived_from"},
     {"source": "certification_ready", "target": "lab_completion", "relationship_type": "derived_from"},
-    {"source": "certification_ready", "target": "manager_approval", "relationship_type": "derived_from"}
+    {"source": "certification_ready", "target": "manager_approval", "relationship_type": "derived_from"},
+    {"source": "required_training_complete", "target": "learner", "relationship_type": "selects"},
+    {"source": "required_training_complete", "target": "certification", "relationship_type": "governs"},
+    {"source": "required_training_complete", "target": "module_completion", "relationship_type": "derived_from"},
+    {"source": "exam_eligible", "target": "learner", "relationship_type": "selects"},
+    {"source": "exam_eligible", "target": "certification", "relationship_type": "governs"},
+    {"source": "exam_eligible", "target": "module_completion", "relationship_type": "derived_from"},
+    {"source": "exam_eligible", "target": "lab_completion", "relationship_type": "derived_from"},
+    {"source": "exam_eligible", "target": "manager_approval", "relationship_type": "derived_from"}
   ]
 }

@@ -57,6 +57,16 @@ LEARNING_DEMO_SCENARIOS = (
             "Do HR, Learning and Development, and managers agree on who is Certification Ready?"
         ),
     ),
+    DemoScenario(
+        scenario_id="required-training-complete",
+        term="Required Training Complete",
+        question="Are our Required Training Complete definitions operationally equivalent?",
+    ),
+    DemoScenario(
+        scenario_id="exam-eligible",
+        term="Exam Eligible",
+        question="Can we choose one enterprise Exam Eligible definition?",
+    ),
 )
 
 # Existing Fabric/replay proof tooling captures the reviewed business scenarios.

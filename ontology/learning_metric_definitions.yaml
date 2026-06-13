@@ -54,6 +54,78 @@
         "exclusions": ["missing labs", "missing or declined manager approval"],
         "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN manager_approvals ma ON ma.learner_id = l.learner_id AND ma.approved = 1 WHERE NOT EXISTS (SELECT 1 FROM required_labs rl WHERE rl.certification_id = l.certification_id AND rl.required = 1 AND NOT EXISTS (SELECT 1 FROM lab_completions lc WHERE lc.learner_id = l.learner_id AND lc.lab_id = rl.lab_id AND lc.completed = 1)) ORDER BY entity_id"
       }
+    },
+    {
+      "definition_id": "required_training_complete_hr",
+      "concept_id": "required_training_complete",
+      "name": "HR Required Training Complete",
+      "owner": "HR",
+      "rule_text": "Learner has completed all required learning modules for the certification.",
+      "semantic_dimensions": ["required-module-completion", "learner-population"],
+      "binding": {
+        "binding_id": "required_training_complete_hr_v1",
+        "source_tables": ["learners", "required_modules", "module_completions"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners with every required module completed.",
+        "filters": ["no required module is missing a completed record"],
+        "exclusions": ["learners missing any required module"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "required_training_complete_learning",
+      "concept_id": "required_training_complete",
+      "name": "Learning and Development Required Training Complete",
+      "owner": "Learning & Development",
+      "rule_text": "Learner has 100 percent required course completion for the certification.",
+      "semantic_dimensions": ["required-module-completion", "learner-population"],
+      "binding": {
+        "binding_id": "required_training_complete_learning_v1",
+        "source_tables": ["learners", "required_modules", "module_completions"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners whose completed required-course count equals the required-course count.",
+        "filters": ["completed required course count = required course count"],
+        "exclusions": ["learners below 100 percent required completion"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE (SELECT COUNT(*) FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1) = (SELECT COUNT(*) FROM module_completions mc JOIN required_modules rm2 ON rm2.module_id = mc.module_id AND rm2.certification_id = l.certification_id AND rm2.required = 1 WHERE mc.learner_id = l.learner_id AND mc.completed = 1) ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "exam_eligible_hr",
+      "concept_id": "exam_eligible",
+      "name": "HR Exam Eligible",
+      "owner": "HR",
+      "rule_text": "Learner is exam eligible once every required learning module is completed.",
+      "semantic_dimensions": ["required-module-completion", "exam-eligibility-window"],
+      "binding": {
+        "binding_id": "exam_eligible_hr_v1",
+        "source_tables": ["learners", "required_modules", "module_completions"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners with all required modules completed.",
+        "filters": ["every required module completed"],
+        "exclusions": ["learners missing any required module"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+      }
+    },
+    {
+      "definition_id": "exam_eligible_manager",
+      "concept_id": "exam_eligible",
+      "name": "Manager Exam Eligible",
+      "owner": "Managers",
+      "rule_text": "Learner is exam eligible once every required lab is completed and a manager has approved.",
+      "semantic_dimensions": ["required-lab-completion", "manager-approval", "exam-eligibility-window"],
+      "binding": {
+        "binding_id": "exam_eligible_manager_v1",
+        "source_tables": ["learners", "required_labs", "lab_completions", "manager_approvals"],
+        "entity_key": "learner_id",
+        "grain": "learner",
+        "population": "Learners with all required labs completed and an approved manager record.",
+        "filters": ["every required lab completed", "manager approval = approved"],
+        "exclusions": ["missing labs", "missing or declined manager approval"],
+        "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN manager_approvals ma ON ma.learner_id = l.learner_id AND ma.approved = 1 WHERE NOT EXISTS (SELECT 1 FROM required_labs rl WHERE rl.certification_id = l.certification_id AND rl.required = 1 AND NOT EXISTS (SELECT 1 FROM lab_completions lc WHERE lc.learner_id = l.learner_id AND lc.lab_id = rl.lab_id AND lc.completed = 1)) ORDER BY entity_id"
+      }
     }
   ]
 }

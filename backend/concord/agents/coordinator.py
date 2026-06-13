@@ -17,6 +17,8 @@ class CoordinatorAgent:
             "churned_customer",
             "qualified_lead",
             "certification_ready",
+            "required_training_complete",
+            "exam_eligible",
         }
     )
 
