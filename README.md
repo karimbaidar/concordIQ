@@ -35,7 +35,10 @@ that semantic reconciliation generalizes beyond learning.
 
 ## Demo scenario
 
-The default local experience is **Certification Ready**:
+The default learning pack proves three governance behaviours over the same synthetic
+learner data — a real conflict, a rejected decoy, and a governed refusal.
+
+### 1. Certification Ready — proven conflict
 
 | Owner | Executed definition | Ready learners |
 |---|---|---:|
@@ -45,11 +48,27 @@ The default local experience is **Certification Ready**:
 
 The two 56-learner populations are not the same set. Concord IQ executes all three
 definitions, proves the conflict, identifies **24 false-ready learners** in the HR claim,
-and quantifies **$10,800 of synthetic exam-voucher spend at risk**.
+and quantifies **$10,800 of synthetic exam-voucher spend at risk**. Authority is clear
+(Learning Governance Council), so the engine drafts a Semantic PR that only that owner can
+approve.
 
-The run includes the agent trace, exact SQL, evidence IDs, skeptical verification,
-Learning Governance Council authority, a Semantic PR, and owner-gated promotion inside
-the Concord IQ registry.
+### 2. Required Training Complete — rejected decoy
+
+Two differently-worded definitions — "all required modules completed" (HR) and "100%
+required course completion" (Learning & Development) — execute to the **same 80 learners**.
+Concord IQ rules the decoy out as wording-only: verdict `consistent`, low impact, **no
+proposal and no refusal**.
+
+### 3. Exam Eligible — governed refusal
+
+Module-completion (HR, 80 learners) and lab-plus-manager-approval (Managers, 56 learners)
+produce **materially different** sets, but enterprise authority over exam eligibility is
+**ambiguous** — no configured owner can approve a canonical definition. Concord IQ refuses
+automatic reconciliation, routes the decision to a human, and **promotes nothing**.
+
+Every run includes the agent trace, exact SQL, evidence IDs, skeptical verification, the
+resolved authority decision, and (for the conflict) a Semantic PR with owner-gated promotion
+inside the Concord IQ registry.
 
 [Screenshot placeholder: Certification Ready meaning fork and readiness outcome]
 
@@ -97,16 +116,30 @@ CONCORD_SCENARIO_PACK=business make dev
 Valid values are `learning` and `business`. Invalid values fail with an actionable
 configuration error.
 
-## Microsoft integration
+## Microsoft IQ usage
+
+**Default reviewer mode runs locally with deterministic synthetic data and no cloud calls.
+Fabric IQ and Foundry Agent Service proofs are included as sanitized replay captures.**
+
+The IQ integration applies to the **learning** default. Fabric IQ grounds the governed
+**Certification Ready** concept and its semantic graph — learner, role, certification,
+required module, practice assessment, lab completion, manager approval, and the readiness
+rule. Concord IQ's deterministic engine then executes and verifies the competing definitions
+against synthetic learner data. **Fabric IQ does not compute the readiness counts**; the
+counts come only from executed SQL.
 
 - **Microsoft Agent Framework:** implemented ten-stage typed workflow used by both packs.
-- **Foundry Agent Service:** a real hosted business-scenario deployment and invocation
-  are recorded in [`docs/proofs/foundry-agent-service-smoke.md`](docs/proofs/foundry-agent-service-smoke.md).
-- **Fabric IQ:** verified sanitized semantic-proof capture and business-scenario replay.
-- **Foundry IQ:** advisory authority grounding is transport-tested; no real-tenant
-  Foundry IQ capture is claimed.
-- **Work IQ:** guarded adapter is implemented, but live retrieval is license-gated in
-  the available tenant.
+- **Foundry Agent Service:** a real hosted deployment and invocation are recorded as a
+  sanitized capture in
+  [`docs/proofs/foundry-agent-service-smoke.md`](docs/proofs/foundry-agent-service-smoke.md).
+- **Fabric IQ:** semantic grounding is proven through a verified, sanitized replay capture.
+  The committed live/replay capture is currently anchored to the business pack; a learning
+  **Certification Ready** live capture is the planned strongest artifact and is scaffolded in
+  [`docs/proofs/`](docs/proofs/) and [`artifacts/replay/sanitized/`](artifacts/replay/sanitized/).
+- **Foundry IQ:** advisory authority grounding is transport-tested; no real-tenant Foundry IQ
+  capture is claimed.
+- **Work IQ:** the guarded adapter is implemented, but live retrieval is license-gated in the
+  available tenant — never reported as a live retrieval.
 
 The Certification Ready scenario uses deterministic local synthetic data. It is
 representative of enterprise learning artifacts and is **not** presented as a live Work
