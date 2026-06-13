@@ -1,0 +1,22 @@
+{
+  "canonical_term": "Certification Ready",
+  "entity_type": "CertificationReady",
+  "learner_count": 10000,
+  "certification_ready_count": 522,
+  "false_ready_blocked_count": 4334,
+  "tables": [
+    "ciq_certification_ready",
+    "ciq_certifications",
+    "ciq_false_ready_learners",
+    "ciq_lab_completions",
+    "ciq_learners",
+    "ciq_manager_approvals",
+    "ciq_module_completions",
+    "ciq_ontology_entities",
+    "ciq_practice_assessments",
+    "ciq_readiness_definitions",
+    "ciq_required_labs",
+    "ciq_required_modules"
+  ],
+  "remote_dir": "Files/concord_iq_seed/learning"
+}

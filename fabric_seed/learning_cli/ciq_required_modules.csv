@@ -1,0 +1,4 @@
+module_id,certification_id,module_name,sequence_number,required
+mod-policy,cert-enterprise-ai-safety,AI Policy and Risk Controls,1,True
+mod-data,cert-enterprise-ai-safety,Data Handling and Privacy,2,True
+mod-incident,cert-enterprise-ai-safety,Incident Response Simulation,3,True

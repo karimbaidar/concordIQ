@@ -1,0 +1,2 @@
+certification_id,certification_name,certification_term,entity_type,version,owner_department,validity_days,minimum_assessment_score,requires_all_modules,requires_all_labs,requires_manager_approval,created_on
+cert-enterprise-ai-safety,Enterprise AI Safety Certification,Certification Ready,CertificationReady,2026.06,Learning and Development,365,80,True,True,True,2026-06-06

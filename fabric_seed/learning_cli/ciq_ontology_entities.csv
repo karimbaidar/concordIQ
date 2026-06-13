@@ -1,0 +1,12 @@
+entity_type,display_name,source_table,primary_key,search_terms,description
+CertificationReady,Certification Ready,ciq_certification_ready,learner_id,Certification Ready; certification readiness; false readiness; learner ready,"Canonical readiness decision joining HR, LMS, assessment, lab, and manager evidence."
+Learner,Learner,ciq_learners,learner_id,learner; employee; participant,Person who may need enterprise certification.
+Certification,Certification,ciq_certifications,certification_id,certification; enterprise AI safety certification,Certification program and policy threshold.
+RequiredModule,Required Module,ciq_required_modules,module_id,required module; learning module; LMS,Required training module for readiness.
+ModuleCompletion,Module Completion,ciq_module_completions,"learner_id,module_id",module completion; training completion,Learner module completion evidence.
+PracticeAssessment,Practice Assessment,ciq_practice_assessments,assessment_id,assessment; score; practice test,Practice assessment score used in readiness.
+RequiredLab,Required Lab,ciq_required_labs,lab_id,required lab; hands-on lab,Required lab for certification readiness.
+LabCompletion,Lab Completion,ciq_lab_completions,"learner_id,lab_id",lab completion; passed lab,Learner lab evidence.
+ManagerApproval,Manager Approval,ciq_manager_approvals,"learner_id,certification_id",manager approval; approval status,Manager approval evidence.
+ReadinessDefinition,Readiness Definition,ciq_readiness_definitions,definition_id,readiness definition; certification ready definition,Canonical definition and ownership for Certification Ready.
+FalseReadyLearner,False Ready Learner,ciq_false_ready_learners,learner_id,false ready; blocked learner; readiness risk,Learners claimed ready by one source but blocked by canonical readiness.

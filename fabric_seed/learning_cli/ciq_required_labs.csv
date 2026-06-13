@@ -1,0 +1,3 @@
+lab_id,certification_id,lab_name,sequence_number,required
+lab-redteam,cert-enterprise-ai-safety,Red Team Review Lab,1,True
+lab-escalation,cert-enterprise-ai-safety,Manager Escalation Lab,2,True
