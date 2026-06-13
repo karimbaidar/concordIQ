@@ -223,14 +223,14 @@ def test_cold_open_passes_on_three_way_conflict() -> None:
         "Active Customer: CONFLICT | counts=1600/1500/1334 | proposal drafted; "
         "human approval required\n"
     )
-    ok, detail = verify_cold_open(demo_text=lambda: text)
+    ok, detail = verify_cold_open(scenario_pack="business", demo_text=lambda: text)
     assert ok is True
     assert "1600/1500/1334" in detail
 
 
 def test_cold_open_fails_when_canonical_already_promoted() -> None:
     text = "Active Customer: CONSISTENT | counts=1334/1334 | governed canonical v1\n"
-    ok, detail = verify_cold_open(demo_text=lambda: text)
+    ok, detail = verify_cold_open(scenario_pack="business", demo_text=lambda: text)
     assert ok is False
     assert "canonical" in detail.lower()
 
@@ -240,7 +240,11 @@ def test_run_dev_stack_aborts_when_cold_open_fails(tmp_path: Path) -> None:
         raise AssertionError("must not start servers when cold open fails")
 
     monkey = pytest.MonkeyPatch()
-    monkey.setattr(dev_launcher, "verify_cold_open", lambda: (False, "canonical still in force"))
+    monkey.setattr(
+        dev_launcher,
+        "verify_cold_open",
+        lambda **_: (False, "canonical still in force"),
+    )
     try:
         with pytest.raises(SystemExit):
             dev_launcher.run_dev_stack("local", reset=True, spawn=spawn, base_env={})

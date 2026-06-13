@@ -9,6 +9,11 @@ from concord.providers import LocalProvider, create_provider
 from pydantic import ValidationError
 
 
+@pytest.fixture(autouse=True)
+def _clear_scenario_pack_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("CONCORD_SCENARIO_PACK", raising=False)
+
+
 def test_missing_scenario_pack_defaults_to_learning() -> None:
     settings = Settings(_env_file=None)
 

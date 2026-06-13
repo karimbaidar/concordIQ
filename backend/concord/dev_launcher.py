@@ -50,6 +50,24 @@ BACKEND_URL = "http://127.0.0.1:8000"
 FRONTEND_URL = "http://127.0.0.1:5173"
 
 
+VALID_SCENARIO_PACKS = ("learning", "business")
+
+
+def _scenario_pack_from_env(env: dict[str, str]) -> str:
+    """Return the selected scenario pack, defaulting to the challenge pack.
+
+    ``learning`` is the default because it is the Challenge A submission path.
+    ``business`` remains available for the preserved Active Customer scenarios.
+    """
+    scenario_pack = env.get("CONCORD_SCENARIO_PACK", "learning").strip() or "learning"
+    if scenario_pack not in VALID_SCENARIO_PACKS:
+        valid = ", ".join(VALID_SCENARIO_PACKS)
+        raise ValueError(
+            f"Invalid CONCORD_SCENARIO_PACK={scenario_pack!r}. Expected one of: {valid}."
+        )
+    return scenario_pack
+
+
 def _load_dotenv(path: Path = DOTENV_PATH) -> dict[str, str]:
     """Parse stable ``key=value`` pairs from ``.env`` (never tokens we acquire).
 
@@ -80,10 +98,12 @@ def build_runtime_environment(
 ) -> dict[str, str]:
     """Build the child-process environment for ``mode``.
 
-    Local mode is forced safe regardless of inherited values. Cloud modes set an
-    explicit provider, budget, and exactly one freshly acquired token.
+    Local mode is forced safe regardless of inherited cloud token values.
+    Cloud modes set an explicit provider, budget, selected scenario pack, and
+    exactly one freshly acquired token.
     """
     env = dict(os.environ if base_env is None else base_env)
+    scenario_pack = _scenario_pack_from_env(env)
 
     # Always remove inherited cloud bearer tokens first. A local child must never
     # receive one, and a cloud child must only receive the one we just acquired.
@@ -98,10 +118,10 @@ def build_runtime_environment(
                 "MAX_CLOUD_CALLS": "0",
                 "AGENT_WORKFLOW_MODE": "strict",
                 "CONCORD_WORKFLOW_MODE": "strict",
+                "CONCORD_SCENARIO_PACK": scenario_pack,
             }
         )
         env.setdefault("LLM_PROVIDER", "disabled")
-        env.setdefault("CONCORD_SCENARIO_PACK", "learning")
         return env
 
     if mode not in MODES:
@@ -114,7 +134,7 @@ def build_runtime_environment(
             "ALLOW_CLOUD": "true",
             "AGENT_WORKFLOW_MODE": "strict",
             "CONCORD_WORKFLOW_MODE": "strict",
-            "CONCORD_SCENARIO_PACK": "business",
+            "CONCORD_SCENARIO_PACK": scenario_pack,
         }
     )
     if mode == FOUNDRY:
@@ -183,31 +203,55 @@ def render_banner(mode: str) -> str:
 # --------------------------------------------------------------------------- #
 # Cold-open verification (dev-fresh safety check)
 # --------------------------------------------------------------------------- #
-EXPECTED_COLD_OPEN = "counts=1600/1500/1334"
+EXPECTED_COLD_OPEN_BY_PACK = {
+    "learning": ("Certification Ready", "proposal drafted"),
+    "business": ("counts=1600/1500/1334", "proposal drafted"),
+}
 
 
-def _run_demo_text() -> str:
+def _run_demo_text(scenario_pack: str | None = None) -> str:
+    base_env = {**_load_dotenv(), **os.environ}
+    if scenario_pack:
+        base_env["CONCORD_SCENARIO_PACK"] = scenario_pack
     proc = subprocess.run(  # noqa: S603
         [sys.executable, "-m", "concord.demo"],  # noqa: S607
         capture_output=True,
         text=True,
         check=False,
-        env=build_runtime_environment(LOCAL),
+        env=build_runtime_environment(LOCAL, base_env=base_env),
     )
     return proc.stdout + proc.stderr
 
 
-def verify_cold_open(demo_text: Callable[[], str] = _run_demo_text) -> tuple[bool, str]:
-    """Confirm the reset demo shows the unresolved three-way conflict.
+def verify_cold_open(
+    demo_text: Callable[[], str] | None = None,
+    *,
+    scenario_pack: str | None = None,
+) -> tuple[bool, str]:
+    """Confirm the reset demo shows the expected unresolved default scenario.
 
-    Returns (ok, detail). A previously promoted canonical would collapse the
-    Active Customer conflict, so this guards the recording cold open.
+    In learning mode, the cold open is Certification Ready. In business mode,
+    the preserved cold open is the Active Customer 1600/1500/1334 conflict.
     """
-    text = demo_text()
-    if EXPECTED_COLD_OPEN in text and "proposal drafted" in text:
+    base_env = {**_load_dotenv(), **os.environ}
+    if scenario_pack:
+        base_env["CONCORD_SCENARIO_PACK"] = scenario_pack
+    selected_pack = _scenario_pack_from_env(base_env)
+
+    text = demo_text() if demo_text is not None else _run_demo_text(selected_pack)
+    expected = EXPECTED_COLD_OPEN_BY_PACK[selected_pack]
+    if all(fragment in text for fragment in expected):
+        if selected_pack == "learning":
+            return True, "Certification Ready learning conflict confirmed"
         return True, "Active Customer conflict 1600/1500/1334 confirmed"
+
+    if selected_pack == "learning":
+        return False, (
+            "Cold-open learning conflict not found. Expected the Certification Ready "
+            "scenario with a drafted proposal. Check CONCORD_SCENARIO_PACK and local state."
+        )
     return False, (
-        "Cold-open conflict not found. A canonical promotion may still be in force; "
+        "Cold-open business conflict not found. A canonical promotion may still be in force; "
         "expected 'Active Customer ... counts=1600/1500/1334 ... proposal drafted'."
     )
 
@@ -339,13 +383,15 @@ def run_dev_stack(
     if mode not in MODES:
         raise ValueError(f"Unknown dev mode: {mode!r}.")
 
+    source_env = {**_load_dotenv(), **os.environ} if base_env is None else dict(base_env)
+    scenario_pack = _scenario_pack_from_env(source_env)
+
     if reset:
-        ok, detail = verify_cold_open()
+        ok, detail = verify_cold_open(scenario_pack=scenario_pack)
         if not ok:
             raise SystemExit(detail)
         emit(detail)
 
-    source_env = {**_load_dotenv(), **os.environ} if base_env is None else dict(base_env)
     token = None if mode == LOCAL else _acquire_token(mode, source_env)
     env = build_runtime_environment(mode, base_env=source_env, token=token)
 
