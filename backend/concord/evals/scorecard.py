@@ -18,6 +18,7 @@ from sqlalchemy.engine import make_url
 
 from concord.agents.coordinator import UnsupportedScenario
 from concord.config import ScenarioPack, Settings
+from concord.court import SemanticCourt
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import GroundingProvider, create_provider
@@ -219,6 +220,43 @@ def run_scorecard(runner: ReconciliationRunner) -> Scorecard:
         "red_team",
         fake_verified_rejected,
         "a non-cloud provider cannot label a capture as verified real Microsoft IQ",
+    )
+
+    # --- Semantic Court: the agents argue, but cannot change the verdict ---
+    court_active = SemanticCourt().deliberate(active)
+    court_active_again = SemanticCourt().deliberate(active)
+    court_churned = SemanticCourt().deliberate(churned)
+
+    check(
+        "court_debate_does_not_change_verdict",
+        "no_llm_verdict",
+        court_active.verdict == active.verdict == "conflict"
+        and court_active.outcome == "proposal"
+        and active.reconciliation_proposal is not None,
+        f"court verdict={court_active.verdict}; engine proposal still drafted after the debate",
+    )
+    check(
+        "court_refusal_survives_adversarial_stewards",
+        "refusal",
+        court_churned.outcome == "refusal"
+        and churned.reconciliation_proposal is None
+        and churned.refusal_reason is not None,
+        "stewards argued the Churned Customer case but no canonical definition was published",
+    )
+    court_real_ids = {record.evidence_id for record in active.evidence}
+    court_cited = {eid for turn in court_active.turns for eid in turn.cited_evidence_ids}
+    check(
+        "court_cites_only_real_evidence_ids",
+        "governance",
+        bool(court_cited) and court_cited <= court_real_ids,
+        f"{len(court_cited)} cited evidence ids, all present in the executed casefile",
+    )
+    check(
+        "court_transcript_is_reproducible_and_labeled",
+        "no_llm_verdict",
+        court_active.content_digest == court_active_again.content_digest
+        and court_active.mode.value == "deterministic_fallback",
+        "same case yields the same debate digest; provenance labeled deterministic_fallback",
     )
 
     return Scorecard(results=tuple(results))

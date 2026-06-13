@@ -25,7 +25,9 @@ Enterprises built a single source of truth for data, but not for meaning. Concor
 - compares result sets, not wording, to decide conflict versus consistency;
 - resolves authority from configured governance rules;
 - refuses unsupported or ambiguously owned reconciliations;
-- creates an evidence-backed Semantic PR gated to the configured human owner.
+- creates an evidence-backed Semantic PR gated to the configured human owner;
+- convenes the Semantic Court — autonomous agents that argue, investigate, and
+  cross-examine, then replay the whole debate with no cloud.
 
 An LLM can narrate a result, but it cannot change the verdict, authority decision,
 refusal, evidence, or stored canonical definition.
@@ -147,6 +149,34 @@ verdict is `consistent`; no proposal or refusal is created.
 The definitions diverge, but authority is ambiguous. Concord IQ refuses automatic
 reconciliation and promotes nothing.
 
+## The Semantic Court
+
+Click **Convene the Semantic Court** on any run to watch a panel of autonomous agents
+reason over the case: stewards for HR, Learning & Development, and Managers argue their
+own definition; an investigator runs a plan/execute/replan loop to isolate the contested
+cohort; a skeptic cross-examines only the stewards who claim someone outside the set every
+definition agrees on; an authority agent rules on who, if anyone, may approve a canonical
+definition. The debate is dynamic — its shape comes from the executed data, not a script.
+
+The agents argue; the evidence rules. The verdict, authority decision, proposal, and
+refusal stay exactly what the deterministic engine produced — the court only voices and
+pressure-tests them, so the agents can be wrong out loud but the system cannot publish a
+fabricated result. Each turn is labeled by provenance (generated live, replayed, or
+deterministic), and the whole debate is captured as a sanitized, digest-sealed transcript
+that replays with no cloud and no model — the same trust model as the Fabric replay, now
+for the reasoning itself (`make capture-deliberation`, `make court-replay-check`).
+
+[Screenshot placeholder: the Semantic Court debate timeline]
+
+### Challenge A agent mapping
+
+| Challenge A agent | In Concord IQ |
+|---|---|
+| Learning Path Curator / Study Plan Generator | Out of scope by design — Concord governs the meaning of readiness, it does not generate study plans |
+| Assessment Agent | The stewards and investigator evaluate readiness over grounded evidence and quantify the false-ready cohort |
+| Manager Insights Agent | The court's core: team-level readiness, the divergent cohort, and exam-spend risk, surfaced without guessing |
+| (added) Governance / authority | The authority agent and owner-gated Semantic PR — the part that makes a readiness number trustworthy |
+
 ## Environment
 
 Copy `.env.example` to `.env` and keep access-token values empty. Tokens are acquired at
@@ -252,8 +282,12 @@ Useful focused proofs:
 ```bash
 make eval
 make replay-check
+make court-replay-check
 make foundry-hosted-smoke
 ```
+
+`make judge-proof` includes the Semantic Court replay as a mandatory step; `make
+capture-deliberation` records a fresh debate transcript.
 
 ## Safety Contract
 
