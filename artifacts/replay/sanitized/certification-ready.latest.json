@@ -1,0 +1,1262 @@
+{
+  "schema_version": "1.0",
+  "capture": {
+    "provider_name": "FabricIQProvider",
+    "provider_mode": "fabric_iq",
+    "captured_at": "2026-06-13T14:32:48.803465Z",
+    "verified_real_iq": true,
+    "data_classification": "synthetic",
+    "api_version": "MCP 2025-06-18",
+    "iq_proof_mode": "fabric_semantic_proof_with_deterministic_snapshot",
+    "snapshot_source": "LocalProvider synthetic snapshot",
+    "fabric_tools_used": [
+      "list_ontology_entity_types",
+      "search_ontology"
+    ],
+    "fabric_matched_concepts": {
+      "Certification Ready": "CertificationReady"
+    },
+    "fabric_response_shapes": [
+      "{result: {content: [{...} x1], structuredContent: {values: [{...} x1]}, isError: bool}, id: int, jsonrpc: str(len=3)}"
+    ],
+    "semantic_proof_terms": [
+      "Certification Ready"
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_id": "certification-ready",
+      "term": "Certification Ready",
+      "data_classification": "synthetic",
+      "concept": {
+        "concept_id": "certification_ready",
+        "canonical_name": "Certification Ready",
+        "description": "A learner represented as ready for an enterprise certification exam.",
+        "aliases": [
+          "certification readiness",
+          "certification-ready",
+          "exam ready",
+          "ready for certification"
+        ],
+        "definition_ids": [
+          "certification_ready_hr",
+          "certification_ready_learning",
+          "certification_ready_manager"
+        ]
+      },
+      "bindings": [
+        {
+          "binding_id": "certification_ready_hr_v1",
+          "definition_id": "certification_ready_hr",
+          "concept_id": "certification_ready",
+          "name": "HR Certification Ready",
+          "owner": "HR",
+          "rule_text": "Learner has completed every required learning module for the certification.",
+          "semantic_dimensions": [
+            "required-module-completion",
+            "learner-population"
+          ],
+          "source_tables": [
+            "learners",
+            "required_modules",
+            "module_completions"
+          ],
+          "entity_key": "learner_id",
+          "grain": "learner",
+          "population": "Learners with all required modules completed.",
+          "time_window_days": null,
+          "filters": [
+            "every required module has a completed record"
+          ],
+          "exclusions": [
+            "learners missing any required module"
+          ],
+          "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+        },
+        {
+          "binding_id": "certification_ready_learning_v1",
+          "definition_id": "certification_ready_learning",
+          "concept_id": "certification_ready",
+          "name": "Learning and Development Certification Ready",
+          "owner": "Learning & Development",
+          "rule_text": "Learner has completed every required module and the latest practice assessment score is at least 80 percent.",
+          "semantic_dimensions": [
+            "required-module-completion",
+            "latest-practice-score",
+            "readiness-threshold"
+          ],
+          "source_tables": [
+            "learners",
+            "required_modules",
+            "module_completions",
+            "practice_assessments"
+          ],
+          "entity_key": "learner_id",
+          "grain": "learner",
+          "population": "Module-complete learners whose latest practice score is at least 80 percent.",
+          "time_window_days": null,
+          "filters": [
+            "every required module completed",
+            "latest practice score >= 80"
+          ],
+          "exclusions": [
+            "superseded practice attempts",
+            "scores below 80"
+          ],
+          "sql_template": "WITH latest_practice AS (SELECT learner_id, score, ROW_NUMBER() OVER (PARTITION BY learner_id ORDER BY CAST(attempted_at AS DATE) DESC, assessment_id DESC) AS recency_rank FROM practice_assessments) SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN latest_practice p ON p.learner_id = l.learner_id AND p.recency_rank = 1 WHERE p.score >= 80 AND NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+        },
+        {
+          "binding_id": "certification_ready_manager_v1",
+          "definition_id": "certification_ready_manager",
+          "concept_id": "certification_ready",
+          "name": "Manager Certification Ready",
+          "owner": "Managers",
+          "rule_text": "Learner has completed every required lab and has a recorded manager approval.",
+          "semantic_dimensions": [
+            "required-lab-completion",
+            "manager-approval",
+            "operational-readiness"
+          ],
+          "source_tables": [
+            "learners",
+            "required_labs",
+            "lab_completions",
+            "manager_approvals"
+          ],
+          "entity_key": "learner_id",
+          "grain": "learner",
+          "population": "Learners with all required labs completed and an approved manager record.",
+          "time_window_days": null,
+          "filters": [
+            "every required lab completed",
+            "manager approval = approved"
+          ],
+          "exclusions": [
+            "missing labs",
+            "missing or declined manager approval"
+          ],
+          "sql_template": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN manager_approvals ma ON ma.learner_id = l.learner_id AND ma.approved = 1 WHERE NOT EXISTS (SELECT 1 FROM required_labs rl WHERE rl.certification_id = l.certification_id AND rl.required = 1 AND NOT EXISTS (SELECT 1 FROM lab_completions lc WHERE lc.learner_id = l.learner_id AND lc.lab_id = rl.lab_id AND lc.completed = 1)) ORDER BY entity_id"
+        }
+      ],
+      "evaluations": [
+        {
+          "binding_id": "certification_ready_hr_v1",
+          "definition_id": "certification_ready_hr",
+          "concept_id": "certification_ready",
+          "period": {
+            "start_date": "2026-03-04",
+            "end_date": "2026-06-01"
+          },
+          "entity_ids": [
+            "L001",
+            "L002",
+            "L003",
+            "L004",
+            "L005",
+            "L006",
+            "L007",
+            "L008",
+            "L009",
+            "L010",
+            "L011",
+            "L012",
+            "L013",
+            "L014",
+            "L015",
+            "L016",
+            "L017",
+            "L018",
+            "L019",
+            "L020",
+            "L021",
+            "L022",
+            "L023",
+            "L024",
+            "L025",
+            "L026",
+            "L027",
+            "L028",
+            "L029",
+            "L030",
+            "L031",
+            "L032",
+            "L033",
+            "L034",
+            "L035",
+            "L036",
+            "L037",
+            "L038",
+            "L039",
+            "L040",
+            "L041",
+            "L042",
+            "L043",
+            "L044",
+            "L045",
+            "L046",
+            "L047",
+            "L048",
+            "L049",
+            "L050",
+            "L051",
+            "L052",
+            "L053",
+            "L054",
+            "L055",
+            "L056",
+            "L057",
+            "L058",
+            "L059",
+            "L060",
+            "L061",
+            "L062",
+            "L063",
+            "L064",
+            "L065",
+            "L066",
+            "L067",
+            "L068",
+            "L069",
+            "L070",
+            "L071",
+            "L072",
+            "L073",
+            "L074",
+            "L075",
+            "L076",
+            "L077",
+            "L078",
+            "L079",
+            "L080"
+          ],
+          "rows": [
+            {
+              "entity_id": "L001",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L002",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L003",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L004",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L005",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L006",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L007",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L008",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L009",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L010",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L011",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L012",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L013",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L014",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L015",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L016",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L017",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L018",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L019",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L020",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L021",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L022",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L023",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L024",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L025",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L026",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L027",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L028",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L029",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L030",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L031",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L032",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L033",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L034",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L035",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L036",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L037",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L038",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L039",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L040",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L041",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L042",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L043",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L044",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L045",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L046",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L047",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L048",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L049",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L050",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L051",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L052",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L053",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L054",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L055",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L056",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L057",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L058",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L059",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L060",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L061",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L062",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L063",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L064",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L065",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L066",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L067",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L068",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L069",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L070",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L071",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L072",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L073",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L074",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L075",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L076",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L077",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L078",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L079",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L080",
+              "metric_value": 450.0
+            }
+          ],
+          "entity_count": 80,
+          "metric_total": 36000.0,
+          "executed_sql": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l WHERE NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+        },
+        {
+          "binding_id": "certification_ready_learning_v1",
+          "definition_id": "certification_ready_learning",
+          "concept_id": "certification_ready",
+          "period": {
+            "start_date": "2026-03-04",
+            "end_date": "2026-06-01"
+          },
+          "entity_ids": [
+            "L001",
+            "L002",
+            "L003",
+            "L004",
+            "L005",
+            "L006",
+            "L007",
+            "L008",
+            "L009",
+            "L010",
+            "L011",
+            "L012",
+            "L013",
+            "L014",
+            "L015",
+            "L016",
+            "L017",
+            "L018",
+            "L019",
+            "L020",
+            "L021",
+            "L022",
+            "L023",
+            "L024",
+            "L025",
+            "L026",
+            "L027",
+            "L028",
+            "L029",
+            "L030",
+            "L031",
+            "L032",
+            "L033",
+            "L034",
+            "L035",
+            "L036",
+            "L037",
+            "L038",
+            "L039",
+            "L040",
+            "L041",
+            "L042",
+            "L043",
+            "L044",
+            "L045",
+            "L046",
+            "L047",
+            "L048",
+            "L049",
+            "L050",
+            "L051",
+            "L052",
+            "L053",
+            "L054",
+            "L055",
+            "L056"
+          ],
+          "rows": [
+            {
+              "entity_id": "L001",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L002",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L003",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L004",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L005",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L006",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L007",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L008",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L009",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L010",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L011",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L012",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L013",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L014",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L015",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L016",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L017",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L018",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L019",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L020",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L021",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L022",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L023",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L024",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L025",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L026",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L027",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L028",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L029",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L030",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L031",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L032",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L033",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L034",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L035",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L036",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L037",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L038",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L039",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L040",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L041",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L042",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L043",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L044",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L045",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L046",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L047",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L048",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L049",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L050",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L051",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L052",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L053",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L054",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L055",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L056",
+              "metric_value": 450.0
+            }
+          ],
+          "entity_count": 56,
+          "metric_total": 25200.0,
+          "executed_sql": "WITH latest_practice AS (SELECT learner_id, score, ROW_NUMBER() OVER (PARTITION BY learner_id ORDER BY CAST(attempted_at AS DATE) DESC, assessment_id DESC) AS recency_rank FROM practice_assessments) SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN latest_practice p ON p.learner_id = l.learner_id AND p.recency_rank = 1 WHERE p.score >= 80 AND NOT EXISTS (SELECT 1 FROM required_modules rm WHERE rm.certification_id = l.certification_id AND rm.required = 1 AND NOT EXISTS (SELECT 1 FROM module_completions mc WHERE mc.learner_id = l.learner_id AND mc.module_id = rm.module_id AND mc.completed = 1)) ORDER BY entity_id"
+        },
+        {
+          "binding_id": "certification_ready_manager_v1",
+          "definition_id": "certification_ready_manager",
+          "concept_id": "certification_ready",
+          "period": {
+            "start_date": "2026-03-04",
+            "end_date": "2026-06-01"
+          },
+          "entity_ids": [
+            "L041",
+            "L042",
+            "L043",
+            "L044",
+            "L045",
+            "L046",
+            "L047",
+            "L048",
+            "L049",
+            "L050",
+            "L051",
+            "L052",
+            "L053",
+            "L054",
+            "L055",
+            "L056",
+            "L057",
+            "L058",
+            "L059",
+            "L060",
+            "L061",
+            "L062",
+            "L063",
+            "L064",
+            "L065",
+            "L066",
+            "L067",
+            "L068",
+            "L069",
+            "L070",
+            "L071",
+            "L072",
+            "L073",
+            "L074",
+            "L075",
+            "L076",
+            "L077",
+            "L078",
+            "L079",
+            "L080",
+            "L081",
+            "L082",
+            "L083",
+            "L084",
+            "L085",
+            "L086",
+            "L087",
+            "L088",
+            "L089",
+            "L090",
+            "L091",
+            "L092",
+            "L093",
+            "L094",
+            "L095",
+            "L096"
+          ],
+          "rows": [
+            {
+              "entity_id": "L041",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L042",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L043",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L044",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L045",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L046",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L047",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L048",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L049",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L050",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L051",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L052",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L053",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L054",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L055",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L056",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L057",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L058",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L059",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L060",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L061",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L062",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L063",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L064",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L065",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L066",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L067",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L068",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L069",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L070",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L071",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L072",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L073",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L074",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L075",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L076",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L077",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L078",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L079",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L080",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L081",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L082",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L083",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L084",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L085",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L086",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L087",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L088",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L089",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L090",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L091",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L092",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L093",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L094",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L095",
+              "metric_value": 450.0
+            },
+            {
+              "entity_id": "L096",
+              "metric_value": 450.0
+            }
+          ],
+          "entity_count": 56,
+          "metric_total": 25200.0,
+          "executed_sql": "SELECT l.learner_id AS entity_id, l.exam_voucher_cost AS metric_value FROM learners l JOIN manager_approvals ma ON ma.learner_id = l.learner_id AND ma.approved = 1 WHERE NOT EXISTS (SELECT 1 FROM required_labs rl WHERE rl.certification_id = l.certification_id AND rl.required = 1 AND NOT EXISTS (SELECT 1 FROM lab_completions lc WHERE lc.learner_id = l.learner_id AND lc.lab_id = rl.lab_id AND lc.completed = 1)) ORDER BY entity_id"
+        }
+      ],
+      "subgraph": {
+        "concept_id": "certification_ready",
+        "nodes": [
+          {
+            "node_id": "certification_ready",
+            "node_type": "learning_concept",
+            "label": "Certification Ready",
+            "properties": {}
+          },
+          {
+            "node_id": "learner",
+            "node_type": "entity_type",
+            "label": "Learner",
+            "properties": {}
+          },
+          {
+            "node_id": "certification",
+            "node_type": "entity_type",
+            "label": "Certification",
+            "properties": {}
+          },
+          {
+            "node_id": "module_completion",
+            "node_type": "evidence_type",
+            "label": "Module Completion",
+            "properties": {}
+          },
+          {
+            "node_id": "practice_assessment",
+            "node_type": "evidence_type",
+            "label": "Practice Assessment",
+            "properties": {}
+          },
+          {
+            "node_id": "lab_completion",
+            "node_type": "evidence_type",
+            "label": "Lab Completion",
+            "properties": {}
+          },
+          {
+            "node_id": "manager_approval",
+            "node_type": "evidence_type",
+            "label": "Manager Approval",
+            "properties": {}
+          }
+        ],
+        "relationships": [
+          {
+            "source": "certification_ready",
+            "target": "learner",
+            "relationship_type": "selects"
+          },
+          {
+            "source": "certification_ready",
+            "target": "certification",
+            "relationship_type": "governs"
+          },
+          {
+            "source": "certification_ready",
+            "target": "module_completion",
+            "relationship_type": "derived_from"
+          },
+          {
+            "source": "certification_ready",
+            "target": "practice_assessment",
+            "relationship_type": "derived_from"
+          },
+          {
+            "source": "certification_ready",
+            "target": "lab_completion",
+            "relationship_type": "derived_from"
+          },
+          {
+            "source": "certification_ready",
+            "target": "manager_approval",
+            "relationship_type": "derived_from"
+          }
+        ]
+      },
+      "authority_rules": [
+        {
+          "concept_id": "certification_ready",
+          "semantic_dimension": "required-module-completion",
+          "status": "clear",
+          "owner": "HR",
+          "rationale": "HR owns completion records used in workforce reporting."
+        },
+        {
+          "concept_id": "certification_ready",
+          "semantic_dimension": "latest-practice-score",
+          "status": "clear",
+          "owner": "Learning & Development",
+          "rationale": "Learning and Development owns assessment design and score thresholds."
+        },
+        {
+          "concept_id": "certification_ready",
+          "semantic_dimension": "manager-approval",
+          "status": "clear",
+          "owner": "Managers",
+          "rationale": "Managers own operational approval for learner readiness."
+        },
+        {
+          "concept_id": "certification_ready",
+          "semantic_dimension": "canonical-certification-ready",
+          "status": "clear",
+          "owner": "Learning Governance Council",
+          "rationale": "The Learning Governance Council owns the enterprise certification-readiness definition."
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from concord.config import ScenarioPack
 from concord.providers.base import (
     AuthorityGrounding,
     AuthorityRule,
@@ -20,6 +21,11 @@ from concord.providers.base import (
     unmatched_query_result,
 )
 from concord.providers.replay_schema import ReplayArtifact, ReplayScenarioSnapshot
+
+# Concept ids that identify the learning pack inside a captured artifact.
+_LEARNING_CONCEPT_IDS = frozenset(
+    {"certification_ready", "required_training_complete", "exam_eligible"}
+)
 
 
 class ReplayProvider:
@@ -46,6 +52,12 @@ class ReplayProvider:
                 "Replay artifact is not marked as a verified real Microsoft IQ capture."
             )
         self.name = self.artifact.capture.provider_name
+        # Reflect the captured pack so the headless demo selects the right scenarios
+        # (a learning capture replays Certification Ready, not the business scenarios).
+        concept_ids = {snapshot.concept.concept_id for snapshot in self.artifact.scenarios}
+        self.scenario_pack = (
+            ScenarioPack.LEARNING if concept_ids & _LEARNING_CONCEPT_IDS else ScenarioPack.BUSINESS
+        )
         self._by_term: dict[str, ReplayScenarioSnapshot] = {}
         self._by_concept: dict[str, ReplayScenarioSnapshot] = {}
         self._by_binding: dict[str, tuple[ReplayScenarioSnapshot, int]] = {}

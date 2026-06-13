@@ -81,9 +81,19 @@ def demo_scenarios_for_pack(scenario_pack: ScenarioPack) -> tuple[DemoScenario, 
 
 
 def demo_scenarios_for_provider(provider: object) -> tuple[DemoScenario, ...]:
-    """Infer the active pack, defaulting legacy/replay providers to business."""
+    """Infer the active pack, defaulting legacy/replay providers to business.
+
+    A replay capture may contain only a subset of a pack's scenarios (for example a
+    single live-captured Certification Ready artifact). In that case the demo runs
+    exactly the captured scenarios so it never asks the replay for a missing one.
+    """
     scenario_pack = getattr(provider, "scenario_pack", ScenarioPack.BUSINESS)
-    return demo_scenarios_for_pack(ScenarioPack(scenario_pack))
+    scenarios = demo_scenarios_for_pack(ScenarioPack(scenario_pack))
+    artifact = getattr(provider, "artifact", None)
+    if artifact is not None:
+        captured_ids = {snapshot.scenario_id for snapshot in artifact.scenarios}
+        scenarios = tuple(item for item in scenarios if item.scenario_id in captured_ids)
+    return scenarios
 
 
 def get_demo_scenario(

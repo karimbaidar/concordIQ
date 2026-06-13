@@ -21,7 +21,7 @@ def _valid_proof(**overrides: Any) -> dict[str, Any]:
     proof = {
         "provider_mode": "replay",
         "workflow_mode": "strict",
-        "term": "Active Customer",
+        "term": "Certification Ready",
         "verdict": "conflict",
         "verification_status": "passed",
         "specialist_steps": 10,

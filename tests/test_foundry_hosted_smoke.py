@@ -65,7 +65,8 @@ def test_foundry_agent_local_smoke_executes_responses_protocol(
 
     assert result.provider_mode == "local"
     assert result.workflow_mode == "strict"
-    assert result.term == "Active Customer"
+    # run_smoke defaults to the challenge-facing learning term.
+    assert result.term == "Certification Ready"
     assert result.verdict == "conflict"
     assert result.verification_status == "passed"
     assert result.specialist_steps == 10

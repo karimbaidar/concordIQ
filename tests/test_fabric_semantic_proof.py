@@ -194,7 +194,7 @@ def test_diagnose_distinguishes_three_states(
         local_provider=p2_local_provider,
     )
 
-    report = diagnose(_fabric_settings(tmp_path), provider=provider)
+    report = diagnose(_fabric_settings(tmp_path), term="Active Customer", provider=provider)
     assert report["state"] == expected_state
     assert not (tmp_path / "sanitized" / "latest.json").exists()
 
