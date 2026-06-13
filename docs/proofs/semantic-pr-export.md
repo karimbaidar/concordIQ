@@ -6,7 +6,7 @@
 - **Term:** Active Customer
 - **Verdict:** `conflict`
 - **SHA-256:** `81582bd5768365f016032a90dc0c089075aab911e71d03747d5e84ecdb002d5e`
-- **Timestamp (UTC):** 2026-06-11T22:56:04Z
+- **Timestamp (UTC):** 2026-06-13T11:25:23Z
 - **Machine-readable artifact:** `artifacts/semantic-pr/latest.json`
 
 ## Conflicting definitions
@@ -39,9 +39,9 @@ Active Customer means a customer with an active contract and qualifying usage in
 
 ## Evidence IDs
 
-- `54b36fd8-9e1a-581b-aa9d-d4d8ed7cd094`
-- `024b2386-c60a-52d6-9e82-2466ea49826c`
-- `27da9f1b-7785-518b-be6d-a2da0ea75a34`
+- `dab1f2e2-db54-5da6-82cc-5a98b20ccb7b`
+- `7d9e225a-01e7-5d2b-8c8f-0dd76275b75e`
+- `ae11ecbf-5b03-516d-aa50-574361399e76`
 
 The canonical proposal is exported with `requires_human_approval=true`. Concord IQ
 never merges a canonical definition without the configured governance owner.
