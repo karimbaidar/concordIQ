@@ -62,6 +62,9 @@ class Settings(BaseSettings):
         "artifacts/replay/sanitized/certification-ready.latest.json"
     )
     business_replay_artifact_path: Path = Path("artifacts/replay/sanitized/latest.json")
+    court_transcript_path: Path = Path(
+        "artifacts/replay/sanitized/certification-ready.deliberation.json"
+    )
     replay_require_verified_capture: bool = True
     capture_raw_dir: Path = Path("artifacts/replay/raw")
     capture_sanitized_path: Path = Path("artifacts/replay/sanitized/latest.json")

@@ -8,7 +8,8 @@ PYTHON := .venv/bin/python
 	fabric-proof foundry-hosted-deploy foundry-hosted-smoke agent-smoke \
 	foundry-agent-dry-run foundry-agent-smoke foundry-hosted-dry-run \
 	foundry-hosted-package capture fabric-mcp-diagnose \
-	fabric-bootstrap-dry-run fabric-bootstrap replay-check clean
+	fabric-bootstrap-dry-run fabric-bootstrap replay-check \
+	capture-deliberation court-replay-check clean
 
 FOUNDRY_AGENT_PROVIDER ?= local
 FOUNDRY_AGENT_WORKFLOW_MODE ?= strict
@@ -202,6 +203,12 @@ fabric-bootstrap:
 replay-check:
 	$(PYTHON) -m concord.replay_check
 	PROVIDER=replay ALLOW_CLOUD=false MAX_CLOUD_CALLS=0 $(MAKE) demo
+
+capture-deliberation: postgres seed
+	$(PYTHON) -m concord.court.capture
+
+court-replay-check:
+	$(PYTHON) -m concord.court.deliberation_check
 
 clean:
 	rm -f data/concord_iq.duckdb

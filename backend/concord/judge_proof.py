@@ -106,6 +106,7 @@ class JudgeProof:
             ("eval", "Eval scorecard", "eval"),
             ("replay", "Replay proof", "replay-check"),
             ("semantic_pr_export", "Semantic PR export", "semantic-pr-export"),
+            ("court_replay", "Semantic Court replay", "court-replay-check"),
         )
         for key, label, target in plan:
             self.steps.append(_mandatory_step(key, label, target))
@@ -282,6 +283,7 @@ Lint/typecheck:     {up(local.get("lint", "?"))}
 Eval scorecard:     {up(local.get("eval", "?"))}
 Replay proof:       {up(local.get("replay", "?"))}
 Semantic PR export: {up(local.get("semantic_pr_export", "?"))}
+Semantic Court:     {up(local.get("court_replay", "?"))}
 
 Foundry Agent Service: {up(document["foundry_agent_service"]["status"])}
 Fabric IQ live:        {up(document["fabric_iq"]["live"])}
