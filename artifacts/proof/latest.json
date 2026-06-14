@@ -1,5 +1,5 @@
 {
-  "commit": "12088c3469617fec7926fbcfa7849550f29434bc",
+  "commit": "25013cd027fb6cd4d418912eb62390c15c3d6091",
   "fabric_iq": {
     "live": "skipped",
     "mode": "sanitized_replay",
@@ -28,7 +28,7 @@
     "tests": "passed"
   },
   "mandatory_passed": true,
-  "timestamp_utc": "2026-06-14T08:53:41Z",
+  "timestamp_utc": "2026-06-14T09:22:47Z",
   "work_iq": {
     "live_recheck": "skipped",
     "mode": "optional_m365_artifact_grounding",

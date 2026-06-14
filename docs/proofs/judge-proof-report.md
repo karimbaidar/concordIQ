@@ -1,7 +1,7 @@
 # Concord IQ — judge proof report
 
-- **Generated (UTC):** 2026-06-14T08:53:41Z
-- **Git commit:** `12088c3469617fec7926fbcfa7849550f29434bc`
+- **Generated (UTC):** 2026-06-14T09:22:47Z
+- **Git commit:** `25013cd027fb6cd4d418912eb62390c15c3d6091`
 - **Mandatory local proof:** ✅ PASSED
 
 ## Local verification (mandatory)
