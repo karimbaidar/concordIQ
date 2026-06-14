@@ -1,6 +1,6 @@
 # Concord IQ
 
-**Version control for the meaning behind enterprise metrics and decisions.**
+**Semantic Version control for the meaning behind Enterprise Learning System metrics and decisions.**
 
 [![Watch the 2-minute demo](https://img.shields.io/badge/Watch_the_2--minute_demo-YouTube-FF0000?logo=youtube&logoColor=white)](https://youtu.be/BMKTFHjyD1o)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://dashboard.render.com/blueprint/new?repo=https://github.com/karimbaidar/concordIQ)
