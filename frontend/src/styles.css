@@ -558,6 +558,7 @@ summary:focus-visible,
 
 .error-banner {
   display: flex;
+  justify-content: space-between;
   gap: 10px;
   align-items: center;
   max-width: 1380px;
@@ -567,6 +568,34 @@ summary:focus-visible,
   border-radius: 12px;
   color: #8c3131;
   background: #fff4f4;
+}
+
+.error-banner > div {
+  display: grid;
+  gap: 3px;
+}
+
+.error-recovery-button {
+  flex: 0 0 auto;
+  padding: 9px 13px;
+  border: 1px solid #b94a4a;
+  border-radius: 9px;
+  color: #7f2525;
+  background: #fff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.error-recovery-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.runtime-credential-guidance {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
 }
 
 .story-strip {

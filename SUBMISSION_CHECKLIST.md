@@ -30,7 +30,7 @@ Microsoft Agents League 2026 · Track: Reasoning Agents · Challenge A: Enterpri
 
 ## Gates (real, reproducible)
 
-- [x] `make test` → **230 backend passed, 1 skipped; 16 frontend passed**.
+- [x] `make test` → **232 backend passed, 1 skipped; 17 frontend passed**.
 - [x] `make lint` → ruff check + format clean; frontend `tsc` clean.
 - [x] `make eval` → safety scorecard **15/15** (business pack plus Court invariants,
   LLM disabled).
@@ -49,14 +49,16 @@ Microsoft Agents League 2026 · Track: Reasoning Agents · Challenge A: Enterpri
 - [x] Semantic Court capture uses the repaired typed graph and digest-sealed transcript.
 - [x] Work IQ live retrieval — license-gated in the available tenant; documented, never faked.
 
-## Manual / pending submission steps
+## Final submission steps
 
-- [ ] Record, upload, and add the final 2–3 minute Challenge A demo video URL.
+- [x] Final Challenge A video uploaded and linked prominently:
+  https://youtu.be/BMKTFHjyD1o
 - [x] Repository is public at `https://github.com/karimbaidar/concordIQ`.
 - [x] Submission text, architecture, proof links, and repo link are ready.
 - [x] Final product changes pushed to the repository.
+- [x] Free public replay deployment configuration and guide added.
 
 ## Repo
 
 - Repo link: https://github.com/karimbaidar/concordIQ
-- Final video link: _pending_
+- Final video link: https://youtu.be/BMKTFHjyD1o

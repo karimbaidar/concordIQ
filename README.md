@@ -2,6 +2,12 @@
 
 **Version control for the meaning behind enterprise metrics and decisions.**
 
+[![Watch the 2-minute demo](https://img.shields.io/badge/Watch_the_2--minute_demo-YouTube-FF0000?logo=youtube&logoColor=white)](https://youtu.be/BMKTFHjyD1o)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://dashboard.render.com/blueprint/new?repo=https://github.com/karimbaidar/concordIQ)
+
+**[Watch the Concord IQ demo on YouTube](https://youtu.be/BMKTFHjyD1o)** ·
+**[Launch your own free replay demo](docs/deployment.md)**
+
 Concord IQ proves when teams use the same term differently, executes each definition
 over the same population, and proposes a governed canonical definition only when the
 configured owner is allowed to approve it.
@@ -125,6 +131,12 @@ unavailable for Business.
 
 Runtime selection is process-local and ephemeral. Switching does not create a proposal,
 change governance state, or persist credentials.
+
+If a live Microsoft credential, endpoint, or Fabric capacity is unavailable, Concord IQ
+shows a friendly recovery message and offers the verified Fabric IQ replay. Supporting
+Learning scenarios that are not registered in the live ontology use the deterministic
+local registry with an explicit provenance label; they never pretend Fabric grounded
+them.
 
 ## Default Learning Demo
 
@@ -289,6 +301,19 @@ Concord IQ registry; it does not write back to Fabric IQ, Foundry IQ, or Work IQ
 
 Detailed architecture: [docs/architecture.md](docs/architecture.md).
 
+## Public Demo Deployment
+
+The included `Dockerfile.web` packages the React UI and FastAPI API as one service.
+`render.yaml` starts a free, cloud-free reviewer deployment in verified Fabric IQ Replay
+mode. No Microsoft credential is exposed to public users.
+
+[Deploy Concord IQ from the public repository](https://dashboard.render.com/blueprint/new?repo=https://github.com/karimbaidar/concordIQ)
+or follow the [step-by-step deployment guide](docs/deployment.md).
+
+The free deployment uses an ephemeral registry so the demo resets safely after a service
+restart or idle spin-down. Use the presenter-controlled `make dev` path for fresh live
+Fabric IQ and Foundry Agent Service calls.
+
 ## Submission Resources
 
 - [Project submission narrative](docs/hackathon-submission.md)
@@ -297,6 +322,8 @@ Detailed architecture: [docs/architecture.md](docs/architecture.md).
 - [Microsoft IQ integration boundaries](docs/iq-integration.md)
 - [Reproducible proof index](docs/proofs/README.md)
 - [Submission checklist](SUBMISSION_CHECKLIST.md)
+- [Public demo deployment guide](docs/deployment.md)
+- [Two-minute YouTube demo](https://youtu.be/BMKTFHjyD1o)
 - [Public GitHub repository](https://github.com/karimbaidar/concordIQ)
 
 ## Verify

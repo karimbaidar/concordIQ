@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -460,5 +460,109 @@ describe("learning-first Concord IQ experience", () => {
       await screen.findByText("Run the reconciliation again before convening the court."),
     ).toBeInTheDocument();
     expect(screen.queryByText(/"detail"/)).not.toBeInTheDocument();
+  });
+
+  it("offers verified replay when Fabric IQ live is unavailable", async () => {
+    const original = vi.mocked(fetch).getMockImplementation();
+    vi.mocked(fetch).mockImplementation((input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith("/runtime")) {
+        return mockJson({
+          scenario_pack: "learning",
+          runtime_profile: "fabric_live",
+          switching_enabled: true,
+          scenario_packs: [
+            { id: "learning", label: "Learning", enabled: true, detail: "Learning pack." },
+          ],
+          runtime_profiles: [
+            {
+              id: "fabric_live",
+              label: "Fabric IQ Live",
+              available: true,
+              cloud: true,
+              detail: "Live Fabric ontology grounding.",
+              supported_packs: ["learning"],
+            },
+            {
+              id: "fabric_replay",
+              label: "Fabric IQ Replay",
+              available: true,
+              cloud: false,
+              detail: "Verified sanitized Fabric capture; no cloud call.",
+              supported_packs: ["learning"],
+            },
+          ],
+        });
+      }
+      if (url.endsWith("/runtime/select")) {
+        return mockJson({
+          scenario_pack: "learning",
+          runtime_profile: "fabric_replay",
+          switching_enabled: true,
+          scenario_packs: [
+            { id: "learning", label: "Learning", enabled: true, detail: "Learning pack." },
+          ],
+          runtime_profiles: [
+            {
+              id: "fabric_replay",
+              label: "Fabric IQ Replay",
+              available: true,
+              cloud: false,
+              detail: "Verified sanitized Fabric capture; no cloud call.",
+              supported_packs: ["learning"],
+            },
+          ],
+        });
+      }
+      if (url.endsWith("/demo/run/certification-ready")) {
+        return Promise.resolve({
+          ok: false,
+          status: 503,
+          text: () =>
+            Promise.resolve(
+              JSON.stringify({
+                detail: {
+                  code: "fabric_capacity_inactive",
+                  title: "Fabric IQ capacity is not active",
+                  message:
+                    "Start the configured Microsoft Fabric capacity and retry, or continue with the verified sanitized Fabric IQ replay recorded from the live ontology.",
+                  recovery_profile: "fabric_replay",
+                  recovery_label: "Use verified Fabric IQ replay",
+                },
+              }),
+            ),
+        } as Response);
+      }
+      return original!(input, init);
+    });
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByRole("heading", { name: /False Readiness Firewall/i });
+    expect(
+      screen.getByText(/Live Microsoft modes require configured short-lived credentials/i),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
+
+    expect(
+      await screen.findByText(/Start the configured Microsoft Fabric capacity/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/CapacityNotActive/)).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Use verified Fabric IQ replay" }),
+    );
+
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/runtime/select"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            scenario_pack: "learning",
+            runtime_profile: "fabric_replay",
+          }),
+        }),
+      ),
+    );
   });
 });

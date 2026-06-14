@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: concord-iq-demo
+    runtime: docker
+    plan: free
+    autoDeploy: false
+    dockerfilePath: ./Dockerfile.web
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite+pysqlite:////tmp/concord_iq.db
+      - key: PROVIDER
+        value: replay
+      - key: CONCORD_SCENARIO_PACK
+        value: learning
+      - key: CONCORD_ENABLE_BUSINESS
+        value: "false"
+      - key: CONCORD_RUNTIME_SWITCHING
+        value: "true"
+      - key: CONCORD_DEFAULT_RUNTIME
+        value: fabric_replay
+      - key: CONCORD_WORKFLOW_MODE
+        value: strict
+      - key: ALLOW_CLOUD
+        value: "false"
+      - key: MAX_CLOUD_CALLS
+        value: "0"
+      - key: LLM_PROVIDER
+        value: disabled
+      - key: DUCKDB_PATH
+        value: data/concord_iq.duckdb
+      - key: LEARNING_REPLAY_ARTIFACT_PATH
+        value: artifacts/replay/sanitized/certification-ready.latest.json
+      - key: BUSINESS_REPLAY_ARTIFACT_PATH
+        value: artifacts/replay/sanitized/latest.json

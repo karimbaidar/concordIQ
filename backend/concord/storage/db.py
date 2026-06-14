@@ -32,4 +32,4 @@ def ensure_schema_compatibility(engine: Engine) -> None:
 
 if __name__ == "__main__":
     initialize_database()
-    print("PostgreSQL schema initialized.")
+    print("Concord IQ registry schema initialized.")

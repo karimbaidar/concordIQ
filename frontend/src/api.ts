@@ -16,6 +16,36 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
+interface StructuredErrorDetail {
+  code?: string;
+  title?: string;
+  message?: string;
+  recovery_profile?: RuntimeProfile;
+  recovery_label?: string;
+}
+
+export class ConcordApiError extends Error {
+  status: number;
+  code: string | null;
+  title: string | null;
+  recoveryProfile: RuntimeProfile | null;
+  recoveryLabel: string | null;
+
+  constructor(
+    message: string,
+    status: number,
+    detail: StructuredErrorDetail | null = null,
+  ) {
+    super(message);
+    this.name = "ConcordApiError";
+    this.status = status;
+    this.code = detail?.code ?? null;
+    this.title = detail?.title ?? null;
+    this.recoveryProfile = detail?.recovery_profile ?? null;
+    this.recoveryLabel = detail?.recovery_label ?? null;
+  }
+}
+
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -27,10 +57,18 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   if (!response.ok) {
     const raw = await response.text();
     let detail = raw;
+    let structured: StructuredErrorDetail | null = null;
     try {
       const parsed = JSON.parse(raw) as { detail?: unknown };
       if (typeof parsed.detail === "string") {
         detail = parsed.detail;
+      } else if (
+        typeof parsed.detail === "object" &&
+        parsed.detail !== null &&
+        "message" in parsed.detail
+      ) {
+        structured = parsed.detail as StructuredErrorDetail;
+        detail = structured.message ?? `Request failed with status ${response.status}.`;
       } else if (Array.isArray(parsed.detail)) {
         const messages = parsed.detail
           .map((item) => {
@@ -48,7 +86,11 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       // Preserve plain-text errors from non-FastAPI intermediaries.
     }
-    throw new Error(detail || `Request failed with status ${response.status}.`);
+    throw new ConcordApiError(
+      detail || `Request failed with status ${response.status}.`,
+      response.status,
+      structured,
+    );
   }
   return response.json() as Promise<T>;
 }

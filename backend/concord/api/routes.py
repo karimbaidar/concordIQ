@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
@@ -57,6 +58,17 @@ from concord.storage.repositories import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+
+class ServiceUnavailableDetail(BaseModel):
+    """Stable, non-secret recovery guidance for an unavailable cloud runtime."""
+
+    code: str
+    title: str
+    message: str
+    recovery_profile: RuntimeProfile = RuntimeProfile.FABRIC_REPLAY
+    recovery_label: str = "Use verified Fabric IQ replay"
 
 
 class ProposalDecisionRequest(BaseModel):
@@ -186,6 +198,55 @@ def _ungoverned_refusal(request: Request, term: str) -> UngovernedTermRefusal:
     )
 
 
+def _cloud_service_exception(
+    manager: RuntimeManager,
+    error: Exception,
+) -> HTTPException:
+    """Translate provider failures without exposing endpoints, tokens, or raw payloads."""
+    message = str(error)
+    profile = manager.runtime_profile
+    provider = "Fabric IQ" if profile is RuntimeProfile.FABRIC_LIVE else "Foundry Agent Service"
+    normalized = message.casefold()
+    if "capacitynotactive" in normalized or "capacity" in normalized and "not active" in normalized:
+        code = "fabric_capacity_inactive"
+        title = "Fabric IQ capacity is not active"
+        guidance = (
+            "Start the configured Microsoft Fabric capacity and retry, or continue with "
+            "the verified sanitized Fabric IQ replay recorded from the live ontology."
+        )
+    elif any(token in normalized for token in ("access_token", "credential", "401", "403")):
+        code = "cloud_credentials_required"
+        title = f"{provider} credentials are required"
+        guidance = (
+            f"Provide a valid short-lived {provider} credential and restart the presenter "
+            "runtime, or continue with the verified sanitized Fabric IQ replay."
+        )
+    elif isinstance(error, CloudCallBudgetExceeded):
+        code = "cloud_budget_exhausted"
+        title = f"{provider} call budget is exhausted"
+        guidance = (
+            "Restart with a positive cloud-call budget, or continue with the verified "
+            "sanitized Fabric IQ replay."
+        )
+    else:
+        code = "cloud_service_unavailable"
+        title = f"{provider} is temporarily unavailable"
+        guidance = (
+            f"Check the configured {provider} endpoint, credential, and service status, "
+            "or continue with the verified sanitized Fabric IQ replay."
+        )
+    logger.warning("%s request unavailable (%s)", provider, type(error).__name__)
+    detail = ServiceUnavailableDetail(
+        code=code,
+        title=title,
+        message=guidance,
+    )
+    return HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=detail.model_dump(mode="json"),
+    )
+
+
 @router.get("/health")
 def health(request: Request) -> dict[str, object]:
     runtime = _runtime_manager(request)
@@ -266,18 +327,38 @@ async def _run_case(payload: ReconciliationRequest, request: Request) -> Reconci
     cloud failures are mapped to HTTP errors here so every caller is consistent.
     """
     manager = _runtime_manager(request)
+    if (
+        manager.scenario_pack is ScenarioPack.LEARNING
+        and manager.runtime_profile in {RuntimeProfile.FABRIC_LIVE, RuntimeProfile.FOUNDRY_LIVE}
+        and payload.term.casefold() != "certification ready"
+    ):
+        # The verified live ontology and hosted deployment currently cover
+        # Certification Ready only. Supporting cases remain fully usable through
+        # the local deterministic registry without claiming a cloud execution.
+        case = await manager.local_workflow(manager.scenario_pack).run(payload)
+        return manager.remember_case(case)
     hosted = _hosted_runtime(request)
     if hosted is not None:
         try:
             case = await asyncio.to_thread(hosted.analyze, payload)
-        except CloudAccessDisabled as error:
-            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
-        except (ProviderNotConfigured, CloudCallBudgetExceeded) as error:
-            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
-        except (FoundryHostedResponseError, CloudTransportError) as error:
-            raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+        except (
+            CloudAccessDisabled,
+            ProviderNotConfigured,
+            CloudCallBudgetExceeded,
+            FoundryHostedResponseError,
+            CloudTransportError,
+        ) as error:
+            raise _cloud_service_exception(manager, error) from error
         return manager.remember_case(case, import_to_registry=True)
-    case = await _workflow(request).run(payload)
+    try:
+        case = await _workflow(request).run(payload)
+    except (
+        CloudAccessDisabled,
+        ProviderNotConfigured,
+        CloudCallBudgetExceeded,
+        CloudTransportError,
+    ) as error:
+        raise _cloud_service_exception(manager, error) from error
     return manager.remember_case(case)
 
 
@@ -334,7 +415,15 @@ async def ask(payload: AskRequest, request: Request) -> AskResponse:
         )
         return AskResponse(query=result, case=case)
     runner = _runner(request)
-    result = runner.provider.nl_query(payload.question)
+    try:
+        result = runner.provider.nl_query(payload.question)
+    except (
+        CloudAccessDisabled,
+        ProviderNotConfigured,
+        CloudCallBudgetExceeded,
+        CloudTransportError,
+    ) as error:
+        raise _cloud_service_exception(_runtime_manager(request), error) from error
     case: ReconciliationCase | None = None
     if result.matched and result.canonical_name:
         try:

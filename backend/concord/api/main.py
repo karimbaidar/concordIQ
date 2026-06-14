@@ -2,8 +2,10 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import Engine
 
 from concord.api.routes import router
@@ -55,6 +57,10 @@ def create_app(
     app.state.agent_workflow = runtime_manager.context.workflow
     app.state.foundry_hosted_provider = runtime_manager.context.hosted
     app.include_router(router)
+    app.include_router(router, prefix="/api", include_in_schema=False)
+    frontend_dist = Path("frontend/dist")
+    if frontend_dist.is_dir():
+        app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
     return app
 
 

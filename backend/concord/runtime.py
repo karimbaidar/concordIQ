@@ -365,7 +365,12 @@ class RuntimeManager:
             RuntimeProfile.FABRIC_LIVE: (
                 "Fabric IQ Live",
                 True,
-                "Live Fabric ontology grounding; deterministic SQL still owns the verdict.",
+                (
+                    "Live Fabric ontology grounding; deterministic SQL still owns the verdict."
+                    if self._profile_available(RuntimeProfile.FABRIC_LIVE, self.scenario_pack)
+                    else "Unavailable until Fabric endpoint credentials and an active capacity "
+                    "are provided. Use the verified Fabric IQ Replay meanwhile."
+                ),
                 (ScenarioPack.LEARNING,),
             ),
             RuntimeProfile.FABRIC_REPLAY: (
@@ -377,7 +382,12 @@ class RuntimeManager:
             RuntimeProfile.FOUNDRY_LIVE: (
                 "Foundry Agent Service Live",
                 True,
-                "Live hosted Agent Framework runtime over the verified learning replay.",
+                (
+                    "Live hosted Agent Framework runtime over the verified learning replay."
+                    if self._profile_available(RuntimeProfile.FOUNDRY_LIVE, self.scenario_pack)
+                    else "Unavailable until Foundry endpoint credentials are provided. "
+                    "Use the verified Fabric IQ Replay meanwhile."
+                ),
                 (ScenarioPack.LEARNING,),
             ),
             RuntimeProfile.LOCAL: (

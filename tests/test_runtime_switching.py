@@ -35,6 +35,7 @@ def test_runtime_defaults_to_learning_and_business_is_disabled(
 
     with TestClient(app) as client:
         state = client.get("/runtime")
+        prefixed_health = client.get("/api/health")
         scenarios = client.get("/demo/scenarios")
         portfolio = client.get("/scan")
         blocked = client.post(
@@ -46,6 +47,7 @@ def test_runtime_defaults_to_learning_and_business_is_disabled(
         )
 
     assert state.status_code == 200
+    assert prefixed_health.status_code == 200
     assert state.json()["scenario_pack"] == "learning"
     assert state.json()["runtime_profile"] == "local"
     business = next(item for item in state.json()["scenario_packs"] if item["id"] == "business")

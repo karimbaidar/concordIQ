@@ -86,6 +86,11 @@ export function RuntimeSwitcher({
       </div>
 
       <p>{runtime.runtime_profiles.find((item) => item.id === runtime.runtime_profile)?.detail}</p>
+      <p className="runtime-credential-guidance">
+        Live Microsoft modes require configured short-lived credentials and active cloud
+        resources. Fabric IQ Replay is a sanitized recording from the verified live
+        ontology and makes no cloud call.
+      </p>
     </section>
   );
 }

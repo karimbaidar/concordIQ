@@ -11,12 +11,12 @@ from typing import Any
 import pytest
 from concord.api.main import create_app
 from concord.capture import capture
-from concord.config import Settings
+from concord.config import ScenarioPack, Settings
 from concord.demo import DEMO_SCENARIOS
 from concord.fabric_mcp_diagnose import diagnose
 from concord.providers import FabricIQProvider, LocalProvider
 from concord.providers.base import ProviderMode, ProviderNotConfigured
-from concord.providers.cloud import HttpResult
+from concord.providers.cloud import CloudTransportError, HttpResult
 from concord.providers.fabric_iq import SEMANTIC_PROOF_MODE
 from concord.providers.replay_schema import (
     ReplayScenarioSnapshot,
@@ -41,6 +41,17 @@ class QueueTransport:
     def request(self, method, url, *, headers, body) -> HttpResult:
         self.requests.append({"method": method, "body": body})
         return self.responses.pop(0)
+
+
+class UnavailableTransport:
+    def __init__(self) -> None:
+        self.requests: list[dict[str, Any]] = []
+
+    def request(self, method, url, *, headers, body) -> HttpResult:
+        self.requests.append({"method": method, "body": body})
+        raise CloudTransportError(
+            "Cloud endpoint returned HTTP 404: CapacityNotActive.Capacity is not active"
+        )
 
 
 def _handshake() -> list[HttpResult]:
@@ -164,6 +175,90 @@ def test_fabric_live_case_can_convene_court_without_a_second_provider_call(
     assert metadata["execution_source"] == "deterministic_local_snapshot"
     assert court.status_code == 200
     assert len(transport.requests) == call_count
+
+
+def test_fabric_live_supporting_case_uses_explicit_local_registry_without_cloud(
+    tmp_path: Path,
+    postgres_engine,
+) -> None:
+    from concord.seed.seed_duckdb import seed_duckdb
+
+    database_path = tmp_path / "learning.duckdb"
+    seed_duckdb(database_path=database_path, data_dir=tmp_path / "csv")
+    local = LocalProvider.for_scenario_pack(
+        ScenarioPack.LEARNING,
+        duckdb_path=database_path,
+    )
+    settings = Settings(
+        _env_file=None,
+        provider="fabric_iq",
+        scenario_pack="learning",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint="https://api.fabric.microsoft.com/v1/mcp/dataPlane/test",
+        fabric_iq_access_token="super-secret-token",
+        duckdb_path=database_path,
+    )
+    transport = UnavailableTransport()
+    provider = FabricIQProvider(
+        settings,
+        transport=transport,
+        local_provider=local,
+        allow_local_fallback=True,
+    )
+    app = create_app(settings, provider=provider, engine=postgres_engine)
+
+    with TestClient(app) as client:
+        response = client.post("/demo/run/required-training-complete")
+
+    assert response.status_code == 200
+    assert response.json()["verdict"] == "consistent"
+    assert response.json()["context_packet"]["provider_metadata"]["grounding_kind"] == (
+        "local_registry"
+    )
+    assert transport.requests == []
+
+
+def test_fabric_live_outage_returns_safe_replay_recovery(
+    tmp_path: Path,
+    postgres_engine,
+) -> None:
+    from concord.seed.seed_duckdb import seed_duckdb
+
+    database_path = tmp_path / "learning.duckdb"
+    seed_duckdb(database_path=database_path, data_dir=tmp_path / "csv")
+    local = LocalProvider.for_scenario_pack(
+        ScenarioPack.LEARNING,
+        duckdb_path=database_path,
+    )
+    settings = Settings(
+        _env_file=None,
+        provider="fabric_iq",
+        scenario_pack="learning",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint="https://api.fabric.microsoft.com/v1/mcp/dataPlane/test",
+        fabric_iq_access_token="super-secret-token",
+        duckdb_path=database_path,
+    )
+    provider = FabricIQProvider(
+        settings,
+        transport=UnavailableTransport(),
+        local_provider=local,
+        allow_local_fallback=True,
+    )
+    app = create_app(settings, provider=provider, engine=postgres_engine)
+
+    with TestClient(app) as client:
+        response = client.post("/demo/run/certification-ready")
+
+    assert response.status_code == 503
+    detail = response.json()["detail"]
+    assert detail["code"] == "fabric_capacity_inactive"
+    assert detail["title"] == "Fabric IQ capacity is not active"
+    assert detail["recovery_profile"] == "fabric_replay"
+    assert "CapacityNotActive" not in detail["message"]
+    assert "api.fabric.microsoft.com" not in response.text
 
 
 def test_provider_calls_list_entity_types_with_exact_name(

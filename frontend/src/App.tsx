@@ -6,6 +6,7 @@ import {
   fetchLearningScaleProof,
   fetchRuntimeState,
   isUngovernedRefusal,
+  ConcordApiError,
   reconcileTerm,
   reconcileWhatIf,
   runCourt,
@@ -143,6 +144,10 @@ export default function App() {
   const [learningScale, setLearningScale] = useState<LearningScaleProofType | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorRecovery, setErrorRecovery] = useState<{
+    profile: RuntimeProfile;
+    label: string;
+  } | null>(null);
   const [refusal, setRefusal] = useState<UngovernedTermRefusal | null>(null);
   const [whatIf, setWhatIf] = useState<WhatIfResult | null>(null);
   const [whatIfBusy, setWhatIfBusy] = useState(false);
@@ -220,6 +225,21 @@ export default function App() {
     setWhatIfError(null);
   }, []);
 
+  const showRequestError = useCallback(
+    (requestError: unknown, fallback: string) => {
+      setError(requestError instanceof Error ? requestError.message : fallback);
+      setErrorRecovery(
+        requestError instanceof ConcordApiError && requestError.recoveryProfile
+          ? {
+              profile: requestError.recoveryProfile,
+              label: requestError.recoveryLabel ?? "Use verified replay",
+            }
+          : null,
+      );
+    },
+    [],
+  );
+
   const handleWhatIf = useCallback(
     async (bindingId: string, timeWindowDays: number) => {
       if (!result) {
@@ -261,6 +281,7 @@ export default function App() {
     }
     setBusy(true);
     setError(null);
+    setErrorRecovery(null);
     setRefusal(null);
     setMergedDecision(null);
     setCourt(null);
@@ -276,11 +297,7 @@ export default function App() {
         });
       });
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "The deterministic reconciliation run failed.",
-      );
+      showRequestError(requestError, "The deterministic reconciliation run failed.");
     } finally {
       setBusy(false);
     }
@@ -311,6 +328,7 @@ export default function App() {
   ) {
     setBusy(true);
     setError(null);
+    setErrorRecovery(null);
     setResult(null);
     setRefusal(null);
     setMergedDecision(null);
@@ -328,11 +346,7 @@ export default function App() {
       setScenarios(scenarioResponse);
       setSelectedId(scenarioResponse[0]?.scenario_id ?? "");
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Unable to switch the Concord IQ runtime.",
-      );
+      showRequestError(requestError, "Unable to switch the Concord IQ runtime.");
     } finally {
       setBusy(false);
     }
@@ -356,6 +370,7 @@ export default function App() {
   async function handleInvestigate(term: string) {
     setBusy(true);
     setError(null);
+    setErrorRecovery(null);
     setRefusal(null);
     setMergedDecision(null);
     setCourt(null);
@@ -382,11 +397,7 @@ export default function App() {
         });
       });
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "The deterministic reconciliation run failed.",
-      );
+      showRequestError(requestError, "The deterministic reconciliation run failed.");
     } finally {
       setBusy(false);
     }
@@ -395,6 +406,7 @@ export default function App() {
   async function handleGovernedRerun(runId: string) {
     setBusy(true);
     setError(null);
+    setErrorRecovery(null);
     resetWhatIf();
     setCourt(null);
     setCourtError(null);
@@ -415,6 +427,7 @@ export default function App() {
           ? requestError
           : new Error("The governed reconciliation re-run failed.");
       setError(failure.message);
+      setErrorRecovery(null);
       throw failure;
     } finally {
       setBusy(false);
@@ -508,8 +521,22 @@ export default function App() {
 
         {error && (
           <div className="error-banner" role="alert">
-            <strong>Concord IQ request unavailable.</strong>
-            <span>{error}</span>
+            <div>
+              <strong>Concord IQ request unavailable.</strong>
+              <span>{error}</span>
+            </div>
+            {errorRecovery && runtime && (
+              <button
+                type="button"
+                className="error-recovery-button"
+                disabled={busy}
+                onClick={() =>
+                  handleRuntimeSelect(runtime.scenario_pack, errorRecovery.profile)
+                }
+              >
+                {errorRecovery.label}
+              </button>
+            )}
           </div>
         )}
 
@@ -575,7 +602,10 @@ export default function App() {
                 </span>
               </div>
             </section>
-            <CaseProvenance result={result} />
+            <CaseProvenance
+              result={result}
+              runtimeProfile={runtime?.runtime_profile}
+            />
 
             <MeaningGraph
               result={result}

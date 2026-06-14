@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "concord-iq"
 version = "0.1.0"
-description = "A semantic reconciliation agent that proves when operational definitions disagree."
+description = "Governed semantic AI that proves when enterprise definitions disagree."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
