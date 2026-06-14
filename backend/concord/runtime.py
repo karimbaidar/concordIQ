@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from dataclasses import dataclass
 from enum import StrEnum
 from threading import Lock
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Engine
@@ -12,6 +14,7 @@ from sqlalchemy import Engine
 from concord.config import ScenarioPack, Settings
 from concord.llm import LLMProvider, create_llm_provider
 from concord.ms_agent import ConcordAgentWorkflow
+from concord.orchestration.casefile import ReconciliationCase
 from concord.orchestration.runner import ReconciliationRunner
 from concord.providers import (
     FoundryHostedProvider,
@@ -83,12 +86,22 @@ class RuntimeSelectionError(ValueError):
     """Raised when a disabled or unavailable runtime selection is requested."""
 
 
+@dataclass(slots=True)
+class CachedCase:
+    """One immutable reviewer-visible case and the semantic system that produced it."""
+
+    case: ReconciliationCase
+    scenario_pack: ScenarioPack
+
+
 class RuntimeManager:
     """Own the active provider for the single-user reviewer application.
 
     Switching is deliberately process-local. It changes no governed definitions,
     writes no credentials, and is intended for one presenter operating one demo UI.
     """
+
+    case_cache_limit = 32
 
     def __init__(
         self,
@@ -104,6 +117,7 @@ class RuntimeManager:
         self.repository = ReconciliationRepository(engine)
         self._llm_provider = llm_provider
         self._lock = Lock()
+        self._cases: OrderedDict[UUID, CachedCase] = OrderedDict()
         self._fixed = provider is not None or foundry_hosted_provider is not None
 
         if provider is not None:
@@ -149,6 +163,61 @@ class RuntimeManager:
     def initialize(self) -> None:
         """Initialize shared registry storage once for all in-process profiles."""
         self.repository.initialize()
+
+    def remember_case(
+        self,
+        case: ReconciliationCase,
+        *,
+        import_to_registry: bool = False,
+    ) -> ReconciliationCase:
+        """Cache one completed verified case without trusting mutable caller state."""
+        if (
+            case.verdict == "incomplete"
+            or case.verification_status != "passed"
+            or case.verifier_report is None
+            or not case.verifier_report.passed
+        ):
+            raise ValueError("Only completed verifier-approved cases may enter the run cache.")
+        if import_to_registry:
+            self.repository.import_verified_case(case)
+        frozen = case.model_copy(deep=True)
+        with self._lock:
+            self._cases[case.run_id] = CachedCase(
+                case=frozen,
+                scenario_pack=self.scenario_pack,
+            )
+            self._cases.move_to_end(case.run_id)
+            while len(self._cases) > self.case_cache_limit:
+                self._cases.popitem(last=False)
+        return case
+
+    def cached_case(self, run_id: UUID) -> CachedCase | None:
+        """Return a defensive copy of a cached case, refreshing its LRU position."""
+        with self._lock:
+            cached = self._cases.get(run_id)
+            if cached is None:
+                return None
+            self._cases.move_to_end(run_id)
+            return CachedCase(
+                case=cached.case.model_copy(deep=True),
+                scenario_pack=cached.scenario_pack,
+            )
+
+    def local_workflow(self, pack: ScenarioPack) -> ConcordAgentWorkflow:
+        """Build a cloud-free workflow over the shared governed registry."""
+        settings = self.base_settings.model_copy(
+            update={
+                "provider": ProviderMode.LOCAL.value,
+                "scenario_pack": pack,
+                "allow_cloud": False,
+                "max_cloud_calls": 0,
+            }
+        )
+        provider = create_provider(settings)
+        workflow = self._runner_context(settings, provider).workflow
+        if workflow is None:
+            raise RuntimeError("Local deterministic workflow could not be constructed.")
+        return workflow
 
     def _replay_path(self, pack: ScenarioPack):
         if pack is ScenarioPack.LEARNING:

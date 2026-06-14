@@ -7,6 +7,7 @@ from concord.court.transcript import (
     DeliberationTranscript,
     DeliberationTurn,
     TranscriptMode,
+    TurnDisposition,
     TurnProvenance,
 )
 
@@ -19,5 +20,6 @@ __all__ = [
     "DeliberationTurn",
     "SemanticCourt",
     "TranscriptMode",
+    "TurnDisposition",
     "TurnProvenance",
 ]

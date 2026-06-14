@@ -7,6 +7,7 @@ from concord.providers import (
     DefinitionBinding,
     GroundingProvider,
     OntologySubgraph,
+    ProviderMode,
 )
 
 PROHIBITED_ASSUMPTIONS = (
@@ -15,6 +16,50 @@ PROHIBITED_ASSUMPTIONS = (
     "Do not claim Microsoft IQ execution while running LocalProvider.",
     "Do not replace executed SQL or entity sets with generated narrative.",
 )
+
+
+def _provider_metadata(
+    provider: GroundingProvider,
+    concept: ConceptResolution,
+) -> dict[str, object]:
+    metadata: dict[str, object] = {
+        "name": provider.name,
+        "mode": provider.mode.value,
+        "uses_cloud": provider.uses_cloud,
+        "data_type": getattr(provider, "data_type", "synthetic"),
+    }
+    if provider.mode is ProviderMode.LOCAL:
+        metadata.update(
+            {
+                "grounding_kind": "local_registry",
+                "execution_source": "deterministic_local_snapshot",
+            }
+        )
+    elif provider.mode is ProviderMode.REPLAY:
+        capture = getattr(getattr(provider, "artifact", None), "capture", None)
+        metadata.update(
+            {
+                "grounding_kind": "sanitized_fabric_replay",
+                "execution_source": "deterministic_replay_snapshot",
+                "iq_proof_mode": getattr(capture, "iq_proof_mode", None),
+                "snapshot_source": getattr(capture, "snapshot_source", None),
+                "verified_real_iq": bool(getattr(capture, "verified_real_iq", False)),
+            }
+        )
+    elif provider.mode is ProviderMode.FABRIC_IQ:
+        proofs = getattr(provider, "semantic_proofs", {})
+        proof = proofs.get(concept.canonical_name) if isinstance(proofs, dict) else None
+        metadata.update(
+            {
+                "grounding_kind": ("fabric_ontology_match" if proof else "local_registry_fallback"),
+                "execution_source": "deterministic_local_snapshot",
+                "iq_proof_mode": (
+                    "fabric_semantic_proof_with_deterministic_snapshot" if proof else None
+                ),
+                "fabric_semantic_proof": proof,
+            }
+        )
+    return metadata
 
 
 def build_context_packet(
@@ -36,12 +81,7 @@ def build_context_packet(
         analytical_tables=tuple(
             dict.fromkeys(table for binding in bindings for table in binding.source_tables)
         ),
-        provider_metadata={
-            "name": provider.name,
-            "mode": provider.mode.value,
-            "uses_cloud": provider.uses_cloud,
-            "data_type": getattr(provider, "data_type", "synthetic"),
-        },
+        provider_metadata=_provider_metadata(provider, concept),
         active_scenario=concept.concept_id,
         prohibited_assumptions=PROHIBITED_ASSUMPTIONS,
         uncertainty_notes=(),

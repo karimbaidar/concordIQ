@@ -82,6 +82,8 @@ def test_runtime_switches_between_learning_local_and_verified_replay(
         )
         health = client.get("/health")
         scenarios = client.get("/demo/scenarios")
+        analyzed = client.post("/demo/run/certification-ready")
+        court = client.post(f"/runs/{analyzed.json()['run_id']}/court")
 
     assert selected.status_code == 200
     assert selected.json()["runtime_profile"] == "fabric_replay"
@@ -97,3 +99,9 @@ def test_runtime_switches_between_learning_local_and_verified_replay(
             ),
         }
     ]
+    assert analyzed.status_code == 200
+    assert analyzed.json()["context_packet"]["provider_metadata"]["grounding_kind"] == (
+        "sanitized_fabric_replay"
+    )
+    assert court.status_code == 200
+    assert court.json()["source_run_id"] == analyzed.json()["run_id"]

@@ -96,6 +96,7 @@ class JudgeProof:
     foundry: dict[str, Any] = field(default_factory=dict)
     fabric: dict[str, Any] = field(default_factory=dict)
     work_iq: dict[str, Any] = field(default_factory=dict)
+    learning_scale: dict[str, Any] = field(default_factory=dict)
 
     # --- mandatory local -------------------------------------------------
     def run_local(self) -> None:
@@ -110,6 +111,52 @@ class JudgeProof:
         )
         for key, label, target in plan:
             self.steps.append(_mandatory_step(key, label, target))
+        self._validate_learning_scale()
+
+    def _validate_learning_scale(self) -> None:
+        """Gate the separate Fabric-bound scale artifact and its exact published values."""
+        path = self.settings.learning_scale_summary_path
+        expected = {
+            "learner_count": 10_000,
+            "certification_ready_count": 522,
+            "false_ready_blocked_count": 4_334,
+        }
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError) as error:
+            self.learning_scale = {"status": FAILED, "path": str(path)}
+            self.steps.append(
+                StepResult(
+                    key="learning_scale",
+                    label="Separate Fabric scale artifact",
+                    status=FAILED,
+                    mandatory=True,
+                    detail=f"Scale artifact unavailable: {error}",
+                )
+            )
+            return
+        actual = {key: document.get(key) for key in expected}
+        passed = actual == expected
+        self.learning_scale = {
+            "status": PASSED if passed else FAILED,
+            "mode": "separate_fabric_bound_scale_artifact",
+            **actual,
+            "workbench_execution": "separate_120_learner_case",
+        }
+        self.steps.append(
+            StepResult(
+                key="learning_scale",
+                label="Separate Fabric scale artifact",
+                status=PASSED if passed else FAILED,
+                mandatory=True,
+                detail=(
+                    "10,000 learners; 522 canonical-ready; 4,334 false-ready; "
+                    "separate from the 120-learner workbench execution."
+                    if passed
+                    else f"Expected {expected}, found {actual}."
+                ),
+            )
+        )
 
     # --- optional cloud --------------------------------------------------
     def run_foundry(self) -> None:
@@ -186,6 +233,7 @@ class JudgeProof:
             "local": self._local_json(),
             "foundry_agent_service": self.foundry,
             "fabric_iq": self.fabric,
+            "learning_scale": self.learning_scale,
             "work_iq": self.work_iq,
         }
 
@@ -284,6 +332,7 @@ Eval scorecard:     {up(local.get("eval", "?"))}
 Replay proof:       {up(local.get("replay", "?"))}
 Semantic PR export: {up(local.get("semantic_pr_export", "?"))}
 Semantic Court:     {up(local.get("court_replay", "?"))}
+Scale artifact:     {up(local.get("learning_scale", "?"))}
 
 Foundry Agent Service: {up(document["foundry_agent_service"]["status"])}
 Fabric IQ live:        {up(document["fabric_iq"]["live"])}

@@ -2,94 +2,176 @@
 
 ## Project
 
-**Concord IQ — the semantic reconciliation agent for enterprise meaning**
+**Concord IQ - Version Control for Enterprise Meaning**
 
-Concord IQ detects when business teams use the same term with different
-operational meanings. It compares executable definitions, tests them against
-synthetic data, ranks business impact, consults authority rules, and proposes or
-refuses a governed semantic reconciliation. It then goes further than a one-off
-report: it **watches** (an autonomous portfolio scan), **scores** (a single
-Concord Score with a per-team leaderboard), **answers** in business terms (an
-NL2Ontology-grounded chat), and **gates** canonical definitions behind
-code-review-style, owner-only approval.
+**Tagline:** The agents argue. The evidence rules.
+
+Enterprises have built a single source of truth for data, but not for meaning.
+Concord IQ detects when teams use the same business term with different executable
+definitions, proves the affected population with deterministic SQL, quantifies the
+impact, and routes a versioned canonical definition to the real human owner.
+
+The primary demonstration is an enterprise learning and certification case.
+HR says 80 learners are **Certification Ready**. Learning and Development says 56.
+Managers also say 56, but they select different learners. Nobody is lying: the
+organization never governed what "ready" means.
+
+Concord IQ proves the disagreement over a fixed 120-learner synthetic snapshot. It
+identifies 24 false-ready learners and `$10,800` in synthetic exam-voucher spending
+at risk. That turns an invisible semantic disagreement into a named cohort,
+measurable exposure, exact SQL evidence, and an accountable decision.
+
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    TEAMS["HR: 80<br/>L&D: 56<br/>Managers: 56, different IDs"] -->
+    FABRIC["Microsoft Fabric IQ<br/>Certification Ready ontology grounding"]
+    FABRIC --> SQL["Deterministic SQL<br/>entity-set comparison"]
+    SQL --> P1["Phase 1<br/>10-stage Microsoft Agent Framework reconciliation"]
+    HOST["Microsoft Foundry Agent Service<br/>verified replay deployment"] -.-> P1
+    P1 --> CASE["Frozen verifier-approved case<br/>24 learners / $10,800 risk"]
+    CASE --> P2["Phase 2<br/>Separate Agent Framework Semantic Court"]
+    P2 --> OWNER["Learning Governance Council<br/>human approval"]
+    OWNER --> PR["Semantic PR"]
+    PR --> CANON["Canonical Definition v1<br/>Concord IQ registry"]
+
+    SCALE["Separate Fabric scale artifact<br/>10,000 learners / 522 canonical-ready / 4,334 false-ready"] -. "not the workbench execution" .-> FABRIC
+```
 
 ## Track alignment
 
 ### Reasoning Agents
 
-Microsoft Agent Framework coordinates ten typed specialist workflow nodes for
-concept resolution, binding inspection, conflict hypothesis, data execution,
-impact ranking, authority resolution, reconciliation, skeptical verification,
-and audit. A **strict** workflow mode makes the framework own the progression —
-each node executes exactly one stage and writes typed output into the casefile —
-while **fast** mode exposes the deterministic runner's trace. The skeptical
-verifier blocks unsupported or incomplete cases (`blocked` / `needs_review`, one
-recovery retry, never inventing evidence), and every run emits a typed agent trace
-served at `GET /runs/{run_id}/agent-trace`. The whole workflow is hosted through a
-Foundry Agent Service entrypoint validated with a cloud-free hosted smoke test.
+Concord IQ implements two genuine Microsoft Agent Framework workflows with typed
+state and role-specialized agents.
+
+**Phase 1 - Analyze Disagreement** is a ten-stage reconciliation workflow:
+
+1. Coordinator
+2. Concept resolution
+3. Binding inspection
+4. Conflict hypothesis and skeptical challenge
+5. Deterministic SQL execution
+6. Impact ranking
+7. Authority resolution
+8. Reconciliation proposal or refusal
+9. Skeptical verification
+10. Audit
+
+The conflict hypothesis agent can argue that wording differences imply different
+populations; the skeptic challenges that claim; executed entity sets settle it.
+Equal counts are not treated as equal populations. Every completed run exposes a
+typed trace, evidence IDs, SQL citations, verifier status, and provider provenance.
+
+This strict ten-stage workflow is deployed and verified on **Microsoft Foundry Agent
+Service** over the sanitized Certification Ready Fabric replay.
+
+**Phase 2 - Convene the Semantic Court** is a separate Agent Framework graph over
+the exact frozen, verifier-approved case. The Court does not rerun SQL, call Foundry
+again, create a second proposal, or change the verdict. Evidence selects the
+conditional branches, including a maximum-one-retry investigator replan when equal
+counts hide unequal learner identities.
+
+HR narrows its enterprise claim. Managers reframe their definition as an
+operational domain view. Learning and Development defends the proposed canonical
+candidate but defers publication to the Learning Governance Council. A final Court
+audit proves that the outcome, verdict, authority, and every citation still match
+the original case.
 
 ### Best Use of IQ Tools
 
-The architecture uses:
+Microsoft Fabric IQ is used for what makes Concord IQ distinctive: semantic
+business understanding.
 
-- Fabric IQ ontology MCP + NL2Ontology as the primary semantic grounding provider.
-  The `nl_query` / `POST /ask` path is genuinely IQ-served: on Fabric/Foundry it
-  calls the real NL2Ontology/retrieve surface. Capture has two honest modes —
-  full-snapshot when Fabric returns the scenario JSON, and **semantic-proof mode**
-  when the ontology MCP only matches the governed entity type, in which case the
-  real Fabric proof is recorded and the deterministic LocalProvider snapshot
-  supplies the SQL/evidence (transparently marked via `iq_proof_mode`). The project
-  never claims Fabric returned the full snapshot unless full-snapshot mode succeeds.
-- Foundry IQ knowledge-base retrieval as the fallback IQ provider.
-- Foundry Agent Service as the deployment path.
+- Fabric IQ grounds **Certification Ready** as an ontology-backed business concept
+  spanning learners, certifications, modules, practice scores, labs, approvals,
+  organizational owners, and readiness definitions.
+- The live Fabric path records the real ontology match and clearly labels that
+  Concord IQ's deterministic local snapshot executes the displayed SQL.
+- A reviewed, sanitized Fabric capture reproduces the same semantic grounding with
+  no cloud call.
+- Foundry Agent Service hosts the ten-stage reconciliation over that verified replay.
+- Foundry IQ authority grounding is advisory and cited; deterministic governance
+  rules remain authoritative.
+- Work IQ is implemented behind a guarded adapter, but the tenant retrieval remains
+  license-gated and is not claimed as verified live.
 
-The bootstrap and adapter REST/MCP surfaces (create ontology, `updateDefinition`,
-list items by `ItemType=Ontology`, the MCP `ontologyEndpoint`) are verified
-against current Microsoft Learn, and F2 is confirmed as the minimum supported SKU.
-`ReplayProvider` is designed to preserve a reviewed real-IQ response for
-zero-spend rehearsal. `LocalProvider` is clearly labeled deterministic reviewer
-mode and is not represented as Microsoft IQ.
+A separate Fabric-bound package demonstrates scale with 10,000 synthetic learners,
+522 canonical-ready records, and 4,334 false-ready records. It is visibly and
+verbally separated from the 120-learner workbench execution. The `$10,800` impact
+belongs only to the 24-learner workbench difference.
 
-### Creativity, originality, and UX
+### Creativity and originality
 
-Few entries make semantic *meaning itself* the object of reasoning. Concord IQ
-also turns governance into a product people return to: ask in plain English, an
-autonomous semantic scan that finds problems nobody asked about, a single Concord
-Score with a team leaderboard, and approval gates that merge meaning like code.
+Most certification agents help learners study, schedule practice, or predict exam
+performance. Concord IQ governs the decision those systems depend on: what the
+enterprise is allowed to mean by "ready."
+
+The product makes semantic meaning itself versionable:
+
+- competing definitions behave like branches
+- executed evidence behaves like tests
+- the Semantic Court exposes structured disagreement
+- the skeptical verifier acts as a blocking quality gate
+- the Semantic PR proposes the merge
+- only the configured owner can promote the canonical version
+
+The same engine generalizes to revenue, churn, risk, eligibility, compliance, and
+other terms whose meaning differs across organizational boundaries. The legacy
+business scenario pack remains a deterministic generalization and regression suite,
+not the primary submission story.
+
+### User experience and presentation
+
+The reviewer workbench presents the experience as two explicit phases:
+
+1. **Evidence workflow complete: 10 Agent Framework stages.**
+2. **Convene a separate Agent Framework Court over this frozen run.**
+
+The UI includes the Certification Ready meaning fork, exact counts and learner IDs,
+business impact, SQL evidence, agent trace, grouped Court rounds, dispositions,
+citations, workflow provenance, authority, Semantic PR, owner approval, and governed
+rerun. Friendly errors replace raw API payloads, and each runtime is honestly
+labeled as Fabric Live, verified Fabric Replay, Foundry Agent Service Live, or Local.
 
 ## Demonstrated behavior
 
-- **Active Customer:** detects a material 1,600 / 1,500 / 1,334 conflict ($33.2M
-  ARR delta) and drafts a proposal.
-- **Net Revenue:** rejects a wording-only decoy with equal 1,600 / 1,600 results.
-- **Churned Customer:** detects a 333 / 666 conflict and refuses because authority
-  is shared or ambiguous.
-- **Qualified Lead:** catches a subtle 20-customer (1.3%, $2.26M) gap from one
-  status value and quantifies it.
-- **Autonomous scan + Concord Score:** sweeps all concepts to a 60/100 (grade D)
-  health score with an impact-ranked board and per-team leaderboard.
-- **NL chat:** `POST /ask` grounds a business question through NL2Ontology, then
-  reconciles it on data.
-- **Approval gate:** `POST /proposals/{id}/approve|reject` merges canonical
-  definitions only with the configured authority owner, promotes one versioned
-  canonical in Concord's registry, and makes a re-run use the governed meaning
-  while preserving prior departmental views and audit history.
-- **Meaning fork:** an accessible, dependency-free SVG turns the typed casefile
-  into the demo's visual spine. Executed counts and windows fork by department,
-  deterministic what-if values move live, authority refusal stays unresolved,
-  and owner approval collapses the graph to the server-confirmed canonical version.
-- Every completed case retains executed SQL, evidence, verifier checks, and audit.
-- Cloud calls are impossible under default configuration.
-- The HTTP API executes through the Microsoft Agent Framework workflow.
+- **Certification Ready conflict:** `80 / 56 / 56` over 120 synthetic learners.
+- **Identity-level proof:** L&D and Managers both return 56 but select different
+  learner populations.
+- **Proven impact:** 24 false-ready learners and `$10,800` of synthetic voucher
+  spending at risk.
+- **Human governance:** the Learning Governance Council is the configured owner.
+- **Owner-only promotion:** approval creates one versioned canonical definition in
+  the Concord IQ registry.
+- **Governed rerun:** executes locally through that registry while preserving the
+  original domain views and audit history.
+- **Safe refusal:** missing or ambiguous authority prevents automatic publication.
+- **Scale evidence:** a separate 10,000-row Fabric-bound artifact reports 522
+  canonical-ready and 4,334 false-ready records.
+- **Generality:** the retained business pack verifies conflict, decoy, subtle-drift,
+  refusal, and non-owner attack cases.
 
-## Reliability
+## Reliability and safety
 
-- fixed-seed synthetic data
-- typed provider and casefile contracts
-- deterministic SQL result-set comparison
-- deterministic authority and refusal rules
-- no LLM required for core behavior
-- hard cloud request budget
-- raw capture isolation and sanitized replay validation
-- optional local Ollama narration with a text-only output contract
-- deterministic fallback when Ollama is unavailable or returns invalid output
+- deterministic SQL result-set equality owns the verdict
+- configured governance rules own authority
+- agents and optional models cannot mutate verdicts, evidence, impact, or authority
+- a skeptical verifier blocks unsupported or incomplete cases
+- Court citations must exactly match the frozen case evidence
+- ambiguous authority produces refusal rather than an invented winner
+- only the configured human owner can promote a canonical definition
+- approval writes only to the Concord IQ registry
+- fixed-seed synthetic data is used throughout
+- cloud calls are disabled by default, budgeted, and fail closed
+- raw captures remain ignored; sanitized replay artifacts are typed and reviewed
+- deterministic evaluation, trace, replay, and audit artifacts are reproducible
+
+## Submission keywords
+
+Microsoft Foundry, Microsoft Agent Framework, Microsoft Foundry Agent Service,
+Microsoft Fabric IQ, Reasoning Agents, Enterprise Learning, Certification
+Readiness, Multi-Agent System, Semantic Governance, Deterministic AI, Human in the
+Loop, Responsible AI, Workforce Intelligence, Executed SQL, Auditability, Semantic
+Court, Semantic PR, Reliability, Safety

@@ -19,7 +19,9 @@ from concord.providers import (
     provider_statuses,
 )
 from concord.providers.cloud import HttpResult
+from concord.storage.models import ReconciliationRun, SemanticProposal
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 
 
 class QueueTransport:
@@ -227,6 +229,7 @@ def test_provider_status_requires_both_hosted_endpoint_and_token() -> None:
 
 def test_foundry_hosted_api_routes_without_fabric_calls(
     active_hosted_case: ReconciliationCase,
+    reconciliation_runner: ReconciliationRunner,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def unexpected_fabric_call(*args: object, **kwargs: object) -> None:
@@ -235,9 +238,13 @@ def test_foundry_hosted_api_routes_without_fabric_calls(
     monkeypatch.setattr(FabricIQProvider, "_retrieve_snapshot", unexpected_fabric_call)
     monkeypatch.setattr(FoundryIQProvider, "_retrieve_snapshot", unexpected_fabric_call)
     transport = QueueTransport(_payload(active_hosted_case), _payload(active_hosted_case))
-    settings = _settings()
+    settings = _settings(duckdb_path=reconciliation_runner.provider.duckdb_path)
     provider = FoundryHostedProvider(settings, transport=transport)
-    app = create_app(settings, foundry_hosted_provider=provider)
+    app = create_app(
+        settings,
+        foundry_hosted_provider=provider,
+        engine=reconciliation_runner.repository.engine,
+    )
 
     with TestClient(app) as client:
         health = client.get("/health")
@@ -262,3 +269,130 @@ def test_foundry_hosted_api_routes_without_fabric_calls(
     assert asked.json()["case"]["verdict"] == "conflict"
     assert statuses["foundry_hosted"]["configured"] is True
     assert len(transport.requests) == 2
+
+
+def test_foundry_hosted_case_supports_court_approval_and_local_governed_rerun(
+    active_hosted_case: ReconciliationCase,
+    reconciliation_runner: ReconciliationRunner,
+    isolated_canonical_registry: None,
+) -> None:
+    transport = QueueTransport(_payload(active_hosted_case))
+    settings = _settings(duckdb_path=reconciliation_runner.provider.duckdb_path)
+    provider = FoundryHostedProvider(settings, transport=transport)
+    app = create_app(
+        settings,
+        foundry_hosted_provider=provider,
+        engine=reconciliation_runner.repository.engine,
+    )
+
+    with TestClient(app) as client:
+        analyzed = client.post(
+            "/analyze",
+            json={
+                "question": active_hosted_case.request.question,
+                "term": active_hosted_case.request.term,
+            },
+        )
+        run_id = analyzed.json()["run_id"]
+        court = client.post(f"/runs/{run_id}/court")
+        unauthorized = client.post(
+            f"/proposals/{run_id}/approve",
+            json={"approver": "Sales"},
+        )
+        approved = client.post(
+            f"/proposals/{run_id}/approve",
+            json={"approver": "Data Governance Council"},
+        )
+        governed = client.post(f"/runs/{run_id}/governed-rerun")
+
+    assert analyzed.status_code == 200
+    assert court.status_code == 200
+    assert court.json()["source_run_id"] == run_id
+    assert unauthorized.status_code == 403
+    assert approved.status_code == 200
+    assert approved.json()["registry_scope"] == "concord_iq"
+    assert governed.status_code == 200
+    assert governed.json()["verdict"] == "consistent"
+    assert governed.json()["context_packet"]["provider_metadata"]["mode"] == "local"
+    assert len(transport.requests) == 1
+
+
+def test_foundry_hosted_case_import_is_idempotent(
+    active_hosted_case: ReconciliationCase,
+    reconciliation_runner: ReconciliationRunner,
+) -> None:
+    transport = QueueTransport(_payload(active_hosted_case), _payload(active_hosted_case))
+    settings = _settings(duckdb_path=reconciliation_runner.provider.duckdb_path)
+    provider = FoundryHostedProvider(settings, transport=transport)
+    app = create_app(
+        settings,
+        foundry_hosted_provider=provider,
+        engine=reconciliation_runner.repository.engine,
+    )
+
+    request = {
+        "question": active_hosted_case.request.question,
+        "term": active_hosted_case.request.term,
+    }
+    with TestClient(app) as client:
+        first = client.post("/analyze", json=request)
+        second = client.post("/analyze", json=request)
+
+    assert first.status_code == second.status_code == 200
+    assert first.json()["run_id"] == second.json()["run_id"]
+    with reconciliation_runner.repository.engine.connect() as connection:
+        run_count = connection.scalar(
+            select(func.count())
+            .select_from(ReconciliationRun)
+            .where(ReconciliationRun.id == active_hosted_case.run_id)
+        )
+        proposal_count = connection.scalar(
+            select(func.count())
+            .select_from(SemanticProposal)
+            .where(SemanticProposal.run_id == active_hosted_case.run_id)
+        )
+    assert run_count == 1
+    assert proposal_count == 1
+    assert len(transport.requests) == 2
+
+
+def test_foundry_hosted_owner_rejection_is_final_and_rerun_remains_conflicted(
+    active_hosted_case: ReconciliationCase,
+    reconciliation_runner: ReconciliationRunner,
+    isolated_canonical_registry: None,
+) -> None:
+    transport = QueueTransport(_payload(active_hosted_case))
+    settings = _settings(duckdb_path=reconciliation_runner.provider.duckdb_path)
+    provider = FoundryHostedProvider(settings, transport=transport)
+    app = create_app(
+        settings,
+        foundry_hosted_provider=provider,
+        engine=reconciliation_runner.repository.engine,
+    )
+
+    with TestClient(app) as client:
+        analyzed = client.post(
+            "/analyze",
+            json={
+                "question": active_hosted_case.request.question,
+                "term": active_hosted_case.request.term,
+            },
+        )
+        run_id = analyzed.json()["run_id"]
+        rejected = client.post(
+            f"/proposals/{run_id}/reject",
+            json={"approver": "Data Governance Council"},
+        )
+        repeated = client.post(
+            f"/proposals/{run_id}/reject",
+            json={"approver": "Data Governance Council"},
+        )
+        governed = client.post(f"/runs/{run_id}/governed-rerun")
+
+    assert rejected.status_code == 200
+    assert rejected.json()["status"] == "rejected"
+    assert repeated.status_code == 409
+    assert governed.status_code == 200
+    assert governed.json()["verdict"] == "conflict"
+    assert governed.json()["reconciliation_proposal"] is not None
+    assert len(transport.requests) == 1

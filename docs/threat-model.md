@@ -12,13 +12,20 @@
 
 ```mermaid
 flowchart LR
-    USER["Reviewer"] --> APP["Local app"]
-    APP --> DB[("PostgreSQL / DuckDB")]
-    APP -. "verified facts only" .-> OLLAMA["Local Ollama"]
-    APP -. "explicit opt-in only" .-> IQ["Microsoft IQ endpoint"]
+    USER["Reviewer"] --> UI["Certification Ready workbench"]
+    UI --> WF1["Phase 1 Agent Framework workflow"]
+    WF1 --> DB[("DuckDB SQL + PostgreSQL evidence")]
+    WF1 -. "explicit opt-in only" .-> IQ["Fabric IQ semantic grounding"]
     IQ --> RAW["Ignored raw capture"]
     RAW --> REVIEW["Typed validation + human review"]
-    REVIEW --> SAFE["Committed sanitized replay"]
+    REVIEW --> SAFE["Committed Certification Ready replay"]
+    WF1 --> FROZEN["Frozen verifier-approved case"]
+    FROZEN --> WF2["Phase 2 Semantic Court workflow"]
+    WF2 -. "cannot mutate engine facts" .-> FROZEN
+    WF1 -. "verified facts only" .-> MODEL["Optional narration model"]
+    WF2 -. "verified facts only" .-> MODEL
+    FROZEN --> OWNER["Learning Governance Council"]
+    OWNER --> REG["Concord IQ registry only"]
 ```
 
 ## Primary risks and controls
@@ -32,6 +39,9 @@ flowchart LR
 | Fabric/Foundry response drift | strict typed snapshot validation and fail-closed parsing |
 | Prompt or tool injection | adapters request registered snapshots; deterministic verifier owns decisions |
 | Generated narrative changes truth | text-only result type; typed decisions are finalized separately |
+| Court changes the original verdict | Court receives a frozen case; `CourtAuditAgent` checks the engine truth digest |
+| Court cites another run's evidence | citation set must exactly equal the frozen case evidence IDs |
+| Duplicate reconciliation or proposal | Court endpoint uses the cached `run_id`; it performs no SQL rerun or proposal creation |
 | Prompt injection through fact values | facts are JSON data; system prompt forbids instruction following |
 | Ollama unavailable or malformed | deterministic fallback; reconciliation continues |
 | Silent provider fallback | provider factory raises instead of substituting LocalProvider |

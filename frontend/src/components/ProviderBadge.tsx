@@ -9,7 +9,9 @@ export function ProviderBadge({ health, result }: ProviderBadgeProps) {
   const metadata = result?.context_packet?.provider_metadata;
   const provider = metadata?.name ?? health?.provider ?? "Connecting";
   const mode = metadata?.mode ?? health?.provider_mode ?? "local";
-  const hostedRuntime = mode === "foundry_hosted" || health?.runtime === "Foundry Agent Service";
+  const hostedRuntime = metadata
+    ? mode === "foundry_hosted"
+    : mode === "foundry_hosted" || health?.runtime === "Foundry Agent Service";
   const modeLabel = hostedRuntime ? "hosted runtime" : `${mode} mode`;
   const cloudEnabled = metadata?.uses_cloud ?? health?.cloud_enabled ?? false;
   const dataType = metadata?.data_type ?? health?.data_type ?? "synthetic";

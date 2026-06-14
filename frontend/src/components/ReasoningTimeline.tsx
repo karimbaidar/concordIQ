@@ -37,10 +37,12 @@ export function ReasoningTimeline({ result }: ReasoningTimelineProps) {
     <section className="surface reasoning-timeline" aria-labelledby="timeline-title">
       <div className="section-heading">
         <div>
-          <span className="section-kicker">Microsoft Agent Framework</span>
-          <h2 id="timeline-title">Agent trace</h2>
+          <span className="section-kicker">Phase 1 · Microsoft Agent Framework</span>
+          <h2 id="timeline-title">Evidence workflow complete</h2>
         </div>
-        <span className="quiet-label">{result.agent_trace.length} specialist steps</span>
+        <span className="quiet-label">
+          {result.agent_trace.length} Agent Framework stages
+        </span>
       </div>
       <ol>
         {result.agent_trace.map((step) => (

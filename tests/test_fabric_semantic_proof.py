@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from concord.api.main import create_app
 from concord.capture import capture
 from concord.config import Settings
 from concord.demo import DEMO_SCENARIOS
@@ -23,6 +24,7 @@ from concord.providers.replay_schema import (
     snapshot_provider_scenario,
 )
 from concord.replay_check import ReplayCheckError, validate_replay_artifact
+from fastapi.testclient import TestClient
 
 EXPECTED_ENTITY = {
     "Active Customer": "ActiveCustomer",
@@ -122,6 +124,46 @@ def test_semantic_proof_mode_matches_concept_and_uses_local_snapshot(
     # The deterministic local evidence is present for replay.
     bindings = provider.get_binding_semantics(concept.concept_id)
     assert {b.owner for b in bindings} == {"Finance", "Sales", "Customer Success"}
+
+
+def test_fabric_live_case_can_convene_court_without_a_second_provider_call(
+    tmp_path: Path,
+    postgres_engine,
+) -> None:
+    from concord.config import ScenarioPack
+    from concord.seed.seed_duckdb import seed_duckdb
+
+    database_path = tmp_path / "learning.duckdb"
+    seed_duckdb(database_path=database_path, data_dir=tmp_path / "csv")
+    local = LocalProvider.for_scenario_pack(
+        ScenarioPack.LEARNING,
+        duckdb_path=database_path,
+    )
+    settings = Settings(
+        _env_file=None,
+        provider="fabric_iq",
+        scenario_pack="learning",
+        allow_cloud=True,
+        max_cloud_calls=6,
+        fabric_iq_mcp_endpoint="https://api.fabric.microsoft.com/v1/mcp/dataPlane/test",
+        fabric_iq_access_token="super-secret-token",
+        duckdb_path=database_path,
+    )
+    transport = QueueTransport(_handshake() + [_semantic_text("CertificationReady")])
+    provider = FabricIQProvider(settings, transport=transport, local_provider=local)
+    app = create_app(settings, provider=provider, engine=postgres_engine)
+
+    with TestClient(app) as client:
+        analyzed = client.post("/demo/run/certification-ready")
+        call_count = len(transport.requests)
+        court = client.post(f"/runs/{analyzed.json()['run_id']}/court")
+
+    assert analyzed.status_code == 200
+    metadata = analyzed.json()["context_packet"]["provider_metadata"]
+    assert metadata["grounding_kind"] == "fabric_ontology_match"
+    assert metadata["execution_source"] == "deterministic_local_snapshot"
+    assert court.status_code == 200
+    assert len(transport.requests) == call_count
 
 
 def test_provider_calls_list_entity_types_with_exact_name(

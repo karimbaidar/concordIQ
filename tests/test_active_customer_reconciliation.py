@@ -134,6 +134,8 @@ def test_context_packet_contains_only_relevant_sections(
         "mode": "local",
         "uses_cloud": False,
         "data_type": "synthetic",
+        "grounding_kind": "local_registry",
+        "execution_source": "deterministic_local_snapshot",
     }
     assert not hasattr(packet, "execution_results")
     assert not hasattr(packet, "reconciliation_proposal")

@@ -336,10 +336,25 @@ export interface ReconciliationCase {
       mode: string;
       uses_cloud: boolean;
       data_type: string;
+      grounding_kind?: string;
+      execution_source?: string;
+      iq_proof_mode?: string | null;
+      snapshot_source?: string | null;
+      verified_real_iq?: boolean;
+      fabric_semantic_proof?: {
+        matched_entity_type?: string;
+        tool?: string;
+        response_shape?: string;
+      } | null;
       runtime?: string;
       semantic_provider?: {
         name?: string;
         mode?: string;
+        grounding_kind?: string;
+        execution_source?: string;
+        iq_proof_mode?: string | null;
+        snapshot_source?: string | null;
+        verified_real_iq?: boolean;
       };
     };
     active_scenario: string;
@@ -383,6 +398,15 @@ export type CourtRole =
   | "skeptic"
   | "authority";
 
+export type TurnDisposition =
+  | "asserted"
+  | "challenged"
+  | "narrowed"
+  | "reframed"
+  | "defended"
+  | "confirmed"
+  | "refused";
+
 export type TranscriptMode =
   | "live_captured"
   | "replayed"
@@ -400,6 +424,7 @@ export interface DeliberationTurn {
   round_no: number;
   agent_id: string;
   role: CourtRole;
+  disposition: TurnDisposition;
   speaking_for: string | null;
   content: string;
   tool_calls: string[];
@@ -409,13 +434,29 @@ export interface DeliberationTurn {
 
 export interface DeliberationTranscript {
   schema_version: string;
+  source_run_id: string;
   term: string;
   concept_id: string;
   verdict: Verdict;
   outcome: "proposal" | "refusal" | "no_action";
+  authority_status: string;
+  authority_owner: string | null;
+  source_evidence_ids: string[];
   rounds: number;
   turns: DeliberationTurn[];
   mode: TranscriptMode;
   captured_at: string;
   content_digest: string;
+  framework: string;
+  workflow_trace: string[];
+}
+
+export interface LearningScaleProof {
+  canonical_term: string;
+  entity_type: string;
+  learner_count: number;
+  certification_ready_count: number;
+  false_ready_blocked_count: number;
+  proof_kind: "fabric_bound_scale_artifact";
+  execution_separation: string;
 }

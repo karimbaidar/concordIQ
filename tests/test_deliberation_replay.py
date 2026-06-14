@@ -67,7 +67,10 @@ def test_capture_validate_and_replay_round_trip(
 
 def test_validator_rejects_secret_shaped_text(captured_file: Path) -> None:
     text = captured_file.read_text(encoding="utf-8")
-    captured_file.write_text(text.replace("conceded", "Bearer leaked-token", 1), encoding="utf-8")
+    captured_file.write_text(
+        text.replace("The court is convened", "Bearer leaked-token", 1),
+        encoding="utf-8",
+    )
     with pytest.raises(DeliberationCheckError, match="secret-shaped"):
         validate_deliberation_artifact(captured_file)
 

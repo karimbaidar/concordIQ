@@ -1,5 +1,5 @@
 {
-  "commit": "7be62571e8b5422a0810226014b1497dfac182e6",
+  "commit": "ed97f03dc0120b08eefa1168e58c92faeb81e31a",
   "fabric_iq": {
     "live": "skipped",
     "mode": "sanitized_replay",
@@ -9,16 +9,26 @@
     "mode": "hosted_runtime",
     "status": "skipped"
   },
+  "learning_scale": {
+    "certification_ready_count": 522,
+    "false_ready_blocked_count": 4334,
+    "learner_count": 10000,
+    "mode": "separate_fabric_bound_scale_artifact",
+    "status": "passed",
+    "workbench_execution": "separate_120_learner_case"
+  },
   "local": {
+    "court_replay": "passed",
     "eval": "passed",
     "frontend_tests": "passed",
+    "learning_scale": "passed",
     "lint": "passed",
     "replay": "passed",
     "semantic_pr_export": "passed",
     "tests": "passed"
   },
   "mandatory_passed": true,
-  "timestamp_utc": "2026-06-13T19:46:37Z",
+  "timestamp_utc": "2026-06-14T08:47:40Z",
   "work_iq": {
     "live_recheck": "skipped",
     "mode": "optional_m365_artifact_grounding",

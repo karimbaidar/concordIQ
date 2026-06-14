@@ -33,6 +33,7 @@ class ReconciliationAgent:
         impact: ImpactAssessment,
         authority: AuthorityAssessment,
         evidence: tuple[EvidenceRecord, ...],
+        governed_canonical: bool = False,
     ) -> ReconciliationDecision:
         if verdict == "consistent":
             decision = ReconciliationDecision(action="no_action")
@@ -45,6 +46,7 @@ class ReconciliationAgent:
                         impact=impact,
                         authority=authority,
                         evidence=evidence,
+                        governed_canonical=governed_canonical,
                     )
                 }
             )
@@ -68,6 +70,7 @@ class ReconciliationAgent:
                         impact=impact,
                         authority=authority,
                         evidence=evidence,
+                        governed_canonical=governed_canonical,
                     )
                 }
             )
@@ -96,6 +99,7 @@ class ReconciliationAgent:
                     impact=impact,
                     authority=authority,
                     evidence=evidence,
+                    governed_canonical=governed_canonical,
                 )
             }
         )
@@ -238,6 +242,7 @@ class ReconciliationAgent:
         impact: ImpactAssessment,
         authority: AuthorityAssessment,
         evidence: tuple[EvidenceRecord, ...],
+        governed_canonical: bool,
     ) -> NarrationResult:
         fallbacks = {
             "propose": (
@@ -249,8 +254,13 @@ class ReconciliationAgent:
                 "can approve a canonical definition. Concord IQ routes the decision to people."
             ),
             "no_action": (
-                "The definitions use different wording but return the same result set "
-                "for the evaluated period, so no reconciliation is proposed."
+                "The approved canonical definition executed as the only unqualified "
+                "enterprise meaning. No competing definition or new proposal was introduced."
+                if governed_canonical
+                else (
+                    "The definitions use different wording but return the same result set "
+                    "for the evaluated period, so no reconciliation is proposed."
+                )
             ),
         }
         return self.llm_provider.narrate(

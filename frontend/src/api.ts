@@ -3,6 +3,7 @@ import type {
   DeliberationTranscript,
   DemoScenario,
   HealthStatus,
+  LearningScaleProof,
   PortfolioScan,
   ProposalDecisionResult,
   ReconciliationCase,
@@ -24,7 +25,29 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
   if (!response.ok) {
-    const detail = await response.text();
+    const raw = await response.text();
+    let detail = raw;
+    try {
+      const parsed = JSON.parse(raw) as { detail?: unknown };
+      if (typeof parsed.detail === "string") {
+        detail = parsed.detail;
+      } else if (Array.isArray(parsed.detail)) {
+        const messages = parsed.detail
+          .map((item) => {
+            if (typeof item === "object" && item !== null && "msg" in item) {
+              return String(item.msg);
+            }
+            return null;
+          })
+          .filter((item): item is string => item !== null);
+        detail =
+          messages.join(" ") || `Request failed with status ${response.status}.`;
+      } else {
+        detail = `Request failed with status ${response.status}.`;
+      }
+    } catch {
+      // Preserve plain-text errors from non-FastAPI intermediaries.
+    }
     throw new Error(detail || `Request failed with status ${response.status}.`);
   }
   return response.json() as Promise<T>;
@@ -61,10 +84,20 @@ export function runDemoScenario(scenarioId: string): Promise<ReconciliationCase>
   });
 }
 
-export function runCourt(scenarioId: string): Promise<DeliberationTranscript> {
-  return requestJson<DeliberationTranscript>(`/court/run/${scenarioId}`, {
+export function runCourt(runId: string): Promise<DeliberationTranscript> {
+  return requestJson<DeliberationTranscript>(`/runs/${runId}/court`, {
     method: "POST",
   });
+}
+
+export function runGovernedRerun(runId: string): Promise<ReconciliationCase> {
+  return requestJson<ReconciliationCase>(`/runs/${runId}/governed-rerun`, {
+    method: "POST",
+  });
+}
+
+export function fetchLearningScaleProof(): Promise<LearningScaleProof> {
+  return requestJson<LearningScaleProof>("/proof/learning-scale");
 }
 
 export function fetchPortfolioScan(): Promise<PortfolioScan> {

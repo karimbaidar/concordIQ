@@ -294,6 +294,7 @@ class ReconciliationRunner:
             impact,
             authority,
             case.evidence,
+            governed_canonical=case.governed_canonical is not None,
         )
         case.reconciliation_proposal = decision.proposal
         case.refusal_reason = decision.refusal_reason
@@ -303,7 +304,11 @@ class ReconciliationRunner:
         decision_summaries = {
             "propose": "Created a draft canonical definition with human approval required.",
             "refuse": "Refused automatic reconciliation and routed it to human approval.",
-            "no_action": "Ruled out the decoy by result-set equality; no reconciliation needed.",
+            "no_action": (
+                "Executed the governed canonical definition; no new proposal was created."
+                if case.governed_canonical
+                else "Ruled out the decoy by result-set equality; no reconciliation needed."
+            ),
         }
         case.transition(
             ReconciliationState.PROPOSE_OR_REFUSE,
@@ -513,6 +518,7 @@ class ReconciliationRunner:
                 self._impact_assessment(case),
                 self._authority_assessment(case),
                 case.evidence,
+                governed_canonical=case.governed_canonical is not None,
             )
             case.reconciliation_proposal = decision.proposal
             case.refusal_reason = decision.refusal_reason

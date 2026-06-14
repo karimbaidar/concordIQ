@@ -1,32 +1,35 @@
-# Certification Ready — Foundry Agent Service hosted smoke (planned strongest artifact)
+# Certification Ready — Foundry Agent Service hosted smoke
 
-> **Status: scaffolded, not yet captured.** This file reserves the home for the strongest
-> planned IQ artifact — a hosted Foundry Agent Service invocation of the **learning**
-> Certification Ready scenario. It has **not** been run yet, and nothing here is presented
-> as a completed capture.
+> **Status: verified live on June 13, 2026.** The existing `concord-iq-2` deployment,
+> version 4, was invoked through Foundry Agent Service for the **Certification Ready**
+> term.
 
-## What this will prove (once captured)
+## Sanitized result
 
-- Concord IQ deployed to Microsoft Foundry Agent Service under a clearly named deployment
-  such as `concord-iq-certification-ready` (the existing Foundry project may be reused).
-- The hosted `/responses` endpoint invoked for the **Certification Ready** term.
-- The hosted agent returns the strict Concord IQ proof envelope
-  (`verdict=conflict`, `verification_status=passed`, `specialist_steps=10`).
-- `FoundryHostedProvider` accepts and validates that envelope.
+```text
+provider=replay
+verdict=conflict
+verification_status=passed
+specialist_steps=10
+```
+
+This proves that Foundry Agent Service hosted the strict ten-stage Microsoft Agent
+Framework reconciliation and returned a verifier-approved case through
+`FoundryHostedProvider`.
 
 ## Honesty note
 
-- The default reviewer mode runs locally with deterministic synthetic data and **no cloud
-  calls**. This hosted smoke is an *optional* proof and is never a judging dependency.
+- The default reviewer mode can run locally with deterministic synthetic data and **no
+  cloud calls**. This hosted smoke is an optional proof and is never a judging
+  dependency.
 - The hosted runtime uses `ReplayProvider` inside Foundry Agent Service for deterministic,
   reproducible evidence. **Fabric IQ does not compute the readiness counts** — they come only
   from executed SQL.
-- The currently completed hosted capture is the business-pack
-  [`foundry-agent-service-smoke.md`](foundry-agent-service-smoke.md). This learning capture is
-  the planned upgrade once Azure access and a cloud budget are available in the build
-  environment.
+- The Semantic Court is a second, in-process Microsoft Agent Framework graph over the
+  frozen hosted result. This proof does not claim that the Court itself is hosted on
+  Foundry Agent Service.
 
-## How to capture it (only with Azure access + an explicit budget)
+## Re-run the smoke
 
 Read [`docs/foundry-agent-service.md`](../foundry-agent-service.md) first, including the
 "Common deployment gotchas" section (module entrypoint, replay container env, root
@@ -37,8 +40,9 @@ ALLOW_CLOUD=true MAX_CLOUD_CALLS=1 PROVIDER=foundry_hosted \
   CONCORD_SCENARIO_PACK=learning make foundry-hosted-smoke
 ```
 
-Save the sanitized output here (UTC timestamp, repo commit, sanitized endpoint, envelope
-JSON). Verify no tokens, Authorization headers, or tenant IDs are written.
+The command requires Azure access and an explicit one-call budget. It validates the
+hosted envelope and must not write tokens, Authorization headers, tenant IDs, or tenant
+URLs.
 
 ## Local verification without Azure credentials
 
@@ -50,5 +54,5 @@ make eval
 make demo            # prints the three learning verdicts
 ```
 
-A deterministic local Certification Ready semantic-PR proof is exported at
+A deterministic local Certification Ready Semantic-PR proof is exported at
 [`certification-ready-semantic-pr.md`](certification-ready-semantic-pr.md).

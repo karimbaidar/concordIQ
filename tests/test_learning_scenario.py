@@ -9,12 +9,13 @@ from concord.orchestration.state_machine import ReconciliationState
 from concord.providers import LocalProvider
 from concord.seed.seed_duckdb import seed_duckdb
 from concord.semantic_pr_export import export_semantic_pr
+from concord.storage.models import ReconciliationRun, SemanticProposal
 from concord.storage.repositories import (
     ReconciliationRepository,
     UnauthorizedApprover,
 )
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine
+from sqlalchemy import Engine, func, select
 
 
 @pytest.fixture(scope="session")
@@ -190,6 +191,9 @@ def test_certification_ready_semantic_pr_is_owner_gated(
     assert governed.governed_canonical
     assert governed.verdict == "consistent"
     assert [result.entity_count for result in governed.execution_results] == [56]
+    assert governed.impact_assessment
+    assert governed.impact_assessment.entity_label == "learners"
+    assert governed.impact_assessment.value_label == "exam spend at risk"
     assert governed.reconciliation_proposal is None
 
 
@@ -225,16 +229,65 @@ def test_court_endpoint_returns_a_debate_transcript(
         engine=postgres_engine,
     )
     with TestClient(app) as client:
-        response = client.post("/court/run/certification-ready")
+        analyzed = client.post("/demo/run/certification-ready")
+        run_id = analyzed.json()["run_id"]
+        with postgres_engine.connect() as connection:
+            runs_before = connection.scalar(select(func.count()).select_from(ReconciliationRun))
+            proposals_before = connection.scalar(select(func.count()).select_from(SemanticProposal))
+        response = client.post(f"/runs/{run_id}/court")
+        with postgres_engine.connect() as connection:
+            runs_after = connection.scalar(select(func.count()).select_from(ReconciliationRun))
+            proposals_after = connection.scalar(select(func.count()).select_from(SemanticProposal))
 
     assert response.status_code == 200
     transcript = response.json()
+    assert transcript["source_run_id"] == run_id
     assert transcript["term"] == "Certification Ready"
     assert transcript["verdict"] == "conflict"
     assert transcript["outcome"] == "proposal"
     assert transcript["mode"] == "deterministic_fallback"
+    assert transcript["workflow_trace"][0] == "CourtCoordinatorAgent"
+    assert transcript["workflow_trace"][-1] == "CourtAuditAgent"
     roles = {turn["role"] for turn in transcript["turns"]}
     assert roles == {"orchestrator", "steward", "investigator", "skeptic", "authority"}
+    assert runs_after == runs_before
+    assert proposals_after == proposals_before
+
+
+def test_court_requires_a_cached_verified_run(
+    postgres_engine: Engine,
+    learning_provider: LocalProvider,
+) -> None:
+    app = create_app(
+        Settings(_env_file=None),
+        provider=learning_provider,
+        engine=postgres_engine,
+    )
+    with TestClient(app) as client:
+        response = client.post("/runs/00000000-0000-0000-0000-000000000001/court")
+
+    assert response.status_code == 404
+    assert "Run the reconciliation again" in response.json()["detail"]
+
+
+def test_learning_scale_proof_is_explicitly_separate(
+    postgres_engine: Engine,
+    learning_provider: LocalProvider,
+) -> None:
+    app = create_app(
+        Settings(_env_file=None),
+        provider=learning_provider,
+        engine=postgres_engine,
+    )
+    with TestClient(app) as client:
+        response = client.get("/proof/learning-scale")
+
+    assert response.status_code == 200
+    proof = response.json()
+    assert proof["learner_count"] == 10_000
+    assert proof["certification_ready_count"] == 522
+    assert proof["false_ready_blocked_count"] == 4_334
+    assert "Separate from the 120-learner" in proof["execution_separation"]
 
 
 def test_certification_ready_semantic_pr_can_be_exported(

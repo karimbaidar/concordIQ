@@ -270,6 +270,8 @@ def format_scorecard(card: Scorecard) -> str:
         "A small, fixed, deterministic eval set over synthetic data (the LLM is disabled).",
         "It is intentionally small and labelled as such — not a large benchmark. It checks",
         "the safety-critical behaviours and the red-team prompts that must fail closed.",
+        "The eval intentionally retains the legacy business pack as cross-domain regression",
+        "coverage; Certification Ready is the primary submission case and has its own tests.",
         "",
         f"**Precision: {card.passed}/{card.total} ({card.precision * 100:.1f}%)**",
         "",

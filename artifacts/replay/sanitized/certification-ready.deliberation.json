@@ -1,18 +1,27 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
+  "source_run_id": "0e13beca-40b0-434a-9b1e-d58b43d51cce",
   "term": "Certification Ready",
   "concept_id": "certification_ready",
   "verdict": "conflict",
   "outcome": "proposal",
-  "rounds": 8,
+  "authority_status": "clear",
+  "authority_owner": "Learning Governance Council",
+  "source_evidence_ids": [
+    "d1e8705b-ae27-5fd5-be17-d1f788642d75",
+    "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3",
+    "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
+  ],
+  "rounds": 10,
   "turns": [
     {
       "turn_no": 1,
       "round_no": 0,
-      "agent_id": "orchestrator",
+      "agent_id": "CourtCoordinatorAgent",
       "role": "orchestrator",
+      "disposition": "asserted",
       "speaking_for": null,
-      "content": "The court is convened on 'Certification Ready'. The advocates are HR, Learning & Development, Managers. Each will argue its own definition; the divergence will be settled by executed evidence, and a canonical meaning will be published only if a configured owner may approve it.",
+      "content": "The court is convened over frozen run [REDACTED-GUID] for 'Certification Ready'. HR, Learning & Development, Managers may defend their operational views. No SQL will be rerun and no argument can change the verified verdict.",
       "tool_calls": [],
       "cited_evidence_ids": [],
       "provenance": {
@@ -25,15 +34,16 @@
     {
       "turn_no": 2,
       "round_no": 1,
-      "agent_id": "steward.hr",
+      "agent_id": "StewardAgent.hr",
       "role": "steward",
+      "disposition": "asserted",
       "speaking_for": "HR",
-      "content": "For HR: 80 are ready. My definition is Learner has completed every required learning module for the certification. I have executed it over the grounded population and stand on that result.",
+      "content": "HR asserts its operational view: 80 learners satisfy Learner has completed every required learning module for the certification.",
       "tool_calls": [
-        "executed_sql:certification_ready_hr_v1"
+        "read_executed_sql:certification_ready_hr_v1"
       ],
       "cited_evidence_ids": [
-        "fb69de31-4dd7-5ad8-8e38-f159b3513238"
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75"
       ],
       "provenance": {
         "generated": false,
@@ -45,15 +55,16 @@
     {
       "turn_no": 3,
       "round_no": 1,
-      "agent_id": "steward.learning",
+      "agent_id": "StewardAgent.learning",
       "role": "steward",
+      "disposition": "asserted",
       "speaking_for": "Learning & Development",
-      "content": "For Learning & Development: 56 are ready. My definition is Learner has completed every required module and the latest practice assessment score is at least 80 percent. I have executed it over the grounded population and stand on that result.",
+      "content": "Learning & Development asserts its operational view: 56 learners satisfy Learner has completed every required module and the latest practice assessment score is at least 80 percent.",
       "tool_calls": [
-        "executed_sql:certification_ready_learning_v1"
+        "read_executed_sql:certification_ready_learning_v1"
       ],
       "cited_evidence_ids": [
-        "8f77b53a-75a5-57ff-a8e9-f5bcd7178d2d"
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3"
       ],
       "provenance": {
         "generated": false,
@@ -65,15 +76,16 @@
     {
       "turn_no": 4,
       "round_no": 1,
-      "agent_id": "steward.managers",
+      "agent_id": "StewardAgent.managers",
       "role": "steward",
+      "disposition": "asserted",
       "speaking_for": "Managers",
-      "content": "For Managers: 56 are ready. My definition is Learner has completed every required lab and has a recorded manager approval. I have executed it over the grounded population and stand on that result.",
+      "content": "Managers asserts its operational view: 56 learners satisfy Learner has completed every required lab and has a recorded manager approval.",
       "tool_calls": [
-        "executed_sql:certification_ready_manager_v1"
+        "read_executed_sql:certification_ready_manager_v1"
       ],
       "cited_evidence_ids": [
-        "83e4536f-60a9-527b-b9a9-103fea694ef2"
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
       ],
       "provenance": {
         "generated": false,
@@ -85,12 +97,13 @@
     {
       "turn_no": 5,
       "round_no": 2,
-      "agent_id": "investigator",
+      "agent_id": "InvestigatorPlanAgent",
       "role": "investigator",
+      "disposition": "asserted",
       "speaking_for": null,
-      "content": "Plan: HR, Learning & Development, Managers disagree. Hypothesis — the divergence sits where one owner's gate admits learners another owner blocks. I will execute each definition and subtract the set every definition agrees on to isolate the contested cohort.",
+      "content": "Plan: inspect the already executed entity sets pairwise, including identity-level differences that equal headline counts can hide. Then bind every claim to the stored SQL evidence.",
       "tool_calls": [
-        "plan:locate_divergence"
+        "plan:pairwise_entity_set_review"
       ],
       "cited_evidence_ids": [],
       "provenance": {
@@ -102,18 +115,20 @@
     },
     {
       "turn_no": 6,
-      "round_no": 2,
-      "agent_id": "investigator",
+      "round_no": 3,
+      "agent_id": "EvidenceReviewAgent",
       "role": "investigator",
+      "disposition": "confirmed",
       "speaking_for": null,
-      "content": "Executed. 24 learners are claimed ready by one owner but false-ready learners (for example L057, L058, L059). At 10,800 exam spend at risk, the divergence is material.",
+      "content": "Evidence review isolated 24 false-ready learners, including L057, L058, L059, with 10,800 exam spend at risk. These are stored results, not Court estimates.",
       "tool_calls": [
-        "query:divergent_cohort"
+        "read:stored_evidence",
+        "compare:entity_ids"
       ],
       "cited_evidence_ids": [
-        "fb69de31-4dd7-5ad8-8e38-f159b3513238",
-        "8f77b53a-75a5-57ff-a8e9-f5bcd7178d2d",
-        "83e4536f-60a9-527b-b9a9-103fea694ef2"
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75",
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3",
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
       ],
       "provenance": {
         "generated": false,
@@ -124,18 +139,19 @@
     },
     {
       "turn_no": 7,
-      "round_no": 2,
-      "agent_id": "investigator",
+      "round_no": 4,
+      "agent_id": "InvestigatorReplanAgent",
       "role": "investigator",
+      "disposition": "confirmed",
       "speaking_for": null,
-      "content": "Replan: confirm the contested cohort is exactly the looser definition minus the stricter one. Confirmed — 24 learners, no more, no fewer.",
+      "content": "Replan triggered: Learning & Development and Managers both report 56, but their learner identities differ. The Court therefore compares exact IDs, not equal totals, before cross-examination.",
       "tool_calls": [
-        "replan:confirm_cohort"
+        "replan:equal_count_identity_check"
       ],
       "cited_evidence_ids": [
-        "fb69de31-4dd7-5ad8-8e38-f159b3513238",
-        "8f77b53a-75a5-57ff-a8e9-f5bcd7178d2d",
-        "83e4536f-60a9-527b-b9a9-103fea694ef2"
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75",
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3",
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
       ],
       "provenance": {
         "generated": false,
@@ -146,14 +162,15 @@
     },
     {
       "turn_no": 8,
-      "round_no": 3,
-      "agent_id": "skeptic",
+      "round_no": 5,
+      "agent_id": "SkepticAgent",
       "role": "skeptic",
-      "speaking_for": null,
-      "content": "Cross-examination of HR: you claim 80 ready, but some are outside the set every definition agrees on (for example L001, L002, L003). Concede that your count is a claim under your own gate, not enterprise readiness — or produce evidence.",
+      "disposition": "challenged",
+      "speaking_for": "HR",
+      "content": "HR, your view admits learners the proposed candidate excludes (for example L057, L058, L059). Narrow the enterprise claim or justify those identities.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "fb69de31-4dd7-5ad8-8e38-f159b3513238"
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75"
       ],
       "provenance": {
         "generated": false,
@@ -164,14 +181,15 @@
     },
     {
       "turn_no": 9,
-      "round_no": 3,
-      "agent_id": "skeptic",
+      "round_no": 5,
+      "agent_id": "SkepticAgent",
       "role": "skeptic",
-      "speaking_for": null,
-      "content": "Cross-examination of Learning & Development: you claim 56 ready, but some are outside the set every definition agrees on (for example L001, L002, L003). Concede that your count is a claim under your own gate, not enterprise readiness — or produce evidence.",
+      "disposition": "challenged",
+      "speaking_for": "Learning & Development",
+      "content": "Learning & Development, the engine proposed your definition as the candidate source. Defend the evidence for that scope, but acknowledge that only the configured authority can make it canonical.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "8f77b53a-75a5-57ff-a8e9-f5bcd7178d2d"
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3"
       ],
       "provenance": {
         "generated": false,
@@ -182,14 +200,15 @@
     },
     {
       "turn_no": 10,
-      "round_no": 3,
-      "agent_id": "skeptic",
+      "round_no": 5,
+      "agent_id": "SkepticAgent",
       "role": "skeptic",
-      "speaking_for": null,
-      "content": "Cross-examination of Managers: you claim 56 ready, but some are outside the set every definition agrees on (for example L057, L058, L059). Concede that your count is a claim under your own gate, not enterprise readiness — or produce evidence.",
+      "disposition": "challenged",
+      "speaking_for": "Managers",
+      "content": "Managers, your population differs from the proposed candidate (for example L001, L002, L003). Explain whether this is an enterprise definition or a legitimate operational domain view.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "83e4536f-60a9-527b-b9a9-103fea694ef2"
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
       ],
       "provenance": {
         "generated": false,
@@ -200,14 +219,15 @@
     },
     {
       "turn_no": 11,
-      "round_no": 4,
-      "agent_id": "steward.hr",
+      "round_no": 6,
+      "agent_id": "StewardAgent.hr",
       "role": "steward",
+      "disposition": "narrowed",
       "speaking_for": "HR",
-      "content": "HR responds: conceded. My population is correct under my mandate, but I yield that it is not the enterprise readiness term. I defend my scope as a named domain view and accept that the canonical meaning must be governed.",
+      "content": "HR narrows its claim: its population is valid for its operational mandate, but the extra cohort is not asserted as enterprise readiness.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "fb69de31-4dd7-5ad8-8e38-f159b3513238"
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75"
       ],
       "provenance": {
         "generated": false,
@@ -218,14 +238,15 @@
     },
     {
       "turn_no": 12,
-      "round_no": 4,
-      "agent_id": "steward.learning",
+      "round_no": 6,
+      "agent_id": "StewardAgent.learning",
       "role": "steward",
+      "disposition": "defended",
       "speaking_for": "Learning & Development",
-      "content": "Learning & Development responds: conceded. My population is correct under my mandate, but I yield that it is not the enterprise readiness term. I defend my scope as a named domain view and accept that the canonical meaning must be governed.",
+      "content": "Learning & Development defends the candidate because its executed evidence applies the required learning and assessment gates. It does not self-approve: the Learning Governance Council retains the publication decision.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "8f77b53a-75a5-57ff-a8e9-f5bcd7178d2d"
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3"
       ],
       "provenance": {
         "generated": false,
@@ -236,14 +257,15 @@
     },
     {
       "turn_no": 13,
-      "round_no": 4,
-      "agent_id": "steward.managers",
+      "round_no": 6,
+      "agent_id": "StewardAgent.managers",
       "role": "steward",
+      "disposition": "reframed",
       "speaking_for": "Managers",
-      "content": "Managers responds: conceded. My population is correct under my mandate, but I yield that it is not the enterprise readiness term. I defend my scope as a named domain view and accept that the canonical meaning must be governed.",
+      "content": "Managers reframes its result as a named operational view. It remains useful for local decisions without competing for the canonical enterprise term.",
       "tool_calls": [],
       "cited_evidence_ids": [
-        "83e4536f-60a9-527b-b9a9-103fea694ef2"
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
       ],
       "provenance": {
         "generated": false,
@@ -254,13 +276,18 @@
     },
     {
       "turn_no": 14,
-      "round_no": 5,
-      "agent_id": "skeptic",
+      "round_no": 7,
+      "agent_id": "ReflectionAgent",
       "role": "skeptic",
+      "disposition": "confirmed",
       "speaking_for": null,
-      "content": "Reflection: 3 claim(s) were conceded as claims, not readiness. No count was accepted on argument — each is the row count of an executed query recorded as evidence. The debate is resolved; what remains is who, if anyone, may approve a canonical.",
+      "content": "Reflection: the record now distinguishes an evidence-backed candidate from narrower or operational domain views. No steward changed the verdict; the remaining question is solely whether configured authority permits a proposal.",
       "tool_calls": [],
-      "cited_evidence_ids": [],
+      "cited_evidence_ids": [
+        "d1e8705b-ae27-5fd5-be17-d1f788642d75",
+        "3aa67e9f-c964-5b12-9c0f-7870ded0f3f3",
+        "b1aaf51e-cc57-5017-9a93-e5623af2d73b"
+      ],
       "provenance": {
         "generated": false,
         "provider_name": "DisabledLLMProvider",
@@ -270,11 +297,12 @@
     },
     {
       "turn_no": 15,
-      "round_no": 6,
-      "agent_id": "authority",
+      "round_no": 8,
+      "agent_id": "AuthorityAgent",
       "role": "authority",
+      "disposition": "confirmed",
       "speaking_for": null,
-      "content": "Authority is clear. Learning Governance Council is the configured owner and may approve a canonical definition. The court may publish a governed proposal for human approval.",
+      "content": "Authority is clear. Learning Governance Council alone may approve the proposed canonical meaning. The Court records the recommendation but cannot merge it.",
       "tool_calls": [],
       "cited_evidence_ids": [],
       "provenance": {
@@ -286,11 +314,12 @@
     },
     {
       "turn_no": 16,
-      "round_no": 7,
-      "agent_id": "orchestrator",
+      "round_no": 9,
+      "agent_id": "CourtAuditAgent",
       "role": "orchestrator",
+      "disposition": "confirmed",
       "speaking_for": null,
-      "content": "Ruling: the divergence is proven and a configured owner may approve. The court publishes a governed canonical proposal that still requires human approval.",
+      "content": "Ruling: the engine-proven conflict supports a draft proposal. Human owner approval is still required; the Court changed no evidence and published no verdict.",
       "tool_calls": [],
       "cited_evidence_ids": [],
       "provenance": {
@@ -302,6 +331,20 @@
     }
   ],
   "mode": "deterministic_fallback",
-  "captured_at": "2026-06-13T21:58:15.438473Z",
-  "content_digest": "dab30696a7acae0fb7a89f66286053276042b12a0a8739211d7f8f67121d77de"
+  "captured_at": "2026-06-13T23:55:49.128942Z",
+  "content_digest": "538443b52c7625e54494c9a907da85d82c016587ebc814d9248c6edd88902524",
+  "framework": "Microsoft Agent Framework",
+  "workflow_trace": [
+    "CourtCoordinatorAgent",
+    "StewardPanelAgent",
+    "InvestigatorPlanAgent",
+    "EvidenceReviewAgent",
+    "InvestigatorReplanAgent",
+    "CourtBranchAgent",
+    "SkepticAgent",
+    "StewardResponseAgent",
+    "ReflectionAgent",
+    "AuthorityAgent",
+    "CourtAuditAgent"
+  ]
 }

@@ -54,11 +54,16 @@ def validate_deliberation_artifact(path: Path) -> DeliberationTranscript:
             f"not {transcript.mode.value!r}."
         )
     expected = content_digest(
+        source_run_id=transcript.source_run_id,
         term=transcript.term,
         concept_id=transcript.concept_id,
         verdict=transcript.verdict,
         outcome=transcript.outcome,
+        authority_status=transcript.authority_status,
+        authority_owner=transcript.authority_owner,
+        source_evidence_ids=transcript.source_evidence_ids,
         turns=transcript.turns,
+        workflow_trace=transcript.workflow_trace,
     )
     if expected != transcript.content_digest:
         raise DeliberationCheckError(

@@ -8,6 +8,7 @@ from typing import Literal
 from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sqlalchemy import Engine, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
 from concord.orchestration.casefile import (
@@ -87,6 +88,24 @@ class ReconciliationRepository:
     def initialize(self) -> None:
         Base.metadata.create_all(self.engine)
         ensure_schema_compatibility(self.engine)
+
+    def has_run(self, run_id: UUID) -> bool:
+        """Return whether a verified run is already present in the registry."""
+        with self._sessions() as session:
+            return session.get(ReconciliationRun, run_id) is not None
+
+    def import_verified_case(self, case: ReconciliationCase) -> UUID:
+        """Persist a verified remote case once, preserving its original run id."""
+        if self.has_run(case.run_id):
+            return case.run_id
+        try:
+            return self.save(case)
+        except IntegrityError:
+            # The reviewer app is single-user, but keep a concurrent duplicate import
+            # idempotent if two requests complete at the same time.
+            if self.has_run(case.run_id):
+                return case.run_id
+            raise
 
     def save(self, case: ReconciliationCase) -> UUID:
         if not case.verifier_report or not case.verifier_report.passed:

@@ -47,11 +47,16 @@ def sanitize_transcript(
         for turn in transcript.turns
     )
     digest = content_digest(
+        source_run_id=transcript.source_run_id,
         term=transcript.term,
         concept_id=transcript.concept_id,
         verdict=transcript.verdict,
         outcome=transcript.outcome,
+        authority_status=transcript.authority_status,
+        authority_owner=transcript.authority_owner,
+        source_evidence_ids=transcript.source_evidence_ids,
         turns=sanitized_turns,
+        workflow_trace=transcript.workflow_trace,
     )
     return transcript.model_copy(update={"turns": sanitized_turns, "content_digest": digest})
 

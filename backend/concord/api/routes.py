@@ -1,6 +1,7 @@
 """HTTP routes for deterministic local reconciliation."""
 
 import asyncio
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
@@ -95,6 +96,18 @@ class UngovernedTermRefusal(BaseModel):
     term: str
     reason: str
     known_terms: list[str]
+
+
+class LearningScaleProof(BaseModel):
+    """Committed Fabric-bound scale artifact, separate from the workbench run."""
+
+    canonical_term: str
+    entity_type: str
+    learner_count: int
+    certification_ready_count: int
+    false_ready_blocked_count: int
+    proof_kind: str = "fabric_bound_scale_artifact"
+    execution_separation: str = "Separate from the 120-learner deterministic workbench execution."
 
 
 def _runtime_manager(request: Request) -> RuntimeManager:
@@ -252,17 +265,20 @@ async def _run_case(payload: ReconciliationRequest, request: Request) -> Reconci
     public ``/analyze`` route turns those into a graceful, typed refusal. Hosted
     cloud failures are mapped to HTTP errors here so every caller is consistent.
     """
+    manager = _runtime_manager(request)
     hosted = _hosted_runtime(request)
     if hosted is not None:
         try:
-            return await asyncio.to_thread(hosted.analyze, payload)
+            case = await asyncio.to_thread(hosted.analyze, payload)
         except CloudAccessDisabled as error:
             raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
         except (ProviderNotConfigured, CloudCallBudgetExceeded) as error:
             raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(error)) from error
         except (FoundryHostedResponseError, CloudTransportError) as error:
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
-    return await _workflow(request).run(payload)
+        return manager.remember_case(case, import_to_registry=True)
+    case = await _workflow(request).run(payload)
+    return manager.remember_case(case)
 
 
 @router.post("/analyze", response_model=ReconciliationCase | UngovernedTermRefusal)
@@ -322,8 +338,9 @@ async def ask(payload: AskRequest, request: Request) -> AskResponse:
     case: ReconciliationCase | None = None
     if result.matched and result.canonical_name:
         try:
-            case = await _workflow(request).run(
-                ReconciliationRequest(question=payload.question, term=result.canonical_name)
+            case = await _run_case(
+                ReconciliationRequest(question=payload.question, term=result.canonical_name),
+                request,
             )
         except (UnsupportedScenario, ConceptNotFound):
             case = None
@@ -356,7 +373,7 @@ def score(request: Request) -> ConcordScore:
 
 @router.get("/proposals/{run_id}")
 def proposal_state(run_id: UUID, request: Request) -> dict[str, object]:
-    state = _runner(request).repository.get_proposal_state(run_id)
+    state = _runtime_manager(request).repository.get_proposal_state(run_id)
     if state is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -367,7 +384,7 @@ def proposal_state(run_id: UUID, request: Request) -> dict[str, object]:
 
 @router.get("/runs/{run_id}/agent-trace", response_model=list[AgentTraceStep])
 def agent_trace(run_id: UUID, request: Request) -> tuple[AgentTraceStep, ...]:
-    trace = _runner(request).repository.get_agent_trace(run_id)
+    trace = _runtime_manager(request).repository.get_agent_trace(run_id)
     if trace is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -400,7 +417,7 @@ def _decide(
     decision: str,
     approver: str,
 ) -> ProposalDecisionResult:
-    repository = _runner(request).repository
+    repository = _runtime_manager(request).repository
     try:
         return repository.decide_proposal(run_id, decision=decision, approver=approver)  # type: ignore[arg-type]
     except ProposalNotFound as error:
@@ -431,27 +448,54 @@ async def run_demo_scenario(
     return await _run_case(scenario.request(), request)
 
 
-@router.post("/court/run/{scenario_id}", response_model=DeliberationTranscript)
-async def run_court(scenario_id: str, request: Request) -> DeliberationTranscript:
-    """Convene the Semantic Court for one scenario and return the debate transcript.
-
-    The agents argue over the case the active runtime produced; the transcript reports
-    the engine's verdict and outcome unchanged. Online (replay) runtimes voice the debate
-    deterministically; a live model produces live turns, both labeled by provenance.
-    """
-    try:
-        scenario = get_demo_scenario(scenario_id, _active_demo_scenarios(request))
-    except KeyError as error:
+@router.post("/runs/{run_id}/court", response_model=DeliberationTranscript)
+async def run_court(run_id: UUID, request: Request) -> DeliberationTranscript:
+    """Convene the Agent Framework Court over one frozen verified case."""
+    cached = _runtime_manager(request).cached_case(run_id)
+    if cached is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Unknown demo scenario: {scenario_id}",
-        ) from error
-    runner = _runner(request)
-    case = await asyncio.to_thread(runner.run, scenario.request())
+            detail=(
+                "This completed run is no longer available in the reviewer cache. "
+                "Run the reconciliation again before convening the court."
+            ),
+        )
     try:
-        return SemanticCourt(runner.llm_provider).deliberate(case)
+        return await SemanticCourt(request.app.state.llm_provider).deliberate_async(cached.case)
     except CourtNotReady as error:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
+
+
+@router.post("/runs/{run_id}/governed-rerun", response_model=ReconciliationCase)
+async def governed_rerun(run_id: UUID, request: Request) -> ReconciliationCase:
+    """Re-run a cached term through the local governed registry only."""
+    manager = _runtime_manager(request)
+    cached = manager.cached_case(run_id)
+    if cached is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=(
+                "This completed run is no longer available for a governed re-run. "
+                "Run the reconciliation again."
+            ),
+        )
+    workflow = manager.local_workflow(cached.scenario_pack)
+    case = await workflow.run(cached.case.request)
+    return manager.remember_case(case)
+
+
+@router.get("/proof/learning-scale", response_model=LearningScaleProof)
+def learning_scale_proof(request: Request) -> LearningScaleProof:
+    """Return the committed 10K Fabric scale proof with an explicit separation label."""
+    path = _runtime_manager(request).base_settings.learning_scale_summary_path
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Learning scale proof is unavailable: {path}.",
+        ) from error
+    return LearningScaleProof.model_validate(document)

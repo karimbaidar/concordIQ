@@ -1,272 +1,230 @@
 # Concord IQ architecture
 
-Concord IQ uses Microsoft Agent Framework as its orchestration layer and the
-existing deterministic reconciliation engine as its domain tool layer. Semantic
-grounding, analytical execution, governance, and optional language generation
-remain separated so fluent explanation cannot change an evidence-backed verdict.
+Concord IQ is a learning and certification governance system built around one
+rule: agents may investigate and explain, but deterministic evidence owns the
+verdict. The primary demonstration reconciles three operational definitions of
+**Certification Ready** over a fixed, synthetic 120-learner workbench case.
 
-## System view
+Microsoft Fabric IQ grounds the business concept and its relationships. Microsoft
+Agent Framework coordinates two distinct reasoning workflows. Exact SQL, entity-set
+comparison, configured authority, skeptical verification, and human approval remain
+outside model control.
+
+## Learning system view
 
 ```mermaid
 flowchart LR
-    UI["React reviewer workbench"] --> API["FastAPI"]
-    API --> MAF["Microsoft Agent Framework"]
-    MAF --> NODES["Ten specialist workflow nodes"]
-    NODES --> TOOL["reconcile_business_term"]
-    TOOL --> RUNNER["Deterministic ReconciliationRunner"]
-    RUNNER --> PROVIDER["GroundingProvider contract"]
-    PROVIDER --> LOCAL["LocalProvider"]
-    PROVIDER --> REPLAY["ReplayProvider"]
-    PROVIDER --> FABRIC["FabricIQProvider primary"]
-    PROVIDER --> FOUNDRY["FoundryIQProvider fallback"]
-    LOCAL --> DUCKDB[("DuckDB synthetic analytics")]
-    REPLAY --> ARTIFACT[("Sanitized replay JSON")]
-    FOUNDRY --> SEARCH["Azure AI Search knowledge base"]
-    FABRIC --> ONTOLOGY["Fabric ontology MCP"]
-    RUNNER -. "verified facts only" .-> LLM["LLMProvider"]
-    LLM --> DISABLED["DisabledLLMProvider"]
-    LLM --> OLLAMA["OllamaLLMProvider"]
-    LLM -. "narration records only" .-> UI
-    RUNNER --> POSTGRES[("PostgreSQL evidence and audit")]
-    MAF -. "optional deployment" .-> HOST["Foundry Agent Service"]
+    subgraph SOURCES["Enterprise learning meaning sources"]
+        HR["HR<br/>80 claimed ready"]
+        LD["Learning and Development<br/>56 selected"]
+        MGR["Managers<br/>56 selected<br/>different learner IDs"]
+    end
+
+    FABRIC["Microsoft Fabric IQ<br/>Ontology and semantic concept grounding<br/><b>Grounds meaning; does not decide the verdict</b>"]
+
+    subgraph ENGINE["Concord IQ deterministic evidence engine"]
+        BIND["Trusted definition bindings"]
+        SNAP["Fixed 120-learner synthetic snapshot"]
+        SQL["Exact SQL execution"]
+        SETS["Entity-set comparison<br/>Equal counts do not imply equal populations"]
+        EVID["Evidence records<br/>80 / 56 / 56<br/>24 false-ready<br/>$10,800 synthetic voucher risk"]
+        BIND --> SQL
+        SNAP --> SQL
+        SQL --> SETS --> EVID
+    end
+
+    subgraph PHASE1["Phase 1: Analyze Disagreement"]
+        AF1["Microsoft Agent Framework<br/>10-stage reconciliation"]
+        VERIFY["Skeptical verifier<br/>Deterministic blocking checks"]
+        AF1 --> VERIFY
+    end
+
+    HOST["Microsoft Foundry Agent Service<br/>Hosts Phase 1 over verified replay"]
+    CASE["Frozen verifier-approved case<br/>Verdict, populations, evidence IDs,<br/>SQL citations, impact, authority, proposal"]
+
+    subgraph PHASE2["Phase 2: Convene the Semantic Court"]
+        AF2["Separate Microsoft Agent Framework graph"]
+        COURT["Stewards, investigator, skeptic,<br/>reflection, authority, Court audit"]
+        AF2 --> COURT
+    end
+
+    OWNER["Learning Governance Council<br/>Human owner approval"]
+    PR["Semantic PR"]
+    CANON["Canonical Definition v1<br/>Concord IQ registry only"]
+    RERUN["Governed local rerun"]
+
+    HR --> FABRIC
+    LD --> FABRIC
+    MGR --> FABRIC
+    FABRIC --> ENGINE
+    ENGINE --> PHASE1
+    HOST -. "deployed strict workflow" .-> AF1
+    VERIFY --> CASE
+    CASE --> PHASE2
+    COURT --> OWNER
+    OWNER --> PR --> CANON --> RERUN
+
+    SCALE["Separate Fabric-bound scale artifact<br/>10,000 synthetic learners<br/>522 canonical-ready<br/>4,334 false-ready records<br/><b>Not the 120-learner workbench execution</b>"]
+    SCALE -. "separate proof surface" .-> PHASE1
 ```
 
+The `$10,800` value belongs only to the 24-learner difference in the 120-learner
+workbench case. It is not derived from, or combined with, the separate 10,000-row
+Fabric scale artifact.
 
-### Concord IQ end-to-end runtime sequence
-
-This sequence diagram shows how a business question moves through the Concord IQ
-workbench, API, Microsoft Agent Framework workflow, grounding providers, deterministic
-execution, verification, persistence, and human approval.
+## Exact case lifecycle
 
 ```mermaid
 sequenceDiagram
     autonumber
 
-    actor User as Business User
-    participant UI as Concord IQ Workbench
-    participant API as Concord IQ API<br/>FastAPI
-    participant ORCH as Concord IQ Orchestrator<br/>Microsoft Agent Framework
-    participant GROUND as Grounding Provider<br/>Fabric IQ / Foundry IQ / Work IQ / Replay / Local
-    participant SEM as Semantic Agents<br/>Coordinator / Concept Resolver / Binding Inspector
-    participant PROOF as Proof Agents<br/>Hypothesis / Data Execution / Impact Ranker
-    participant GOV as Governance Agents<br/>Authority Resolver / Reconciliation
-    participant VERIFY as Assurance Agents<br/>Skeptical Verifier / Audit
-    participant DB as Deterministic Services<br/>DuckDB / PostgreSQL / Semantic Registry
-    participant LLM as Optional Model<br/>GPT / Claude / Ollama
-    actor Owner as Authority Owner
+    actor Reviewer
+    participant UI as React Workbench
+    participant API as FastAPI
+    participant IQ as Fabric IQ / Replay / Local
+    participant WF1 as Phase 1 Agent Framework
+    participant SQL as DuckDB Evidence Engine
+    participant DB as PostgreSQL and Case Cache
+    participant WF2 as Semantic Court Agent Framework
+    actor Owner as Learning Governance Council
 
-    User->>UI: Ask why a business term disagrees
-    UI->>API: Analyze disagreement
-    API->>ORCH: Create typed semantic casefile
+    Reviewer->>UI: Analyze Certification Ready
+    UI->>API: POST /analyze
+    API->>IQ: Resolve concept and competing bindings
+    IQ-->>API: HR, L&D, and Managers definitions with provenance
+    API->>WF1: Start typed 10-stage casefile
+    WF1->>SQL: Execute trusted bindings
+    SQL-->>WF1: Entity IDs, counts, exact SQL, evidence IDs
+    WF1->>WF1: Rank impact, resolve authority, verify, audit
+    WF1->>DB: Persist and cache verifier-approved case by run_id
+    DB-->>API: Frozen case: 80 / 56 / 56, conflict, 24, $10,800
+    API-->>UI: Evidence workflow complete
 
-    ORCH->>GROUND: Select one grounding provider for this run
-    GROUND-->>ORCH: Governed concept, definitions, bindings, citations
+    Reviewer->>UI: Convene the Semantic Court
+    UI->>API: POST /runs/{run_id}/court
+    API->>DB: Load the exact frozen case
+    DB-->>API: Verifier-approved casefile
+    API->>WF2: Deliberate over frozen evidence
+    Note over WF2,SQL: No SQL rerun and no second reconciliation
+    WF2->>WF2: Evidence-selected branches and optional one-time replan
+    WF2->>WF2: Audit verdict, outcome, authority, and exact citations
+    WF2-->>API: Grouped, digest-sealed Court transcript
+    API-->>UI: No new verdict and no duplicate proposal
 
-    ORCH->>SEM: Resolve meaning and inspect definitions
-    SEM->>DB: Read definitions, owners, and authority rules
-    DB-->>SEM: Registry metadata
-    SEM-->>ORCH: Grounded semantic context
-
-    ORCH->>PROOF: Test the competing definitions
-    PROOF->>DB: Execute trusted SQL and compare entity sets
-    DB-->>PROOF: Counts, result sets, and evidence
-    PROOF-->>ORCH: Conflict verdict and quantified impact
-
-    ORCH->>GOV: Resolve authority and determine action
-    GOV->>DB: Read governance rules
-    DB-->>GOV: Accountable owner and approval policy
-
-    opt Optional explanation only
-        GOV->>LLM: Explain verified evidence and proposed action
-        LLM-->>GOV: Text narration only
-    end
-
-    GOV-->>ORCH: Propose, refuse, or take no action
-
-    ORCH->>VERIFY: Verify evidence, authority, and decision
-    VERIFY->>DB: Persist case, evidence, proposal, and agent trace
-    DB-->>VERIFY: Persistence confirmed
-
-    alt Verified material conflict with clear authority
-        VERIFY-->>API: Semantic PR created
-        API-->>UI: Show evidence, impact, and accountable owner
-        UI-->>User: Present semantic PR for review
-
-        User->>Owner: Request canonical approval
-
-        alt Owner approves
-            Owner->>API: Approve semantic PR
-            API->>DB: Promote canonical definition in Concord IQ
-            DB-->>API: Canonical version stored
-            API-->>UI: Canonical definition approved
-            UI-->>User: Show governed resolution
-        else Owner rejects
-            Owner->>API: Reject semantic PR
-            API->>DB: Record rejection and audit history
-            API-->>UI: Proposal remains unmerged
-            UI-->>User: Show rejection outcome
-        end
-
-    else Definitions are operationally equivalent
-        VERIFY-->>API: False conflict rejected
-        API-->>UI: Show deterministic proof
-        UI-->>User: No semantic change required
-
-    else Evidence or authority is insufficient
-        VERIFY-->>API: Governed refusal
-        API-->>UI: Show blocking reason and missing evidence
-        UI-->>User: No unsupported decision made
-    end
+    Owner->>API: Approve Semantic PR
+    API->>DB: Promote one versioned canonical definition
+    DB-->>UI: Canonical Definition v1
+    Reviewer->>API: POST /runs/{run_id}/governed-rerun
+    API->>SQL: Execute through local deterministic registry
+    SQL-->>UI: Governed result with domain views preserved
 ```
 
-The optional model can explain verified results, but it cannot change executed evidence,
-the conflict verdict, authority, refusal status, or human approval.
+Completed verifier-approved cases are held in a bounded runtime cache keyed by
+`run_id`. An unknown or expired run returns a friendly `404`; an incomplete or
+unverified case returns `409`. A verified Foundry-hosted case is imported
+idempotently into the local Concord IQ registry so the configured owner can approve
+it. The governed rerun is deliberately local and performs no Fabric or Foundry
+writeback.
 
+## Phase 1: evidence workflow
 
-## Reconciliation flow
-
-The Agent Framework graph is:
-
-```text
-CoordinatorAgent -> ConceptResolverAgent -> BindingInspectorAgent
--> ConflictHypothesisAgent -> DataExecutionAgent -> ImpactRankerAgent
--> AuthorityResolverAgent -> ReconciliationAgent
--> SkepticalVerifierAgent -> AuditAgent
-```
-
-The workflow runs in two modes. **Fast** mode (default) calls the deterministic
-domain tool once and exposes the resulting trace; each later node validates its
-corresponding typed output before forwarding the casefile. **Strict** mode
-(`CONCORD_WORKFLOW_MODE=strict`) makes the Agent Framework own the progression — each
-specialist node executes exactly one stage and writes its typed output into the
-casefile, so no single call performs the whole reasoning. Both modes share the same
-deterministic truth path and reach the same verdict.
-
-The domain tool retains the tested state machine:
+The first Microsoft Agent Framework graph produces the governed case:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> RESOLVE_CONCEPT
-    RESOLVE_CONCEPT --> INSPECT_BINDINGS
-    INSPECT_BINDINGS --> HYPOTHESIZE_CONFLICTS
-    HYPOTHESIZE_CONFLICTS --> EXECUTE_DEFINITIONS
-    EXECUTE_DEFINITIONS --> RANK_IMPACT
-    RANK_IMPACT --> RESOLVE_AUTHORITY
-    RESOLVE_AUTHORITY --> PROPOSE_OR_REFUSE
-    PROPOSE_OR_REFUSE --> VERIFY
-    VERIFY --> AUDIT
-    AUDIT --> COMPLETE
+flowchart LR
+    C["1. CoordinatorAgent"] --> R["2. ConceptResolverAgent"]
+    R --> B["3. BindingInspectorAgent"]
+    B --> H["4. ConflictHypothesisAgent"]
+    H --> D["5. DataExecutionAgent"]
+    D --> I["6. ImpactRankerAgent"]
+    I --> A["7. AuthorityResolverAgent"]
+    A --> P["8. ReconciliationAgent"]
+    P --> V["9. SkepticalVerifierAgent"]
+    V --> U["10. AuditAgent"]
+
+    D -. "exact SQL and entity sets" .-> E[("Deterministic evidence")]
+    E -. "blocks unsupported output" .-> V
 ```
 
-The skeptical verifier blocks unsupported proposals: it checks required evidence
-IDs, stored SQL, divergent-vs-equal result sets, authority status, and
-proposal/refusal validity. On failure the case is marked `blocked` or
-`needs_review`; one recovery retry is allowed for a recoverable missing-step
-output, and the verifier never invents evidence to pass. The audit agent persists
-the result, evidence references, exact SQL, decision, and complete state timeline.
+The conflict hypothesis stage records a claim, a skeptical challenge, and the
+eventual data ruling. SQL result-set equality settles the ruling. The verifier
+checks evidence completeness, result-set behavior, authority consistency, proposal
+validity, and impact derivation before the case can be shown as complete.
 
-Every run also emits a typed **agent trace** (step number, agent, input/output
-summary, evidence IDs, provider mode, verifier status, duration), persisted and
-served at `GET /runs/{run_id}/agent-trace` and shown in the reviewer workbench so
-the multi-agent pattern is explicit.
+Foundry Agent Service hosts this ten-stage strict workflow over the verified
+Certification Ready replay. It does not host the second Court graph.
 
-## Hosting and layering
+## Phase 2: Semantic Court
 
-```text
-Foundry Agent Service   hosts/deploys the Agent Framework workflow
-Microsoft Agent Framework   orchestrates specialist agents and workflow states
-Concord IQ deterministic tools   execute SQL, evidence, authority, verifier, audit
-Fabric IQ   primary semantic ontology grounding
-Foundry IQ   fallback knowledge grounding
-ReplayProvider   sanitized Microsoft IQ replay
-LocalProvider   deterministic reviewer mode
+The Court is a separate Agent Framework graph over the frozen case:
+
+```mermaid
+flowchart TD
+    C["CourtCoordinatorAgent"] --> S["StewardPanelAgent"]
+    S --> P["InvestigatorPlanAgent"]
+    P --> E["EvidenceReviewAgent"]
+    E --> Q{"Unresolved comparison?<br/>Including equal counts with unequal IDs"}
+    Q -- "yes, once at most" --> RP["InvestigatorReplanAgent"]
+    RP --> B{"Frozen verdict"}
+    Q -- "no" --> B
+    B -- "conflict" --> SK["SkepticAgent"]
+    SK --> SR["StewardResponseAgent"]
+    SR --> RF["ReflectionAgent"]
+    B -- "consistent" --> SC["SkepticConsensusAgent"]
+    RF --> A["AuthorityAgent"]
+    SC --> A
+    A --> CA["CourtAuditAgent"]
+    CA --> T["Digest-sealed transcript"]
+
+    FROZEN[("Frozen verifier-approved case")] --> C
+    FROZEN -. "verdict, evidence, authority,<br/>and proposal cannot change" .-> CA
 ```
 
-The Foundry Agent Service hosting protocol is validated cloud-free with
-`make foundry-agent-dry-run` and `make foundry-agent-smoke` (LocalProvider or a
-verified ReplayProvider artifact, no Fabric credentials). A real tenant deployment
-and a real Fabric IQ capture remain deliberately deferred. See
-[Foundry Agent Service](foundry-agent-service.md).
+For the Certification Ready conflict:
 
-## Provider model
+- HR narrows its enterprise claim after the 24-person false-ready finding.
+- Managers reframe their result as an operational domain view.
+- Learning and Development defends the proposed canonical candidate but defers
+  publication to the Learning Governance Council.
+- Ambiguous authority produces no winner; the authority agent preserves the
+  engine's refusal.
 
-All grounding modes implement the same contract:
+`CourtAuditAgent` recomputes a digest over engine-owned facts and proves that the
+Court outcome, verdict, authority, proposal state, and exact evidence citations
+still match the original case. Model narration is optional. Deterministic fallback
+narration traverses the same Agent Framework graph.
 
-- resolve a business term to a canonical concept
-- return operational definition bindings
-- evaluate a trusted binding for a fixed period
-- return the relevant ontology subgraph
-- return configured authority rules
+## Provider and provenance model
 
-`LocalProvider` is deterministic reviewer mode, not fake Microsoft IQ.
-`ReplayProvider` consumes a reviewed, synthetic-only capture. For automatic cloud
-selection, Fabric IQ is preferred because ontology and governed business
-vocabulary are central to Concord IQ. Foundry IQ is the fallback knowledge
-provider. Neither cloud path falls back to local data silently.
+| Reviewer label | Meaning |
+| --- | --- |
+| Fabric IQ Live | Fabric ontology match with deterministic local snapshot execution |
+| Fabric Replay | Sanitized, verified Fabric capture replay with no cloud call |
+| Foundry Agent Service Live | Hosted Phase 1 Agent Framework workflow over verified replay |
+| Local | Fully local grounding and deterministic execution |
 
-`LLMProvider` is a separate axis. Disabled mode returns reviewed deterministic
-text. Ollama posts schema-constrained requests to the local `/api/chat` endpoint.
-Its result type contains text and provenance only, so it cannot return a verdict,
-authority choice, evidence set, impact value, or approval decision. Connection or
-validation failures fall back without interrupting reconciliation.
+`FabricIQProvider`, `ReplayProvider`, and `LocalProvider` implement the same typed
+grounding contract. Fabric IQ supplies semantic grounding; the displayed learner
+populations are computed by Concord IQ's deterministic evidence path. Foundry IQ
+authority grounding is advisory only and cannot replace the configured authority
+rule. Work IQ is implemented behind a fail-closed adapter but remains license-gated
+and is not claimed as a completed live retrieval.
 
-The adapter follows Ollama's official
-[chat API](https://docs.ollama.com/api/chat) and
-[structured output](https://docs.ollama.com/capabilities/structured-outputs)
-contracts with streaming disabled and temperature zero.
+Optional model narration receives verified facts only. Its result type contains
+text and provenance, not verdicts, authority choices, evidence sets, impact values,
+or approval decisions.
 
-## Engagement surfaces
+## Trust and storage boundaries
 
-Three read-only, deterministic surfaces sit on top of the reconciliation engine
-and never weaken the truth path:
+- **DuckDB** holds fixed-seed synthetic learning data and executes trusted SQL.
+- **PostgreSQL** stores cases, exact evidence, proposals, canonical versions, agent
+  traces, and audit events.
+- **RuntimeManager** caches a bounded set of completed cases for exact-run Court
+  deliberation.
+- **The Concord IQ registry** is the only system changed by approval.
+- **Fabric IQ and Foundry Agent Service** receive no automatic writeback.
+- **Cloud is off by default** and every cloud adapter requires explicit permission,
+  authentication, an endpoint, and a positive call budget.
 
-- **`nl_query` / `POST /ask`** resolves a natural-language question to a governed
-  concept and its competing definitions, then runs the full reconciliation. On
-  Fabric/Foundry the resolution is served by NL2Ontology/retrieve; Local and
-  Replay answer the same typed contract deterministically.
-- **`scan_portfolio` / `GET /scan` / `make scan`** sweeps every concept through
-  the deterministic agents (no persistence, no cloud), ranks conflicts by ARR
-  impact, and derives a single 0–100 **Concord Score** plus a per-business-unit
-  leaderboard (`GET /score`).
-- **The Semantic-PR approval gate** (`POST /proposals/{id}/approve|reject`) merges
-  a canonical definition only when the caller equals the proposal's configured
-  authority owner. Approval atomically versions and promotes exactly one canonical
-  `MetricDefinition`, links it to the proposal, supersedes a prior canonical, and
-  appends both decision and promotion events to the audit trail. The next local
-  reconciliation executes the approved source binding as the unqualified governed
-  meaning while retaining prior definitions as named domain views. This is a write
-  to Concord's own registry, not Fabric or Foundry. The owner check is a
-  configuration lookup, never an LLM judgement.
-- **The meaning graph** (`frontend/src/components/MeaningGraph.tsx`) is a read-only
-  SVG projection of the typed casefile. It derives nodes, counts, windows, impact,
-  refusal, exploration, and convergence from existing result fields and the
-  ephemeral what-if response. It never computes or overrides a verdict.
-
-## Data flow and trust
-
-1. The user asks a natural-language question, runs the autonomous scan, or selects
-   one of the synthetic concepts.
-2. The provider returns only the resolved scenario context.
-3. Trusted definition bindings produce entity sets and metric totals.
-4. Agents compare behavior, rank impact, and consult authority rules.
-5. The verifier checks evidence completeness and decision constraints.
-6. Optional narration receives a compact copy of those verified facts.
-7. PostgreSQL stores the auditable case, including narration provenance.
-
-The context packet excludes execution results and decisions until those stages
-have run. This keeps each specialist scoped to the information it needs.
-
-## Deployment posture
-
-The workflow is deployed through the Foundry Agent Service entrypoint in
-`concord.ms_agent.foundry_hosted_entrypoint`. The deployed reviewer runtime uses
-ReplayProvider with cloud grounding disabled. Separately, the main FastAPI app can
-set `PROVIDER=foundry_hosted` to call that deployed Responses endpoint; this caller
-requires explicit cloud permission, a positive budget, endpoint, and token.
-
-Cloud calls are disabled by default. Opening the UI, listing providers, running
-tests, and using `LocalProvider` or `ReplayProvider` make no Microsoft request.
-Cloud adapters require an explicit opt-in and a positive hard call budget.
-
-See [IQ integration](iq-integration.md), [cost controls](cost-controls.md), and
-[threat model](threat-model.md).
+See [IQ integration](iq-integration.md), [Foundry Agent Service](foundry-agent-service.md),
+[cloud runtime](cloud-runtime.md), and [threat model](threat-model.md).

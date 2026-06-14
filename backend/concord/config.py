@@ -65,6 +65,9 @@ class Settings(BaseSettings):
     court_transcript_path: Path = Path(
         "artifacts/replay/sanitized/certification-ready.deliberation.json"
     )
+    learning_scale_summary_path: Path = Path(
+        "fabric_seed/learning_cli/ciq_certification_ready_summary.json"
+    )
     replay_require_verified_capture: bool = True
     capture_raw_dir: Path = Path("artifacts/replay/raw")
     capture_sanitized_path: Path = Path("artifacts/replay/sanitized/latest.json")

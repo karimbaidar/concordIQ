@@ -1,7 +1,7 @@
 # Concord IQ — judge proof report
 
-- **Generated (UTC):** 2026-06-13T19:46:37Z
-- **Git commit:** `7be62571e8b5422a0810226014b1497dfac182e6`
+- **Generated (UTC):** 2026-06-14T08:47:40Z
+- **Git commit:** `ed97f03dc0120b08eefa1168e58c92faeb81e31a`
 - **Mandatory local proof:** ✅ PASSED
 
 ## Local verification (mandatory)
@@ -14,6 +14,8 @@
 | Eval scorecard | ✅ PASSED |  |
 | Replay proof | ✅ PASSED |  |
 | Semantic PR export | ✅ PASSED |  |
+| Semantic Court replay | ✅ PASSED |  |
+| Separate Fabric scale artifact | ✅ PASSED | 10,000 learners; 522 canonical-ready; 4,334 false-ready; separate from the 120-learner workbench execution. |
 
 ## Optional cloud integrations
 

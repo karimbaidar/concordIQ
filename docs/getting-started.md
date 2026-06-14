@@ -63,14 +63,16 @@ It never touches Azure, Fabric, Foundry, SharePoint, or committed replay artifac
 ## Explore the rest of the system
 
 ```bash
-make demo     # the three deterministic scenario verdicts
-make scan     # portfolio scan, Concord Score, per-team leaderboard
+make demo     # legacy business-pack regression demo
+make scan     # legacy business portfolio regression scan
 make eval     # deterministic safety scorecard
 make test     # backend + frontend tests
 make lint     # ruff + frontend lint/typecheck
 ```
 
-`make demo` prints:
+The primary hackathon experience is the Learning workbench started by `make dev`,
+`make dev-local`, or `make dev-fresh`. `make demo` intentionally remains pinned to
+the older business scenario pack as generalization and regression coverage:
 
 ```text
 Active Customer: CONFLICT | counts=1600/1500/1334 | proposal drafted; human approval required
@@ -81,11 +83,14 @@ Churned Customer: CONFLICT | counts=333/666 | automatic reconciliation refused; 
 ## Verified, credential-free Fabric IQ replay
 
 ```bash
+CONCORD_SCENARIO_PACK=learning \
+REPLAY_ARTIFACT_PATH=artifacts/replay/sanitized/certification-ready.latest.json \
 make replay-check
 ```
 
-This validates the committed sanitized Fabric IQ semantic-proof capture and replays the
-full demo through `ReplayProvider` with cloud disabled — no Fabric tenant, token, or paid
-capacity required.
+This validates the committed Certification Ready Fabric IQ semantic-proof capture and
+replays the 120-learner Learning case through `ReplayProvider` with cloud disabled. No
+Fabric tenant, token, or paid capacity is required. The separate 10,000-row scale package
+is evidence of Fabric-bound scale and is not executed by this workbench command.
 
 For cloud modes, see [cloud runtime](cloud-runtime.md).

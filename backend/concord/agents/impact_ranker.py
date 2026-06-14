@@ -23,6 +23,7 @@ class ImpactRankerAgent:
             sorted(set().union(*entity_sets) - set.intersection(*entity_sets))
         )
         if customer_delta == 0 and arr_delta == 0:
+            learning_case = concept_id == "certification_ready"
             return ImpactAssessment(
                 rank=0,
                 severity="low",
@@ -31,6 +32,8 @@ class ImpactRankerAgent:
                 reports_affected=len(units),
                 business_units_affected=units,
                 decision_criticality="low",
+                entity_label="learners" if learning_case else "customers",
+                value_label="exam spend at risk" if learning_case else "metric delta",
                 affected_entity_ids=affected_entity_ids,
             )
         high_impact = customer_delta >= 10 or arr_delta >= 1_000_000

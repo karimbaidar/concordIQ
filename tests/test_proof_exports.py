@@ -140,11 +140,18 @@ def test_judge_proof_mandatory_gate() -> None:
 
 def test_judge_proof_json_shape() -> None:
     proof = _proof_with_local(("tests", "passed"))
+    proof.learning_scale = {
+        "status": "passed",
+        "learner_count": 10_000,
+        "certification_ready_count": 522,
+        "false_ready_blocked_count": 4_334,
+    }
     document = proof.to_json("abc123", "2026-06-10T00:00:00Z")
     assert document["commit"] == "abc123"
     assert document["fabric_iq"]["mode"] == "sanitized_replay"
     assert document["work_iq"]["status"] == "license_gated"
     assert document["foundry_agent_service"]["status"] == "skipped"
+    assert document["learning_scale"]["false_ready_blocked_count"] == 4_334
 
 
 def test_judge_proof_report_has_no_secret_shaped_text() -> None:

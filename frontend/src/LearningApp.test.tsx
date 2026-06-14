@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
-import type { ReconciliationCase } from "./types";
+import type { DeliberationTranscript, ReconciliationCase } from "./types";
 
 const scenario = {
   scenario_id: "certification-ready",
@@ -222,6 +222,71 @@ const learningCase: ReconciliationCase = {
   ],
 };
 
+const courtTranscript: DeliberationTranscript = {
+  schema_version: "2.0",
+  source_run_id: learningCase.run_id,
+  term: "Certification Ready",
+  concept_id: "certification_ready",
+  verdict: "conflict",
+  outcome: "proposal",
+  authority_status: "clear",
+  authority_owner: "Learning Governance Council",
+  source_evidence_ids: learningCase.evidence.map((item) => item.evidence_id),
+  rounds: 10,
+  mode: "deterministic_fallback",
+  captured_at: "2026-06-14T00:00:00Z",
+  content_digest: "court-digest",
+  framework: "Microsoft Agent Framework",
+  workflow_trace: [
+    "CourtCoordinatorAgent",
+    "StewardPanelAgent",
+    "InvestigatorPlanAgent",
+    "EvidenceReviewAgent",
+    "InvestigatorReplanAgent",
+    "SkepticAgent",
+    "StewardResponseAgent",
+    "ReflectionAgent",
+    "AuthorityAgent",
+    "CourtAuditAgent",
+  ],
+  turns: [
+    {
+      turn_no: 1,
+      round_no: 0,
+      agent_id: "CourtCoordinatorAgent",
+      role: "orchestrator",
+      disposition: "asserted",
+      speaking_for: null,
+      content: "The court is convened over the frozen run.",
+      tool_calls: [],
+      cited_evidence_ids: [],
+      provenance: {
+        generated: false,
+        provider_name: "DisabledLLMProvider",
+        model: null,
+        fallback_reason: "LLM narration is disabled.",
+      },
+    },
+    {
+      turn_no: 2,
+      round_no: 6,
+      agent_id: "StewardAgent.learning",
+      role: "steward",
+      disposition: "defended",
+      speaking_for: "Learning & Development",
+      content: "L&D defends the candidate while authority retains approval.",
+      tool_calls: [],
+      cited_evidence_ids: [evidenceIds[1]],
+      provenance: {
+        generated: false,
+        provider_name: "DisabledLLMProvider",
+        model: null,
+        fallback_reason: "LLM narration is disabled.",
+      },
+    },
+  ],
+};
+
 function mockJson(body: unknown) {
   return Promise.resolve({
     ok: true,
@@ -283,8 +348,23 @@ describe("learning-first Concord IQ experience", () => {
         if (url.endsWith("/demo/scenarios")) {
           return mockJson([scenario]);
         }
+        if (url.endsWith("/proof/learning-scale")) {
+          return mockJson({
+            canonical_term: "Certification Ready",
+            entity_type: "CertificationReady",
+            learner_count: 10000,
+            certification_ready_count: 522,
+            false_ready_blocked_count: 4334,
+            proof_kind: "fabric_bound_scale_artifact",
+            execution_separation:
+              "Separate from the 120-learner deterministic workbench execution.",
+          });
+        }
         if (url.endsWith("/demo/run/certification-ready")) {
           return mockJson(learningCase);
+        }
+        if (url.endsWith(`/runs/${learningCase.run_id}/court`)) {
+          return mockJson(courtTranscript);
         }
         return mockJson({});
       }),
@@ -326,9 +406,59 @@ describe("learning-first Concord IQ experience", () => {
     expect(within(summary).getByText("56")).toBeInTheDocument();
     expect(within(summary).getByText("24")).toBeInTheDocument();
     expect(screen.getByText("$10,800")).toBeInTheDocument();
+    expect(screen.getByText("10,000")).toBeInTheDocument();
+    expect(screen.getByText("4,334")).toBeInTheDocument();
+    expect(
+      screen.getByText(/not the source of the workbench’s 80\/56\/56 result/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Evidence workflow complete" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("No SQL rerun. No new verdict. No duplicate proposal."),
+    ).toBeInTheDocument();
     expect(screen.getByText(falseReadyIds.join(", "))).toBeInTheDocument();
     expect(screen.getAllByText("Learning Governance Council").length).toBeGreaterThan(0);
     expect(screen.getByText("Proposed canonical definition")).toBeInTheDocument();
     expect(screen.getByText("Skeptical verifier passed")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /convene the court/i }));
+    expect(
+      await screen.findByRole("heading", { name: "Semantic Court over frozen run" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("L&D defends the candidate while authority retains approval."))
+      .toBeInTheDocument();
+  });
+
+  it("shows a friendly Court API detail instead of raw JSON", async () => {
+    const original = vi.mocked(fetch).getMockImplementation();
+    vi.mocked(fetch).mockImplementation((input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith(`/runs/${learningCase.run_id}/court`)) {
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          text: () =>
+            Promise.resolve(
+              JSON.stringify({
+                detail: "Run the reconciliation again before convening the court.",
+              }),
+            ),
+        } as Response);
+      }
+      return original!(input, init);
+    });
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByRole("heading", { name: /False Readiness Firewall/i });
+    await user.click(screen.getByRole("button", { name: /analyze disagreement/i }));
+    await screen.findByText("Material conflict confirmed");
+    await user.click(screen.getByRole("button", { name: /convene the court/i }));
+
+    expect(
+      await screen.findByText("Run the reconciliation again before convening the court."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/"detail"/)).not.toBeInTheDocument();
   });
 });

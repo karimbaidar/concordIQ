@@ -1,151 +1,96 @@
-# Demo script — Concord IQ
+# Concord IQ — two-minute recording script
 
-This document is the reproducible recording runbook for the hackathon demo, including the exact click path, timing, evidence, and approved claims for the submitted build.
-
-The judged artifact is the recorded video (≤5 min, your own work), never a live
-tenant. Record against the local/replay stack. This file is the spine: the click
-order, the screen, and the one line for each beat.
-
-**Two honesty rules that override everything below:**
-1. **No claim exceeds the build.** Only show what runs. The meaning graph and the
-   merge-and-rerun act-loop are live in Concord's own governed registry.
-2. **Never overstate the IQ layer.** Say "verified Fabric IQ semantic grounding" only
-   after `make capture` + `make replay-check` pass with real Fabric calls and the badge
-   reads `FabricIQProvider`. Never say Fabric returned the full snapshot unless it did.
+Delivery: fast, certain, slightly defiant. Pause on the bold lines. Let the evidence
+workflow and the Court be the heroes.
 
 ## Before recording
 
 ```bash
-make setup
-make seed
-make test     # 138 backend + 5 frontend green
-make dev
+make dev-fresh
 ```
 
-Open `http://127.0.0.1:5173`. Confirm `ProviderBadge` reads `LocalProvider`, cloud
-disabled, data synthetic. Keep `http://127.0.0.1:8000/docs` and a terminal for
-`make scan` in a second tab for the optional closing beats.
+Use the Learning system. Reset again before the final take so no prior canonical
+promotion exists.
 
-## The spine at a glance
+## 0:00–0:16 — The problem
 
-| # | Beat | Screen (component) | Status |
-| --- | --- | --- | --- |
-| 1 | The pain (board cold open) | `DashboardDisagreement` (1,600 / 1,500 / 1,334) | ✅ LIVE |
-| 2 | Proven conflict + real deliberation | `DefinitionDiff`, `ReasoningTimeline` (claim→challenge→data ruling), `ImpactPanel` | ✅ LIVE (T1.2) |
-| 3 | Glass-box: drag the window, watch the dollars | `DefinitionDiff` what-if slider | ✅ LIVE (T1.1) |
-| 4 | It does not cry wolf (the decoy) | `DecoyRuledOut` (Net Revenue 1,600 = 1,600) | ✅ LIVE |
-| 5 | It refuses rather than guess | `RefusalCard` (Churned) + `UngovernedRefusalCard` (any term) | ✅ LIVE (T1.3) |
-| 6 | Governance: merge, promote, and re-run | `SemanticPullRequest` → `DashboardDisagreement` | ✅ LIVE (T1.5) |
-| 7 | Score the whole org (optional) | `PortfolioBoard` / `make scan` (Concord Score 60/100) | ✅ LIVE |
-| — | Cold-open hero visual | `MeaningGraph` | ✅ LIVE (T1.6) |
+**On screen:** the Certification Ready meaning fork showing 80 / 56 / 56.
 
----
+> Three teams. One word. Watch what happens.
+>
+> HR says eighty people are certification ready. Learning and Development says
+> fifty-six. The managers say fifty-six too — but not the same fifty-six.
+>
+> Nobody is lying. They never agreed on what “ready” means.
 
-## Core spine (~3:15 — record this today)
+## 0:16–0:33 — The product
 
-### 1 — 0:00–0:25 · The pain (lead here, not with architecture)
+**On screen:** Concord IQ workbench and runtime provenance.
 
-Open on `MeaningGraph`: **Active Customer** forks into Finance **1,600 / 90d**,
-Sales **1,500 / 180d**, and Customer Success **1,334 / 30d**. Keep the red
-conflict edges and **266 / $33.2M** impact badge in frame.
+> Enterprises built a source of truth for data, not for meaning.
+>
+> Concord IQ is version control for business definitions. It grounds the term,
+> executes every team’s rule as deterministic SQL, and compares the actual people —
+> not just the wording.
 
-Say: *"A board decision rode on one number: Finance said 1,600 active customers.
-Sales' system said 1,500. Customer Success said 1,334. Same metric, three numbers.
-Nobody lied — they never agreed on what 'active' means. That gap is 266 customers and
-**$33.2M** of ARR."*
+## 0:33–0:58 — Phase 1: evidence workflow
 
-### 2 — 0:25–1:10 · The proven conflict, and a real argument settled by data
+**On screen:** click **Analyze disagreement**, then show the ten-stage trace and impact.
 
-1. `DefinitionDiff`: show the three definitions and their trailing windows
-   (Finance 90 / Sales 180 / Customer Success 30 days).
-2. `ReasoningTimeline`: walk one hypothesis as a **Claim → Challenge → Data ruling**
-   triple — e.g. *"Confirmed: executed entity sets differ (1,600 vs 1,500)"* — with the
-   **"Deterministic · LLM did not decide"** label and the exact SQL.
-3. `ImpactPanel`: counts **1,600 / 1,500 / 1,334**, **$33.2M ARR delta**, ranked high.
+> This reviewed workbench case contains one hundred and twenty synthetic learners.
+> Microsoft Agent Framework coordinates ten specialist stages, but the language model
+> does not decide the result.
+>
+> The verdict is conflict. Concord identifies the exact twenty-four false-ready
+> learners and ten thousand eight hundred dollars of synthetic exam spend at risk.
+>
+> **The agents propose tests. Executed evidence settles them.**
 
-Say: *"The agent doesn't assert the conflict — it designs the test that proves it.
-A specialist claims they diverge, a skeptic demands proof, and **executed SQL** is the
-referee. The model never decides the verdict; the data does."*
+## 0:58–1:10 — Separate Fabric scale proof
 
-### 3 — 1:10–1:40 · Glass-box: edit a definition, watch the money move
+**On screen:** the Fabric scale artifact card.
 
-1. In `DefinitionDiff`, drag the Finance time-window slider **90 → 120 days**.
-2. The count re-derives live **1,600 → 1,667** (**+67 customers, +$8,567,000**); overall
-   impact jumps to **333 / $41,765,000**. The `MeaningGraph` node and impact badge
-   move with it, and the **"Exploration — not governed"** chip shows.
-3. Click **Reset to governed** — back to **266 / $33,198,000**.
+> Separately, the committed Fabric-bound scale package contains ten thousand synthetic
+> learners, five hundred twenty-two canonical-ready records, and four thousand three
+> hundred thirty-four false-ready records.
+>
+> That is scale evidence, not the source of the 80 / 56 / 56 workbench run.
 
-Say: *"This is the glass box. Change one rule and the dollars re-derive instantly —
-real SQL over real rows, no model in the loop. And it's clearly fenced as exploration:
-nothing here touches the governed definition."*
+## 1:10–1:43 — Phase 2: the Semantic Court
 
-### 4 — 1:40–2:05 · It does not cry wolf (the decoy)
+**On screen:** click **Convene the court** and let the grouped rounds appear.
 
-1. Run **Net Revenue**. Two differently-worded definitions; executed sets are
-   **equal 1,600 = 1,600** → `DecoyRuledOut`, verdict **consistent**.
-2. Point to the ruling: *"Overturned: executed entity sets are equal (1,600 = 1,600)."*
+> Now I convene a second Microsoft Agent Framework workflow over the frozen case.
+> No SQL rerun. No new verdict. No duplicate proposal.
+>
+> The investigator reviews exact identities and replans because two teams both report
+> fifty-six while selecting different learners. The skeptic cross-examines each view.
+>
+> HR narrows its enterprise claim. Managers preserve their result as an operational
+> view. L&D defends the evidence-backed candidate — but it cannot approve itself.
+>
+> **The graph is fixed and auditable; the evidence selects its branches.**
 
-Say: *"A naive tool screams CONFLICT at different wording. Concord ran both and proved
-they're identical — so it earns the right to be believed when it does flag one."*
+## 1:43–2:00 — Authority and close
 
-### 5 — 2:05–2:35 · It refuses rather than guess (two ways)
+**On screen:** Authority round, Court audit, then the owner-gated Semantic PR.
 
-1. **Ambiguous authority:** open **Churned Customer** — divergent **333 / 666**, but
-   ownership is shared → `RefusalCard` refuses to auto-pick a winner, routes to a human.
-2. **Ungoverned term:** in the workbench search, type **"Gross Margin"** and click
-   *Investigate* → `UngovernedRefusalCard`: *"Concord IQ will not guess 'Gross Margin'"*
-   with the governed terms it **can** reconcile as chips.
+> The Learning Governance Council is the configured owner. Only that human authority
+> can merge the canonical definition inside Concord IQ’s registry. There is no hidden
+> Fabric or Foundry writeback.
+>
+> Every Court turn is provenance-labeled, evidence-cited, digest-sealed, and replayable.
+>
+> **The agents argue. The evidence rules. Concord IQ.**
 
-Say: *"In a field of agents that do more autonomously, Concord is proud of what it
-won't do. No owner? It refuses. No governed definition? It won't invent one. Restraint
-is the feature."*
+## Claim guardrails
 
-### 6 — 2:35–3:15 · Governance: the merge acts
-
-1. Back on **Active Customer**, open `SemanticPullRequest` — the proposed canonical
-   definition, evidence refs, migration checklist.
-2. Show that only the **Data Governance Council** (the authority owner) can
-   **Approve & merge**.
-3. Point to **"Merged — canonical definition is now governed"**, Canonical v1,
-   approver, timestamp, and the explicit **Concord IQ registry / no external
-   writeback** label.
-4. Click **Re-run with governed definition**. The conflict result becomes
-   **Governed: Canonical v1** and the original Finance/Sales/Customer Success
-   definitions remain visible as named domain views. The meaning fork collapses
-   into one green governed canonical node.
-
-Say: *"Meaning gets a pull request. Only the owner can merge. Approval promotes one
-versioned canonical definition in Concord's governed registry, records the audit event,
-and the next run uses it. The old definitions remain named views — history is not
-erased."*
-
-Close: *"Enterprises built a single source of truth for **data**, but not for
-**meaning**. Concord IQ proves where definitions silently disagree, settles it on data,
-gates it under governance, or refuses — version control for the meaning of your metrics."*
-
----
-
-## Extended beats (fold in for the ≤5:00 cut)
-
-- **Ask in plain English (NL2Ontology).** `AskConcord`: *"Why do our active customer
-  numbers disagree?"* → grounds the question in the ontology, names the competing
-  definitions, runs the proof. Say: *"You ask in business terms; it resolves meaning
-  against the ontology, not free-text search."*
-- **The subtle catch (Qualified Lead).** Open Qualified Lead: a **20-customer / 1.3%**
-  gap (Marketing counts a `nurturing` cohort Sales doesn't) — a silent **$2.26M**
-  divergence, caught and quantified.
-- **Score the whole org.** `PortfolioBoard` / `make scan`: **Concord Score 60/100
-  (grade D)** — Churned #1, Active #2, Qualified Lead #3, Net Revenue consistent — plus
-  the per-team leaderboard. Say: *"Not a one-off report — it sweeps every governed
-  concept every Monday."*
-- **The IQ + runtime layer.** `ProviderBadge` / `GET /providers`: Microsoft Agent
-  Framework orchestrates the 10 specialist nodes; the workflow is hosted on **Foundry
-  Agent Service** (`PROVIDER=foundry_hosted`); **Fabric IQ** is the semantic grounding
-  layer and the committed sanitized capture replays it with no tenant. Keep the wording
-  honest per rule 2.
-
-## Recording note
-
-Keep the meaning graph in frame for the cold open, the live what-if, the Churned
-Customer authority refusal, and the post-merge convergence. It is the visual spine:
-forked, explored, safely refused, then governed.
+- The workbench execution is 120 synthetic learners: 80 / 56 / 56, 24 false-ready,
+  $10,800 synthetic exam spend at risk.
+- The Fabric scale artifact is separate: 10,000 synthetic learners, 522
+  canonical-ready, 4,334 false-ready.
+- The ten-stage reconciliation and the Semantic Court are two distinct Microsoft Agent
+  Framework workflows.
+- Foundry Agent Service hosts the verified ten-stage reconciliation over sanitized
+  replay. Do not claim that the second Court graph is hosted there.
+- Approval promotes only inside the Concord IQ registry.

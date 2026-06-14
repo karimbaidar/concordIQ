@@ -3,15 +3,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchDemoScenarios,
   fetchHealth,
+  fetchLearningScaleProof,
   fetchRuntimeState,
   isUngovernedRefusal,
   reconcileTerm,
   reconcileWhatIf,
   runCourt,
   runDemoScenario,
+  runGovernedRerun,
   selectRuntime,
 } from "./api";
 import { AskConcord } from "./components/AskConcord";
+import { CaseProvenance } from "./components/CaseProvenance";
 import { CourtTimeline } from "./components/CourtTimeline";
 import { DashboardDisagreement } from "./components/DashboardDisagreement";
 import { DecoyRuledOut } from "./components/DecoyRuledOut";
@@ -19,6 +22,7 @@ import { PortfolioBoard } from "./components/PortfolioBoard";
 import { DefinitionDiff } from "./components/DefinitionDiff";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ImpactPanel } from "./components/ImpactPanel";
+import { LearningScaleProof } from "./components/LearningScaleProof";
 import { MeaningGraph } from "./components/MeaningGraph";
 import { NarrationPanel } from "./components/NarrationPanel";
 import { ProviderBadge } from "./components/ProviderBadge";
@@ -33,6 +37,7 @@ import type {
   DemoScenario,
   HealthStatus,
   ImpactAssessment,
+  LearningScaleProof as LearningScaleProofType,
   ProposalDecisionResult,
   ReconciliationCase,
   RuntimeProfile,
@@ -135,6 +140,7 @@ export default function App() {
   const [court, setCourt] = useState<DeliberationTranscript | null>(null);
   const [courtBusy, setCourtBusy] = useState(false);
   const [courtError, setCourtError] = useState<string | null>(null);
+  const [learningScale, setLearningScale] = useState<LearningScaleProofType | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refusal, setRefusal] = useState<UngovernedTermRefusal | null>(null);
@@ -147,14 +153,20 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([fetchRuntimeState(), fetchHealth(), fetchDemoScenarios()])
-      .then(([runtimeResponse, healthResponse, scenarioResponse]) => {
+    Promise.all([
+      fetchRuntimeState(),
+      fetchHealth(),
+      fetchDemoScenarios(),
+      fetchLearningScaleProof().catch(() => null),
+    ])
+      .then(([runtimeResponse, healthResponse, scenarioResponse, scaleResponse]) => {
         if (!active) {
           return;
         }
         setRuntime(runtimeResponse);
         setHealth(healthResponse);
         setScenarios(scenarioResponse);
+        setLearningScale(scaleResponse);
         setSelectedId((currentId) =>
           scenarioResponse.some((item) => item.scenario_id === currentId)
             ? currentId
@@ -275,13 +287,13 @@ export default function App() {
   }
 
   async function handleConvene() {
-    if (!selectedScenario) {
+    if (!result) {
       return;
     }
     setCourtBusy(true);
     setCourtError(null);
     try {
-      setCourt(await runCourt(selectedScenario.scenario_id));
+      setCourt(await runCourt(result.run_id));
     } catch (requestError) {
       setCourtError(
         requestError instanceof Error
@@ -302,6 +314,8 @@ export default function App() {
     setResult(null);
     setRefusal(null);
     setMergedDecision(null);
+    setCourt(null);
+    setCourtError(null);
     resetWhatIf();
     try {
       const selected = await selectRuntime(scenarioPack, runtimeProfile);
@@ -327,6 +341,8 @@ export default function App() {
   function handleAskAnswer(caseResult: ReconciliationCase) {
     setRefusal(null);
     setMergedDecision(null);
+    setCourt(null);
+    setCourtError(null);
     resetWhatIf();
     setResult(caseResult);
     requestAnimationFrame(() => {
@@ -342,6 +358,8 @@ export default function App() {
     setError(null);
     setRefusal(null);
     setMergedDecision(null);
+    setCourt(null);
+    setCourtError(null);
     resetWhatIf();
     try {
       const outcome = await reconcileTerm(term);
@@ -374,15 +392,14 @@ export default function App() {
     }
   }
 
-  async function handleGovernedRerun(term: string) {
+  async function handleGovernedRerun(runId: string) {
     setBusy(true);
     setError(null);
     resetWhatIf();
+    setCourt(null);
+    setCourtError(null);
     try {
-      const outcome = await reconcileTerm(term);
-      if (isUngovernedRefusal(outcome)) {
-        throw new Error(outcome.reason);
-      }
+      const outcome = await runGovernedRerun(runId);
       setRefusal(null);
       setResult(outcome);
       setMergedDecision(null);
@@ -436,7 +453,7 @@ export default function App() {
         <section className="hero" id="workbench">
           <div className="hero-copy">
             {foundryHosted && (
-              <span className="runtime-label">Runtime: Foundry Agent Service</span>
+              <span className="runtime-label">Selected runtime: Foundry Agent Service</span>
             )}
             <span className="eyebrow">
               <i aria-hidden="true" />
@@ -558,6 +575,7 @@ export default function App() {
                 </span>
               </div>
             </section>
+            <CaseProvenance result={result} />
 
             <MeaningGraph
               result={result}
@@ -566,6 +584,9 @@ export default function App() {
               mergedDecision={mergedDecision}
             />
             <DashboardDisagreement result={result} />
+            {learningMode && learningScale && (
+              <LearningScaleProof proof={learningScale} />
+            )}
             <DefinitionDiff
               result={result}
               whatIf={whatIf}
@@ -608,8 +629,10 @@ export default function App() {
             <section className="surface court-convene">
               <div className="section-heading">
                 <div>
-                  <span className="section-kicker">Multi-agent reasoning</span>
-                  <h2>Convene the Semantic Court</h2>
+                  <span className="section-kicker">
+                    Phase 2 · separate Microsoft Agent Framework workflow
+                  </span>
+                  <h2>Convene the Semantic Court over this frozen run</h2>
                 </div>
                 <button
                   type="button"
@@ -621,9 +644,11 @@ export default function App() {
                 </button>
               </div>
               <p className="court-blurb">
-                Autonomous agents argue, investigate, and cross-examine this case. The verdict
-                stays engine-computed — the agents can be wrong out loud, but the system cannot
-                publish a fabricated result.
+                The evidence workflow is complete. Court agents now argue, investigate, and
+                cross-examine the stored case while the engine-owned verdict remains immutable.
+              </p>
+              <p className="court-guarantee">
+                No SQL rerun. No new verdict. No duplicate proposal.
               </p>
               {courtError && <p className="error-text">{courtError}</p>}
             </section>
@@ -633,11 +658,7 @@ export default function App() {
               <SemanticPullRequest
                 proposal={result.reconciliation_proposal}
                 runId={result.run_id}
-                onRerun={() =>
-                  handleGovernedRerun(
-                    result.resolved_concept?.canonical_name ?? result.request.term,
-                  )
-                }
+                onRerun={() => handleGovernedRerun(result.run_id)}
                 onDecision={(decision) =>
                   setMergedDecision(decision.status === "approved" ? decision : null)
                 }

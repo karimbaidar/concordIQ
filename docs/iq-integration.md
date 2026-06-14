@@ -17,6 +17,30 @@ When the Agent Framework tool receives `provider=auto`, it selects configured
 Fabric IQ first. Foundry IQ is used only when Fabric IQ is unavailable. Explicit
 provider names never fall back silently, and local mode remains the default.
 
+## Challenge-facing learning proof
+
+```mermaid
+flowchart LR
+    ONT["Fabric IQ ontology<br/>CertificationReady concept"] --> GROUND["Verified semantic concept match"]
+    GROUND --> SNAP["Deterministic local scenario<br/>HR / L&D / Managers bindings<br/>120 synthetic learners"]
+    SNAP --> SQL["Exact SQL and entity-set comparison"]
+    SQL --> RESULT["80 / 56 / 56<br/>24 false-ready<br/>$10,800 synthetic voucher risk"]
+
+    REPLAY["Sanitized Fabric replay<br/>No cloud call"] --> GROUND
+    SCALE["Separate Fabric-bound artifact<br/>10,000 learners<br/>522 canonical-ready<br/>4,334 false-ready"] -. "scale proof only" .-> ONT
+```
+
+The live Learning path proves that Fabric IQ matched the governed
+`CertificationReady` ontology concept. The displayed populations are then executed
+against Concord IQ's deterministic local synthetic snapshot. This boundary is
+reported as `fabric_semantic_proof_with_deterministic_snapshot`; it is not described
+as Fabric computing the `80 / 56 / 56` counts.
+
+The reviewed capture is
+`artifacts/replay/sanitized/certification-ready.latest.json`. The separate scale
+summary is `fabric_seed/learning_cli/ciq_certification_ready_summary.json`. The
+`$10,800` workbench impact is never combined with the 4,334-record scale result.
+
 The Foundry adapter calls the Azure AI Search knowledge-base `retrieve` action.
 The default API version is `2026-04-01`, which uses semantic intents and returns
 extractive grounding data. A configured knowledge source must contain Concord
@@ -24,8 +48,9 @@ IQ's synthetic scenario snapshot documents.
 
 The Fabric adapter initializes the ontology MCP endpoint, lists tools, selects
 `search_ontology` or `query_ontology`, and validates the returned snapshot.
-Fabric tool schemas can evolve, so a tenant smoke test is required before this
-adapter can be described as verified.
+The Certification Ready semantic match has been verified against a real tenant and
+preserved as a sanitized replay. Fabric tool schemas can still evolve, so a fresh
+tenant smoke is required before claiming a later deployment remains verified.
 
 The Work IQ adapter calls the Microsoft 365 Copilot Retrieval API and reads its
 `retrievalHits`, and is selected explicitly with `PROVIDER=work_iq` (it is not part of
@@ -123,7 +148,21 @@ FABRIC_IQ_ACCESS_TOKEN=<short-lived-token>
 Secrets are represented as Pydantic secret values and are never included in
 provider status output, replay metadata, or logs.
 
-## Fabric bootstrap
+## Challenge-facing learning artifacts
+
+The Learning package contains:
+
+- a 120-learner fixed-seed workbench scenario used for the `80 / 56 / 56`
+  reconciliation
+- a verified, sanitized Fabric IQ semantic capture for `Certification Ready`
+- a separate 10,000-row Fabric-bound package under `fabric_seed/learning_cli/`
+  and `fabric_seed/learning_delta/`
+- a scale summary reporting 522 canonical-ready and 4,334 false-ready records
+
+The 10,000-row package demonstrates the ontology and data shape at a larger scale.
+It is not silently substituted into the reviewer workbench.
+
+## Fabric bootstrap and capture
 
 Concord IQ has one guarded workflow from deterministic local data to a verified
 cloud replay:
@@ -135,11 +174,11 @@ PROVIDER=fabric_iq ALLOW_CLOUD=true MAX_CLOUD_CALLS=6 make capture
 make replay-check
 ```
 
-`make fabric-bootstrap-dry-run` makes no Microsoft call. It regenerates
-`fabric_seed/` from `LocalProvider`, the fixed synthetic DuckDB seed, and the
-typed replay schema. The package contains all three scenario snapshots, a
-human-readable ontology seed, metric definitions, authority rules, and a
-non-secret bootstrap report.
+`make fabric-bootstrap-dry-run` makes no Microsoft call. It regenerates the
+legacy business/generalization seed from `LocalProvider`, the fixed synthetic
+DuckDB seed, and the typed replay schema. That pack remains useful for regression
+coverage. The challenge-facing Learning seed and verified replay are the artifacts
+listed above.
 
 `make fabric-bootstrap` refuses unless `ALLOW_CLOUD=true`. It reads `.env`, uses
 `FABRIC_IQ_ACCESS_TOKEN` or the current Azure CLI login, and creates or reuses the
@@ -153,17 +192,17 @@ preserves the created resources, records the failure in
 or paste the generated seed artifacts into the tiny lakehouse/ontology setup,
 publish the ontology, and then run capture.
 
-Fabric capture requires six budgeted MCP requests: initialize, initialized
-notification, tool discovery, and one scenario request for Active Customer, Net
-Revenue, and Churned Customer. `make replay-check` validates real-IQ provenance,
+Fabric capture uses a bounded MCP budget for initialization, notification, tool
+discovery, and governed concept requests. `make replay-check` detects whether the
+artifact is the Learning or business pack, then validates real-IQ provenance,
 scenario completeness, ontology and definition evidence, executed evaluations,
-authority rules, and secret hygiene. It then runs the demo with
+authority rules, and secret hygiene. It runs the matching demo with
 `PROVIDER=replay`, `ALLOW_CLOUD=false`, and `MAX_CLOUD_CALLS=0`.
 
 ## Scenario content: why entity types are not enough
 
-A Fabric ontology entity *type* (for example `ActiveCustomer` with `DisplayName`,
-`Description`, `ScenarioId`) is only a schema — it carries no instance values.
+A Fabric ontology entity *type* (for example `CertificationReady`) is only a
+schema; it does not by itself contain the executed learner populations.
 `FabricIQProvider` does not need types; it needs the full scenario **snapshot
 JSON** (`scenario_id`, `term`, `concept`, `bindings`, `evaluations`, `subgraph`,
 `authority_rules`) to be *retrievable* through the MCP. If the ontology exposes
@@ -190,10 +229,10 @@ Fabric IQ is used as the semantic grounding layer. Capture has two modes:
    scenario snapshot JSON, it is used exactly as captured.
 2. **Semantic-proof mode** — in tenants where ontology MCP returns searchable
    ontology concepts but not full scenario JSON, Concord IQ records the real
-   Fabric semantic proof (the MCP matched the governed entity type — `Active
-   Customer` → `ActiveCustomer`, `Net Revenue` → `NetRevenue`, `Churned Customer`
-   → `ChurnedCustomer`) and attaches the deterministic synthetic scenario snapshot
-   from `LocalProvider` for the SQL/evidence used in replay.
+   Fabric semantic proof. For the challenge-facing case, the MCP matched
+   `Certification Ready` to `CertificationReady`; Concord IQ then attaches the
+   deterministic synthetic scenario snapshot from `LocalProvider` for the
+   SQL/evidence used in replay.
 
 `FabricIQProvider` tries full-snapshot extraction first and only falls back to
 semantic proof when a concept is genuinely matched; a connectivity-only response
@@ -220,8 +259,8 @@ It prints `Full snapshot JSON: FOUND`, `Semantic proof: FOUND`, or `No useful
 Fabric content found`, along with the discovered tools, the matched concept, and
 the response shape, and writes a sanitized copy to
 `artifacts/replay/raw/diagnostic.json` (gitignored, no tokens). It never writes
-`sanitized/latest.json`. Run `make capture` only once diagnose reports
-`Valid Concord IQ snapshot JSON: FOUND`.
+the reviewed sanitized artifact. Run `make capture` only after diagnose reports a
+valid full snapshot or a genuine semantic concept match.
 
 ## Foundry Agent Service
 
@@ -246,13 +285,16 @@ The acceptance gate is:
 5. `ReplayProvider` runs the same typed contract from that artifact.
 
 A **verified Fabric IQ semantic-proof capture has been made against a real tenant**
-and the reviewed, secret-free sanitized artifact is committed at
-`artifacts/replay/sanitized/latest.json`. It was produced in semantic-proof mode:
-the Fabric ontology MCP matched the governed entity types (`ActiveCustomer`,
-`NetRevenue`, `ChurnedCustomer`) via `list_ontology_entity_types`, and the
-deterministic LocalProvider snapshot supplies the SQL/evidence. `make replay-check`
-validates it (provenance, matched concepts, evidence, secret hygiene) and the demo
-replays from it with cloud disabled — so judges need no Fabric tenant, token, or
-capacity. Raw responses and `artifacts/replay/raw/diagnostic.json` stay gitignored.
-The claim is precisely "verified Fabric IQ semantic grounding" — not that Fabric
-returned the full scenario snapshot.
+for Certification Ready. The reviewed, secret-free artifact is committed at
+`artifacts/replay/sanitized/certification-ready.latest.json`. The ontology MCP
+matched `Certification Ready` to `CertificationReady` through
+`list_ontology_entity_types` and `search_ontology`; the deterministic
+`LocalProvider` snapshot supplies the executed SQL and evidence.
+
+`make replay-check` validates provenance, the matched concept, evidence, and secret
+hygiene, then replays with cloud disabled so judges need no Fabric tenant, token,
+or capacity. The older business artifact at
+`artifacts/replay/sanitized/latest.json` remains regression/generalization proof.
+Raw responses remain gitignored. The precise claim is **verified Fabric IQ semantic
+grounding with deterministic local snapshot execution**, not that Fabric computed
+the learner counts or returned a complete scenario snapshot.

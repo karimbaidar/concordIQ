@@ -427,7 +427,9 @@ describe("Concord IQ demo", () => {
 
     expect(await screen.findByText("Material conflict confirmed")).toBeInTheDocument();
     expect(screen.getByText("Proposed canonical definition")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Agent trace" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Evidence workflow complete" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("DataExecutionAgent")).toBeInTheDocument();
     expect(screen.getAllByText("3 evidence refs")).toHaveLength(2);
     expect(screen.getByText("Skeptical verifier passed")).toBeInTheDocument();
@@ -526,7 +528,7 @@ describe("Concord IQ demo", () => {
     render(<App />);
 
     expect(
-      await screen.findByText("Runtime: Foundry Agent Service"),
+      await screen.findByText("Selected runtime: Foundry Agent Service"),
     ).toBeInTheDocument();
     expect(screen.getByText("hosted runtime")).toBeInTheDocument();
     expect(screen.getByText("Cloud enabled")).toBeInTheDocument();
@@ -621,7 +623,7 @@ describe("Concord IQ demo", () => {
             registry_scope: "concord_iq",
           });
         }
-        if (url.endsWith("/analyze")) {
+        if (url.endsWith("/runs/00000000-0000-0000-0000-000000000099/governed-rerun")) {
           return mockJson(makeGovernedCase());
         }
         return mockJson(makeCase("active_customer"));
@@ -660,6 +662,9 @@ describe("Concord IQ demo", () => {
       await screen.findByText("Governed canonical v1 in force"),
     ).toBeInTheDocument();
     expect(screen.getByText("Governed: Canonical v1")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Canonical v1 executed cleanly" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Governed meaning and named domain views" }),
     ).toBeInTheDocument();

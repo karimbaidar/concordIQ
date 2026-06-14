@@ -82,7 +82,26 @@ export function DashboardDisagreement({ result }: DashboardDisagreementProps) {
           );
         })}
       </div>
-      {learning && impact && (
+      {learning && impact && governed && (
+        <div className="readiness-summary" aria-label="Certification readiness outcome">
+          <div>
+            <span>Canonical ready</span>
+            <strong>{result.execution_results[0]?.entity_count ?? 0}</strong>
+            <small>Canonical v{governed.version} population</small>
+          </div>
+          <div>
+            <span>False-ready learners</span>
+            <strong>0</strong>
+            <small>Unqualified enterprise views no longer publish</small>
+          </div>
+          <div className="readiness-risk">
+            <span>Exam spend at risk</span>
+            <strong>{formatMetric(impact.arr_delta)}</strong>
+            <small>Governed canonical execution</small>
+          </div>
+        </div>
+      )}
+      {learning && impact && !governed && (
         <div className="readiness-summary" aria-label="Certification readiness outcome">
           <div>
             <span>Claimed ready</span>

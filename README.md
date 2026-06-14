@@ -20,21 +20,23 @@ the deterministic verdict contract.
 Enterprises built a single source of truth for data, but not for meaning. Concord IQ:
 
 - runs ten typed specialist stages through Microsoft Agent Framework;
-- grounds definitions in Fabric IQ live or a verified sanitized capture;
+- grounds Certification Ready through Fabric IQ ontology matching or a verified
+  sanitized replay, while Concord IQ supplies the trusted executable bindings;
 - executes competing definitions as deterministic SQL over fixed-seed synthetic data;
 - compares result sets, not wording, to decide conflict versus consistency;
 - resolves authority from configured governance rules;
 - refuses unsupported or ambiguously owned reconciliations;
 - creates an evidence-backed Semantic PR gated to the configured human owner;
-- convenes the Semantic Court — autonomous agents that argue, investigate, and
-  cross-examine, then replay the whole debate with no cloud.
+- can convene a second Microsoft Agent Framework workflow, the Semantic Court, over
+  the exact frozen run without re-executing SQL or creating another proposal;
+- captures the Court as a digest-sealed transcript that can be verified with no cloud.
 
 An LLM can narrate a result, but it cannot change the verdict, authority decision,
 refusal, evidence, or stored canonical definition.
 
 ## Current Verified State
 
-Verified on **June 13, 2026**:
+Verified through **June 14, 2026**:
 
 | Surface | Status | What actually happens |
 |---|---|---|
@@ -139,6 +141,11 @@ identifies 24 false-ready learners, and reports $10,800 of synthetic exam-vouche
 at risk. The Learning Governance Council is the configured owner, so Concord drafts a
 Semantic PR for human approval.
 
+This visible workbench execution contains **120 synthetic learners**. A separate
+Fabric-bound scale package contains **10,000 synthetic learners**, **522
+canonical-ready records**, and **4,334 false-ready records**. The UI labels that package
+as a scale artifact; it is not the execution that produced 80/56/56, 24, or $10,800.
+
 ### Required Training Complete: wording decoy
 
 Two differently worded definitions execute to the same 80 learners. The deterministic
@@ -151,22 +158,33 @@ reconciliation and promotes nothing.
 
 ## The Semantic Court
 
-Click **Convene the Semantic Court** on any run to watch a panel of autonomous agents
-reason over the case: stewards for HR, Learning & Development, and Managers argue their
-own definition; an investigator runs a plan/execute/replan loop to isolate the contested
-cohort; a skeptic cross-examines only the stewards who claim someone outside the set every
-definition agrees on; an authority agent rules on who, if anyone, may approve a canonical
-definition. The debate is dynamic — its shape comes from the executed data, not a script.
+The workbench presents two explicit phases:
+
+1. **Evidence workflow:** the original ten-stage Microsoft Agent Framework
+   reconciliation executes definitions, verifies evidence, and produces the immutable
+   verdict, authority decision, proposal, or refusal.
+2. **Semantic Court:** clicking **Convene the Semantic Court** starts a separate
+   Microsoft Agent Framework graph over that exact cached, verifier-approved run. It
+   performs no SQL rerun, cloud recall, new verdict, or duplicate proposal.
+
+The Court graph is fixed and auditable; the evidence selects its branches. Consistent
+populations skip cross-examination. Conflicts enter skeptic, steward-response,
+reflection, and authority stages. A targeted, maximum-one-retry replan fires when exact
+identities expose an unresolved comparison, including equal counts with unequal IDs.
+
+In the Certification Ready case, HR narrows its enterprise claim after the 24-person
+false-ready finding, Managers preserve their result as an operational domain view, and
+Learning & Development defends the proposed canonical candidate while deferring
+publication to the Learning Governance Council. Ambiguous authority preserves refusal;
+no steward wins.
 
 The agents argue; the evidence rules. The verdict, authority decision, proposal, and
 refusal stay exactly what the deterministic engine produced — the court only voices and
-pressure-tests them, so the agents can be wrong out loud but the system cannot publish a
-fabricated result. Each turn is labeled by provenance (generated live, replayed, or
-deterministic), and the whole debate is captured as a sanitized, digest-sealed transcript
-that replays with no cloud and no model — the same trust model as the Fabric replay, now
-for the reasoning itself (`make capture-deliberation`, `make court-replay-check`).
-
-[Screenshot placeholder: the Semantic Court debate timeline]
+pressure-tests them. Each turn carries an agent name, typed disposition, exact evidence
+citations, and narration provenance. `CourtAuditAgent` rejects any mismatch with the
+original run. The debate can also be captured as a sanitized, digest-sealed transcript
+and verified without cloud or a model (`make capture-deliberation`,
+`make court-replay-check`).
 
 ### Challenge A agent mapping
 
@@ -261,11 +279,25 @@ make dev-work-iq
 
 ![Concord IQ architecture](docs/assets/architecture.png)
 
-The selected provider supplies governed semantic definitions. Microsoft Agent Framework
-coordinates the typed casefile. Deterministic execution compares population IDs and
-produces evidence. Authority rules and the skeptical verifier gate any proposal.
-Authorized approval promotes a version only inside the Concord IQ registry; it does not
-write back to Fabric IQ, Foundry IQ, or Work IQ.
+Fabric IQ supplies semantic concept grounding and provenance; Concord IQ's trusted
+scenario supplies the executable bindings. The first Microsoft Agent Framework workflow
+coordinates the ten-stage reconciliation over a typed casefile. Deterministic execution
+compares population IDs and produces evidence. A separate Microsoft Agent Framework Court
+may then deliberate over the frozen approved run. Authority rules and the skeptical
+verifier gate any proposal. Authorized approval promotes a version only inside the
+Concord IQ registry; it does not write back to Fabric IQ, Foundry IQ, or Work IQ.
+
+Detailed architecture: [docs/architecture.md](docs/architecture.md).
+
+## Submission Resources
+
+- [Project submission narrative](docs/hackathon-submission.md)
+- [Two-minute recording script](docs/demo-script.md)
+- [Architecture and workflow diagrams](docs/architecture.md)
+- [Microsoft IQ integration boundaries](docs/iq-integration.md)
+- [Reproducible proof index](docs/proofs/README.md)
+- [Submission checklist](SUBMISSION_CHECKLIST.md)
+- [Public GitHub repository](https://github.com/karimbaidar/concordIQ)
 
 ## Verify
 

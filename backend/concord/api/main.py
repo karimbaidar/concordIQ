@@ -39,8 +39,7 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-        if active_settings.runtime_switching or runtime_manager.context.runner is not None:
-            runtime_manager.initialize()
+        runtime_manager.initialize()
         yield
 
     app = FastAPI(

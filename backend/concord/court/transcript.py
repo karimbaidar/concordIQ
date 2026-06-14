@@ -29,6 +29,18 @@ class CourtRole(StrEnum):
     AUTHORITY = "authority"
 
 
+class TurnDisposition(StrEnum):
+    """What happened to a claim during one court turn."""
+
+    ASSERTED = "asserted"
+    CHALLENGED = "challenged"
+    NARROWED = "narrowed"
+    REFRAMED = "reframed"
+    DEFENDED = "defended"
+    CONFIRMED = "confirmed"
+    REFUSED = "refused"
+
+
 class TranscriptMode(StrEnum):
     """How the transcript was produced — never blurred."""
 
@@ -57,6 +69,7 @@ class DeliberationTurn(BaseModel):
     round_no: int
     agent_id: str
     role: CourtRole
+    disposition: TurnDisposition
     speaking_for: str | None = None
     content: str
     tool_calls: tuple[str, ...] = ()
@@ -69,16 +82,22 @@ class DeliberationTranscript(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
+    source_run_id: UUID
     term: str
     concept_id: str
     verdict: Literal["conflict", "consistent", "incomplete"]
     outcome: Literal["proposal", "refusal", "no_action"]
+    authority_status: str
+    authority_owner: str | None
+    source_evidence_ids: tuple[UUID, ...]
     rounds: int
     turns: tuple[DeliberationTurn, ...]
     mode: TranscriptMode
     captured_at: datetime
     content_digest: str
+    framework: str = "Microsoft Agent Framework"
+    workflow_trace: tuple[str, ...] = ()
 
     @property
     def cited_evidence_ids(self) -> tuple[UUID, ...]:
@@ -92,11 +111,16 @@ class DeliberationTranscript(BaseModel):
 
 def content_digest(
     *,
+    source_run_id: UUID,
     term: str,
     concept_id: str,
     verdict: str,
     outcome: str,
+    authority_status: str,
+    authority_owner: str | None,
+    source_evidence_ids: tuple[UUID, ...],
     turns: tuple[DeliberationTurn, ...],
+    workflow_trace: tuple[str, ...] = (),
 ) -> str:
     """Deterministic SHA-256 over the meaning of the debate.
 
@@ -104,16 +128,21 @@ def content_digest(
     replayed) hashes the same content; the words and cited evidence are what bind it.
     """
     payload = {
+        "source_run_id": str(source_run_id),
         "term": term,
         "concept_id": concept_id,
         "verdict": verdict,
         "outcome": outcome,
+        "authority_status": authority_status,
+        "authority_owner": authority_owner,
+        "source_evidence_ids": [str(value) for value in source_evidence_ids],
         "turns": [
             {
                 "turn_no": turn.turn_no,
                 "round_no": turn.round_no,
                 "agent_id": turn.agent_id,
                 "role": turn.role.value,
+                "disposition": turn.disposition.value,
                 "speaking_for": turn.speaking_for,
                 "content": turn.content,
                 "tool_calls": list(turn.tool_calls),
@@ -121,6 +150,7 @@ def content_digest(
             }
             for turn in turns
         ],
+        "workflow_trace": list(workflow_trace),
     }
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

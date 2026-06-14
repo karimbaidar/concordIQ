@@ -2,7 +2,13 @@
 
 import pytest
 from concord.config import ScenarioPack, Settings
-from concord.court import CourtNotReady, CourtRole, SemanticCourt, TranscriptMode
+from concord.court import (
+    CourtNotReady,
+    CourtRole,
+    SemanticCourt,
+    TranscriptMode,
+    TurnDisposition,
+)
 from concord.llm import LLMMode, NarrationRequest, NarrationResult
 from concord.orchestration.casefile import ReconciliationCase, ReconciliationRequest
 from concord.orchestration.runner import ReconciliationRunner
@@ -67,6 +73,10 @@ def test_court_voices_the_conflict_without_changing_it(
     assert (case.verdict, case.reconciliation_proposal, case.refusal_reason) == before
     assert transcript.verdict == "conflict"
     assert transcript.outcome == "proposal"
+    assert transcript.source_run_id == case.run_id
+    assert transcript.framework == "Microsoft Agent Framework"
+    assert transcript.workflow_trace[0] == "CourtCoordinatorAgent"
+    assert transcript.workflow_trace[-1] == "CourtAuditAgent"
     # Every role spoke.
     roles_present = {turn.role for turn in transcript.turns}
     assert roles_present == set(CourtRole)
@@ -79,11 +89,15 @@ def test_court_voices_the_conflict_without_changing_it(
     # The court can only cite evidence that exists in the casefile.
     real_ids = {record.evidence_id for record in case.evidence}
     cited = {eid for turn in transcript.turns for eid in turn.cited_evidence_ids}
-    assert cited and cited <= real_ids
-    # The investigator runs a plan -> execute -> replan loop and quantifies the divergence.
+    assert cited == real_ids
+    assert set(transcript.source_evidence_ids) == real_ids
+    assert transcript.authority_status == case.authority_assessment.status
+    assert transcript.authority_owner == case.authority_assessment.owner
+    # Equal counts with unequal identities trigger the targeted replan branch.
     investigators = [t for t in transcript.turns if t.role is CourtRole.INVESTIGATOR]
     assert len(investigators) == 3
     assert any("24" in turn.content for turn in investigators)
+    assert "InvestigatorReplanAgent" in transcript.workflow_trace
 
 
 def test_court_dismisses_the_decoy(court_runner: ReconciliationRunner) -> None:
@@ -98,7 +112,8 @@ def test_court_dismisses_the_decoy(court_runner: ReconciliationRunner) -> None:
     assert transcript.outcome == "no_action"
     closing = transcript.turns[-1]
     assert closing.role is CourtRole.ORCHESTRATOR
-    assert "no reconciliation" in closing.content.lower()
+    assert "no proposal" in closing.content.lower()
+    assert "InvestigatorReplanAgent" not in transcript.workflow_trace
 
 
 def test_court_records_a_governed_refusal(court_runner: ReconciliationRunner) -> None:
@@ -113,6 +128,7 @@ def test_court_records_a_governed_refusal(court_runner: ReconciliationRunner) ->
     assert transcript.outcome == "refusal"
     authority = next(t for t in transcript.turns if t.role is CourtRole.AUTHORITY)
     assert "refuse" in authority.content.lower()
+    assert authority.disposition is TurnDisposition.REFUSED
 
 
 def test_live_model_is_labeled_live_and_still_cannot_change_the_verdict(
@@ -151,12 +167,7 @@ def _by_round(transcript, role, round_no):
 def test_conflict_drives_a_multi_round_cross_examination(
     court_runner: ReconciliationRunner,
 ) -> None:
-    from concord.court.roles import (
-        ROUND_CHALLENGE,
-        ROUND_INVESTIGATE,
-        ROUND_REFLECT,
-        ROUND_RESPOND,
-    )
+    from concord.court.roles import ROUND_CHALLENGE, ROUND_REFLECT, ROUND_RESPOND
 
     case = _run(
         court_runner,
@@ -165,17 +176,19 @@ def test_conflict_drives_a_multi_round_cross_examination(
     )
     transcript = SemanticCourt().deliberate(case)
 
-    # Three stewards each claim members outside the consensus core, so all three are challenged
-    # and all three respond — the shape emerged from the executed sets, not a script.
     challenges = _by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)
     responses = _by_round(transcript, CourtRole.STEWARD, ROUND_RESPOND)
     reflections = _by_round(transcript, CourtRole.SKEPTIC, ROUND_REFLECT)
-    investigations = _by_round(transcript, CourtRole.INVESTIGATOR, ROUND_INVESTIGATE)
     assert len(challenges) == 3
     assert len(responses) == 3
     assert len(reflections) == 1
-    assert len(investigations) == 3  # plan -> execute -> replan
-    assert all("concede" in turn.content.lower() for turn in responses)
+    dispositions = {turn.speaking_for: turn.disposition for turn in responses}
+    assert dispositions == {
+        "HR": TurnDisposition.NARROWED,
+        "Learning & Development": TurnDisposition.DEFENDED,
+        "Managers": TurnDisposition.REFRAMED,
+    }
+    assert all("concede" not in turn.content.lower() for turn in responses)
     # Turn order is well-formed: rounds never go backwards.
     rounds = [turn.round_no for turn in transcript.turns]
     assert rounds == sorted(rounds)
@@ -198,7 +211,7 @@ def test_decoy_skips_cross_examination(court_runner: ReconciliationRunner) -> No
     skeptic_challenge_round = _by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)
     responses = _by_round(transcript, CourtRole.STEWARD, ROUND_RESPOND)
     assert len(skeptic_challenge_round) == 1
-    assert "nothing to contest" in skeptic_challenge_round[0].content.lower()
+    assert "without a dispute" in skeptic_challenge_round[0].content.lower()
     assert responses == []
     assert transcript.outcome == "no_action"
 
@@ -218,3 +231,6 @@ def test_refusal_still_cross_examines_but_publishes_nothing(
     assert len(_by_round(transcript, CourtRole.SKEPTIC, ROUND_CHALLENGE)) == 2
     assert transcript.outcome == "refusal"
     assert case.reconciliation_proposal is None
+    responses = _by_round(transcript, CourtRole.STEWARD, 6)
+    assert responses
+    assert {turn.disposition for turn in responses} == {TurnDisposition.REFRAMED}
